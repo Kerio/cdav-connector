@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<C:calendar-query xmlns:D="DAV:"
+                  xmlns:C="urn:ietf:params:xml:ns:caldav">
+   <D:prop>
+      <D:getetag/>
+      <C:calendar-data content-type="text/calendar" version="2.0" />
+   </D:prop>
+</C:calendar-query>      
