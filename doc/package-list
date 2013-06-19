@@ -1,0 +1,4 @@
+zswi.protocols.caldav
+zswi.protocols.carddav
+zswi.protocols.communication.core
+zswi.protocols.communication.core.requests
