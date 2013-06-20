@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a:multistatus xmlns:a="DAV:" xmlns:d="http://apple.com/ns/ical/"
+    xmlns:c="http://calendarserver.org/ns/" xmlns:f="urn:ietf:params:xml:ns:caldav"
+    xmlns:e="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" xmlns:b="xml:">
+
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/b6abf4e6-831d-4e84-8129-96b69a9e935f/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Calendar</a:displayname>
+                <f:calendar-description/>
+                <d:calendar-color>#0252D4FF</d:calendar-color>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+</a:multistatus>

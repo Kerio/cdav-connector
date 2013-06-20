@@ -1,0 +1,51 @@
+REPORT https://admin:admin@localhost/contacts/localhost/admin/addressbook/ HTTP/1.1
+HTTP/1.1 207 Multi status
+Connection: Keep-Alive
+Content-Type: text/xml; charset="utf-8"
+Date: Sat, 4 May 2013 11:14:40 GMT
+Keep-Alive: timeout=900, max=99
+Server: Kerio Connect 8.0.1
+Transfer-Encoding: chunked
+X-UA-Compatible: IE=edge
+<?xml version="1.0" encoding="UTF-8"?><multistatus xmlns="DAV:"><response><href>/contacts/localhost/admin/addressbook/5a4c58ad-b6a4-465e-9d76-4914b277f852.vcf</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000100000001</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
+VERSION:3.0
+N:Vesely;Adam;;;
+FN:Adam Vesely
+TEL;TYPE=WORK:789465123
+UID:1f33f250-48c2-4f43-a6e8-62d6a55d3f36
+END:VCARD
+]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-00000007.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000700000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
+VERSION:3.0
+PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
+FN:George Smith
+N:Smith;George;;;
+TEL;TYPE=CELL:73565656
+ORG:Google;
+UID:7a2d97ef-efc8-4f01-9dd8-c0b8efd7f890
+END:VCARD
+]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-00000008.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000800000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
+VERSION:3.0
+PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
+FN:Pepa Zdepa
+N:Zdepa;Pepa;;;
+EMAIL;TYPE=WORK:pepik@traktor.com
+ADR;TYPE=WORK:;;Pod Palbou;;;;
+UID:4e3e210c-beac-4716-a311-dbef0132a1dd
+END:VCARD
+]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-00000009.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000900000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
+VERSION:3.0
+PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
+FN:Hektor Èávéz
+N:Èávéz;Hektor;;;
+URL;TYPE=WORK:www.seznam.cz
+UID:87b794bd-6972-425d-8ffe-79d7b6ebe306
+END:VCARD
+]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-0000000a.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000a00000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
+VERSION:3.0
+PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
+FN:Øehoø Skywalker
+N:Skywalker;Øehoø;;;
+NOTE:Veni vidi vici
+UID:0ab8f96a-f386-43a7-9e1b-4c07ecaade59
+END:VCARD
+]]></address-data></prop></propstat></response></multistatus>

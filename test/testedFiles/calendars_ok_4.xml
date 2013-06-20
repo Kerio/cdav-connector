@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a:multistatus xmlns:a="DAV:" xmlns:d="http://apple.com/ns/ical/"
+    xmlns:c="http://calendarserver.org/ns/" xmlns:f="urn:ietf:params:xml:ns:caldav"
+    xmlns:e="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" xmlns:b="xml:">
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>admin@localhost</a:displayname>
+                <c:getctag>00000000-0000-0000-0000-000000000000-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/b4fe7d2f-73b5-40e6-b4e1-788e0f6a7ac2/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>INBOX</a:displayname>
+                <c:getctag>b4fe7d2f-73b5-40e6-b4e1-788e0f6a7ac2-3:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/6b94e798-f2c3-4008-a640-a4a1aa771d34/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Calendar</a:displayname>
+                <d:calendar-color>#FCA7B1FF</d:calendar-color>
+                <f:calendar-description/>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>6b94e798-f2c3-4008-a640-a4a1aa771d34-227:b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/13bd3ace-2e33-452f-813d-a776fd19c64e/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Contacts</a:displayname>
+                <c:getctag>13bd3ace-2e33-452f-813d-a776fd19c64e-202:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/7a96e206-657b-4bed-9b8d-ec766c08388e/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Ctvrty</a:displayname>
+                <d:calendar-color>#F5BB1EFF</d:calendar-color>
+                <f:calendar-description/>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>7a96e206-657b-4bed-9b8d-ec766c08388e-29:b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/49941e14-ae4f-425a-8d51-525aeec5d6e8/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Deleted Items</a:displayname>
+                <c:getctag>49941e14-ae4f-425a-8d51-525aeec5d6e8-47:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/0be74cc1-6f16-4971-a142-5f03b472c5e8/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Drafts</a:displayname>
+                <c:getctag>0be74cc1-6f16-4971-a142-5f03b472c5e8-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/4e53082f-5979-4c61-ac47-d4f07f1e6e5d/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Druhy</a:displayname>
+                <d:calendar-color>#8CE773FF</d:calendar-color>
+                <f:calendar-description/>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>4e53082f-5979-4c61-ac47-d4f07f1e6e5d-20:b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/58f8715c-77bb-4e8b-bc04-35ce6dc0def7/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Junk E-mail</a:displayname>
+                <c:getctag>58f8715c-77bb-4e8b-bc04-35ce6dc0def7-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/9764872d-619a-40b1-9f64-84c6f02fc28f/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Notes</a:displayname>
+                <c:getctag>9764872d-619a-40b1-9f64-84c6f02fc28f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/1c1d3a4f-d650-4df7-8221-e236acd0bc1b/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Sent Items</a:displayname>
+                <c:getctag>1c1d3a4f-d650-4df7-8221-e236acd0bc1b-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/b6abf4e6-831d-4e84-8129-96b69a9e935f/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Tasks</a:displayname>
+                <d:calendar-color>#0252D4FF</d:calendar-color>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <f:calendar-description/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/cd61835e-383d-4cc6-bae0-87d7e42205ac/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Treti</a:displayname>
+                <d:calendar-color>#DCA0FFFF</d:calendar-color>
+                <f:calendar-description/>
+                <d:calendar-order>1</d:calendar-order>
+                <c:getctag>cd61835e-383d-4cc6-bae0-87d7e42205ac-5:b6abf4e6-831d-4e84-8129-96b69a9e935f-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/00000000-0000-0000-0000-000000000000/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Public Folders</a:displayname>
+                <c:getctag>00000000-0000-0000-0000-000000000000-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+    <a:response>
+        <a:href>/full-calendars/localhost/admin/00000000-0000-0000-0000-000000000000/</a:href>
+        <a:propstat>
+            <a:status>HTTP/1.1 200 OK</a:status>
+            <a:prop>
+                <a:displayname>Archive Folders</a:displayname>
+                <c:getctag>00000000-0000-0000-0000-000000000000-1:</c:getctag>
+            </a:prop>
+        </a:propstat>
+        <a:propstat>
+            <a:status>HTTP/1.1 404 NotFound</a:status>
+            <a:prop>
+                <d:calendar-color/>
+                <f:calendar-description/>
+                <d:calendar-order/>
+            </a:prop>
+        </a:propstat>
+    </a:response>
+</a:multistatus>
