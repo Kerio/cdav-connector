@@ -103,22 +103,30 @@ HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "1
 
 This will create a server connection. For secure communication is used HTTPS. If the server SSL certificate is not already installed in the client TrustStore or is not signed by an certification authority, it is created and saved. To disable this function (i.e. to not create an connection, if the certificate is not trusted), user can call the more advanced constructor:
 	
-	HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456",  433, false);
+```java
+HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456",  433, false);
+```
 
 where the last attribute means **do not create the connection, if the certificate is not trusted already**. The attribute `433` specifies port for the connection. Default for HTTPS and for our library is 443, but with this advanced constructors, user can specify his own.
 Default value for downloading certificates is `true`, so calling 
-	
-	HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456", 433, true);
+
+```java	
+HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456", 433, true);
+```
 
 has the same meaning as:
-	
-	HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
+
+```java
+HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
+```
 
 ### Terminating server connection
 
 For termination of connection user must call the function `shutdown()` on top of instance of that connection, that will get terminated. For example, to terminate the connection used in previous example:
-	
-	connection.shutdown();
+
+```java	
+connection.shutdown();
+```
 
 It's highly recommended to terminate every created connection.
 
@@ -132,66 +140,85 @@ Simple way to create a new `vCard` is making an empty new instance of `VCardImpl
 
 **Example of creating a new vCard with a name John Smith:**
 
-	VCard card = new VCardImpl();
-	card.setFormattedName(new FormattedNameType("John Smith"));
-	card.setName(new NameType("Smith", "John"));
+```java
+VCard card = new VCardImpl();
+card.setFormattedName(new FormattedNameType("John Smith"));
+card.setName(new NameType("Smith", "John"));
+```
 
 Attribute `FormattedName` is required for a valid vCard, but doesn't have to be shown anywhere (for example Kerio Connect is showing only the Name attribute). To this newly created vCard we can assign additional information using setters for attributes or adding attributes to collections using add method. Majority of the attributes uses its own types such as `TelephoneType`, `BirthdayType` and so on. These types often have constructors enabling user to convert from traditional java types. 
 
 **Adding telephone number:**
 
-	card.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.HOME));
+```java
+card.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.HOME));
+```
 
 **Adding birthday:**
 
-	java.util.Calendar birthday = java.util.Calendar.getInstance();
-	birthday.set(java.util.Calendar.YEAR, 2000);
-	birthday.set(java.util.Calendar.MONTH, 1);
-	birthday.set(java.util.Calendar.DAY_OF_MONTH, 1);
-	card.setBirthday(new BirthdayType(birthday));
+```java
+java.util.Calendar birthday = java.util.Calendar.getInstance();
+birthday.set(java.util.Calendar.YEAR, 2000);
+birthday.set(java.util.Calendar.MONTH, 1);
+birthday.set(java.util.Calendar.DAY_OF_MONTH, 1);
+card.setBirthday(new BirthdayType(birthday));
+```
 
 **Adding note:**
 
-	card.addNote(new NoteType("Some note"));
-
+```java
+card.addNote(new NoteType("Some note"));
+```
 
 **Adding email:**
 
-	card.addEmail(new EmailType("email@company.tld"));
+```java
+card.addEmail(new EmailType("email@company.tld"));
+```
 
 **Complex example of creating vCard object:**
 
-	VCard vcard = new VCardImpl();
-	vcard.setFormattedName(new FormattedNameType("John Smith"));
-	vcard.setName(new NameType("Smith", "John"));
-	vcard.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.CELL));
-		
-	java.util.Calendar birthday = java.util.Calendar.getInstance();
-	birthday.set(java.util.Calendar.YEAR, 1950);
-	birthday.set(java.util.Calendar.MONTH, 10);
-	birthday.set(java.util.Calendar.DAY_OF_MONTH, 5);
-	vcard.setBirthday(new BirthdayType(birthday));
-		
-	vcard.addNote(new NoteType("My friend from high school"));
-	vcard.addEmail(new EmailType("example@company.tld"));
+```java
+VCard vcard = new VCardImpl();
+vcard.setFormattedName(new FormattedNameType("John Smith"));
+vcard.setName(new NameType("Smith", "John"));
+vcard.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.CELL));
+
+java.util.Calendar birthday = java.util.Calendar.getInstance();
+birthday.set(java.util.Calendar.YEAR, 1950);
+birthday.set(java.util.Calendar.MONTH, 10);
+birthday.set(java.util.Calendar.DAY_OF_MONTH, 5);
+vcard.setBirthday(new BirthdayType(birthday));
+
+vcard.addNote(new NoteType("My friend from high school"));
+vcard.addEmail(new EmailType("example@company.tld"));
+```
 
 ### Parsing vCard from file
 
 We create object of class VCardEngine:
 
-	VCardEngine vcardEngine= new VcardEngine();
+```java
+VCardEngine vcardEngine= new VcardEngine();
+```
 
 We set compatibility mode of folding scheme
 
-	vcardEngine.setCompatibilityMode(CompatibilityMode.RFC2426);
+```java
+vcardEngine.setCompatibilityMode(CompatibilityMode.RFC2426);
+```
 
 method parse in class `VCardEngine` requires as a parameter object File, which we create from our business card *.vcf file, where `fileName` is location and name of the file:
 
-	File vcardFile = new File(fileName);
+```java
+File vcardFile = new File(fileName);
+```
 
 and finally we create object of VCard:
 
-	VCard parsed = vcardEngine.parse(vcardFile);		
+```java
+VCard parsed = vcardEngine.parse(vcardFile);
+```
 
 If at location specified by fileName is a valid vcf `vCard` file, its returned as `VCard` object. On top of this object user can make the same changes as described in previous vCard examples.
 
@@ -205,44 +232,49 @@ Starting and ending time should be created as instances of `java.util.Calendar` 
 
 **Example of creation starting and ending time for a new event "action", starting 1. 5. 2013 and ending at 2. 5. 2013:**
 
-	java.util.Calendar start = java.util.Calendar.getInstance();
-	start.set(java.util.Calendar.YEAR, 2013);
-	start.set(java.util.Calendar.HOUR_OF_DAY, 15);
-	start.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
-	start.set(java.util.Calendar.DAY_OF_MONTH, 1);
-		
-	java.util.Calendar end = java.util.Calendar.getInstance();
-	end.set(java.util.Calendar.YEAR, 2013);
-	end.set(java.util.Calendar.HOUR_OF_DAY, 15);
-	end.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
-	end.set(java.util.Calendar.DAY_OF_MONTH, 2);
+```java
+java.util.Calendar start = java.util.Calendar.getInstance();
+start.set(java.util.Calendar.YEAR, 2013);
+start.set(java.util.Calendar.HOUR_OF_DAY, 15);
+start.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
+start.set(java.util.Calendar.DAY_OF_MONTH, 1);
+	
+java.util.Calendar end = java.util.Calendar.getInstance();
+end.set(java.util.Calendar.YEAR, 2013);
+end.set(java.util.Calendar.HOUR_OF_DAY, 15);
+end.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
+end.set(java.util.Calendar.DAY_OF_MONTH, 2);
+```
 
 All the attributes user haven't specified (in this case minutes and seconds) are taken from the exact date and the time of creation the `java.util.Calendar` object.
 
 **Now creation of VEvent object:**
 
-	VEvent event = new VEvent(new Date(start.getTime()), new Date(end.getTime()), "action");
+```java
+VEvent event = new VEvent(new Date(start.getTime()), new Date(end.getTime()), "action");
+```
 
 `VEvent` can be constructed from two `Date` objects and a `String` summary. Date objects are constructed from `java.util.Calendar getTime()` method. Date objects represent only dates, not time. If user would want to specify date and time of event start and end, it's required to use `DateTime` class.
 
 **Example of event starting 10.1.2013 14:15 and ending 12.1.2013 10:45:**
 
-	java.util.Calendar start = java.util.Calendar.getInstance();
-	start.set(java.util.Calendar.YEAR, 2013);
-	start.set(java.util.Calendar.HOUR_OF_DAY, 14);
-	start.set(java.util.Calendar.MINUTE, 15);
-	start.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
-	start.set(java.util.Calendar.DAY_OF_MONTH, 10);
-		
-	java.util.Calendar end = java.util.Calendar.getInstance();
-	end.set(java.util.Calendar.YEAR, 2013);
-	end.set(java.util.Calendar.HOUR_OF_DAY, 10);
-	end.set(java.util.Calendar.MINUTE, 45);
-	end.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
-	end.set(java.util.Calendar.DAY_OF_MONTH, 12);
-		
-	VEvent event = new VEvent(new DateTime(start.getTime()), new DateTime(end.getTime()), "action");
-
+```java
+java.util.Calendar start = java.util.Calendar.getInstance();
+start.set(java.util.Calendar.YEAR, 2013);
+start.set(java.util.Calendar.HOUR_OF_DAY, 14);
+start.set(java.util.Calendar.MINUTE, 15);
+start.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
+start.set(java.util.Calendar.DAY_OF_MONTH, 10);
+	
+java.util.Calendar end = java.util.Calendar.getInstance();
+end.set(java.util.Calendar.YEAR, 2013);
+end.set(java.util.Calendar.HOUR_OF_DAY, 10);
+end.set(java.util.Calendar.MINUTE, 45);
+end.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
+end.set(java.util.Calendar.DAY_OF_MONTH, 12);
+	
+VEvent event = new VEvent(new DateTime(start.getTime()), new DateTime(end.getTime()), "action");
+```
 
 **Note:** While making and setting a new `java.util.Calendar` object there can be some problems with timezones or daylight saving time. In some cases (usually with times around midnight) the date can be wrongly interpreted. It's recommended to always set all attributes (hours, minutes and seconds) even when creating only date-based events.
 
@@ -250,8 +282,10 @@ All the attributes user haven't specified (in this case minutes and seconds) are
 
 Additional properties can be added to the event by creating their instances as objects listed in `net.fortuna.ical4j.model.property` package and by using the method `getPoperties().add()`. Example of adding location **Workplace** to the event:
 
-	Location loc = new Location("Workplace");
-	event.getProperties().add(loc);
+```java
+Location loc = new Location("Workplace");
+event.getProperties().add(loc);
+```
 
 ## Uploading a card to the server
 
@@ -259,21 +293,24 @@ For upload a card object to the server is there method `addVCard` on top of `HTT
 
 **Example:**
 
-	connection.addVCard(vcard);
-	connection.addVCard(new File("path/vcard.ext"));
+```java
+connection.addVCard(vcard);
+connection.addVCard(new File("path/vcard.ext"));
+```
 
 **More complex example of uploading vCard of "John Smith" on "mail.company.tld" server under user name "admin" and password "123456":**
 
-	HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");
+```java
+HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");
 
-	VCard vcard = new VCardImpl();
-	vcard.setFormattedName(new FormattedNameType("John Smith"));
-	vcard.setName(new NameType("Smith", "John"));
-	
-	con.addVCard(vcard);
+VCard vcard = new VCardImpl();
+vcard.setFormattedName(new FormattedNameType("John Smith"));
+vcard.setName(new NameType("Smith", "John"));
 
-	con.shutdown();
+con.addVCard(vcard);
 
+con.shutdown();
+```
 
 ## Getting list of Calendars from the server
 
@@ -281,22 +318,25 @@ As opposed to `vCards`, event may be saved under different Calendars. So for sav
 
 **Most important methods for ServerCalendar:**
 
-	c.getDisplayName();
-	c.getColor();
-	c.getDescription();
-	c.getOrder();
+```java
+c.getDisplayName();
+c.getColor();
+c.getDescription();
+c.getOrder();
+```
 
 Everyone of this methods return String with desired information, with the exception of Order, which returns integer value.
 
 **Example of getting all Calendars from the server and printing information about DisplayName and Color to the output:**
 
-	List<ServerCalendar> calendars = con.getCalendars();
-		
-	System.out.println(calendars.size());
-	for(ServerCalendar c: calendars) {
-		System.out.println(c.getDisplayName() + " " + c.getColor());
-	}
-
+```java
+List<ServerCalendar> calendars = con.getCalendars();
+	
+System.out.println(calendars.size());
+for(ServerCalendar c: calendars) {
+	System.out.println(c.getDisplayName() + " " + c.getColor());
+}
+```
 
 ### Uploading an event to the server
 
@@ -304,47 +344,53 @@ Upload of the event to the server is very similar to uploading a card. Calling a
 
 **Example:**
 
-	connection.addVEvent(vevent);
-	connection.addVEvent(new File("path/event"));
+```java
+connection.addVEvent(vevent);
+connection.addVEvent(new File("path/event"));
+```
 
 Opposed to the `vCard`, events can be uploaded on different Calendars. Calling this method without Calendar specification (i.e. example shown top) adds the event to the default Calendar (with name **Calendar**). Upload to different Calendar is done by adding a second parameter to the method `addVEvent`. This second parameter specifies targeted Calendar as `ServerCalendar` object. 
 
 **Example:**
 
-	List<ServerCalendar> calendars = con.getCalendars();
-	
-	// selecting some ServerCalendar, based on Name, Color etc.
-	int selectedIndex = /* some index */;
+```java
+List<ServerCalendar> calendars = con.getCalendars();
 
-	connection.addVEvent(vevent, calendars.get(selectedIndex));
+// selecting some ServerCalendar, based on Name, Color etc.
+int selectedIndex = /* some index */;
+
+connection.addVEvent(vevent, calendars.get(selectedIndex));
+```
 	
 **Complex example of creating and adding the same event to all ServerCalendars:**
 
-	HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");
+```java
+HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");
 
-	java.util.Calendar start = java.util.Calendar.getInstance();
-	start.set(java.util.Calendar.YEAR, 2013);
-	start.set(java.util.Calendar.HOUR_OF_DAY, 14);
-	start.set(java.util.Calendar.MINUTE, 15);
-	start.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
-	start.set(java.util.Calendar.DAY_OF_MONTH, 10);
-		
-	java.util.Calendar end = java.util.Calendar.getInstance();
-	end.set(java.util.Calendar.YEAR, 2013);
-	end.set(java.util.Calendar.HOUR_OF_DAY, 10);
-	end.set(java.util.Calendar.MINUTE, 45);
-	end.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
-	end.set(java.util.Calendar.DAY_OF_MONTH, 12);
-		
-	VEvent event = new VEvent(new Date(start.getTime()), new Date(end.getTime()), "Meeting");
+java.util.Calendar start = java.util.Calendar.getInstance();
+start.set(java.util.Calendar.YEAR, 2013);
+start.set(java.util.Calendar.HOUR_OF_DAY, 14);
+start.set(java.util.Calendar.MINUTE, 15);
+start.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
+start.set(java.util.Calendar.DAY_OF_MONTH, 10);
+	
+java.util.Calendar end = java.util.Calendar.getInstance();
+end.set(java.util.Calendar.YEAR, 2013);
+end.set(java.util.Calendar.HOUR_OF_DAY, 10);
+end.set(java.util.Calendar.MINUTE, 45);
+end.set(java.util.Calendar.MONTH, java.util.Calendar.JANUARY);
+end.set(java.util.Calendar.DAY_OF_MONTH, 12);
+	
+VEvent event = new VEvent(new Date(start.getTime()), new Date(end.getTime()), "Meeting");
 
-	List<ServerCalendar> calendars = con.getCalendars();
+List<ServerCalendar> calendars = con.getCalendars();
 
-	for(ServerCalendar c: calendars) {
-		con.addVEvent(event, c);
-	}
+for(ServerCalendar c: calendars) {
+	con.addVEvent(event, c);
+}
 
-	con.shutdown();
+con.shutdown();
+```
 
 ## Getting cards from the server
 
@@ -352,7 +398,9 @@ Cards downloaded from the server are saved as `ServerVCard` objects. In addition
 
 **Example for getting all cards on server:**
 
-	List<ServerVCard> list = con.getVCards();
+```java
+List<ServerVCard> list = con.getVCards();
+```
 
 ## Update or delete of the card on the server
 
@@ -360,50 +408,58 @@ To update some card on server is designed method `updateVCard`. As a parameter i
 
 **Example of update the first vcard to the name John Smith:**
 
-	List<ServerVCard> list = con.getVCards();
-		
-	list.get(0).getVcard().setName(new NameType("Smith", "John"));
-	con.updateVCard(list.get(0));
+```java
+List<ServerVCard> list = con.getVCards();
+	
+list.get(0).getVcard().setName(new NameType("Smith", "John"));
+con.updateVCard(list.get(0));
+```
 
 **Complex example of adding a phone number to the John Smith card on the server:**
 
-	HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");	
+```java
+HTTPSConnection con = new HTTPSConnection("mail.company.tld", "admin", "123456");	
 
-	List<ServerVCard> list = con.getVCards();
-		
-	ServerVCard card;
-	for(ServerVCard c: cardList) {
-		if(c.getVcard().getName().getFamilyName().equals("Smith") &&
-				c.getVcard().getName().getGivenName().equals("John")) {
-			card = c;
-			break;
-		}
-	}
+List<ServerVCard> list = con.getVCards();
 	
-	card.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.HOME));
+ServerVCard card;
+for(ServerVCard c: cardList) {
+	if(c.getVcard().getName().getFamilyName().equals("Smith") &&
+			c.getVcard().getName().getGivenName().equals("John")) {
+		card = c;
+		break;
+	}
+}
 
-	con.updateVCard(card);
+card.addTelephoneNumber(new TelephoneType("+420 123 456 789", TelephoneParameterType.HOME));
 
-	con.shutdown();
+con.updateVCard(card);
+
+con.shutdown();
+```
 
 To delete the card use method `deleteVCard` instead of `updateVCard` with the same parameter.
 
 **Example of deletion one card:**
 
-	List<ServerVCard> list = con.getVCards();
-		
-	// selection of the right ServerVCard
-	int someIndex = /* some inedex */;
+```java
+List<ServerVCard> list = con.getVCards();
+	
+// selection of the right ServerVCard
+int someIndex = /* some inedex */;
 
-	con.deleteVCard(list.get(someIndex));
+con.deleteVCard(list.get(someIndex));
+```
 
 **Example of deletion of all cards on the server:**
 
-	List<ServerVCard> cardList = con.getVCards();
-		
-	for(ServerVCard c: cardList) {
-		con.deleteVCard(c);
-	}
+```java
+List<ServerVCard> cardList = con.getVCards();
+	
+for(ServerVCard c: cardList) {
+	con.deleteVCard(c);
+}
+```
 
 ## Update or delete of the event on the server
 
@@ -411,41 +467,46 @@ To update some card on server is designed method `updateVEvent`. As a parameter 
 
 **Example of update the first vEvent to the date the 1st of December 2013:**
 
-	List<ServerVEvent> list = con.getVEvents();
+```java
+List<ServerVEvent> list = con.getVEvents();
 
-	java.util.Calendar start = java.util.Calendar.getInstance();
-	start.set(java.util.Calendar.YEAR, 2013);
-	start.set(java.util.Calendar.HOUR_OF_DAY, 15);
-	start.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
-	start.set(java.util.Calendar.DAY_OF_MONTH, 10);
-		
-	list.get(0).getVevent().getStartDate().setDate(new DateTime(start.getTime()));
-		
-	con.updateVEvent(list.get(0));
+java.util.Calendar start = java.util.Calendar.getInstance();
+start.set(java.util.Calendar.YEAR, 2013);
+start.set(java.util.Calendar.HOUR_OF_DAY, 15);
+start.set(java.util.Calendar.MONTH, java.util.Calendar.MAY);
+start.set(java.util.Calendar.DAY_OF_MONTH, 10);
+	
+list.get(0).getVevent().getStartDate().setDate(new DateTime(start.getTime()));
+	
+con.updateVEvent(list.get(0));
+```
 
 To delete the card use method `deleteVEvent` instead of `updateVEvent` with the same parameter.
 
 **Example of deletion one card:**
 
-	List<ServerVEvent> list = con.getVEvents();
-		
-	// selection of the right ServerVEvent
-	int someIndex = /* some index */;
+```java
+List<ServerVEvent> list = con.getVEvents();
+	
+// selection of the right ServerVEvent
+int someIndex = /* some index */;
 
-	con.deleteVEvent(list.get(someIndex));
+con.deleteVEvent(list.get(someIndex));
+```
 
 **Example of deletion of all cards on selected Calendar on the server:**
 
-	List<ServerCalendar> calendars = con.getCalendars();
-		
-	int calIndex = /* someCalendar index */;
-		
-	List<ServerVEvent> list = con.getVEvents(calendars.get(calIndex));
+```java
+List<ServerCalendar> calendars = con.getCalendars();
+	
+int calIndex = /* someCalendar index */;
+	
+List<ServerVEvent> list = con.getVEvents(calendars.get(calIndex));
 
-	for (ServerVEvent ev : list) {
-		con.deleteVEvent(ev);
-	}
-
+for (ServerVEvent ev : list) {
+	con.deleteVEvent(ev);
+}
+```
 
 ## Licenses of third parties
 
