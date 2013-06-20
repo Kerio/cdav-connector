@@ -90,14 +90,16 @@ Copyright 2013 Jan Ambrož, Tomáš Balíček, Tomáš Krásný, Jindřich Pouba
 * Getting list of Calendars from the server
 * Upload of the event to the server
 * Getting cards from the server
-* Update to delete of the card on the server
-* Update to delete of the event on the server
+* Update or delete of the card on the server
+* Update or delete of the event on the server
 
 ## Creating a server connection
 
 For connection to the server, user must provide the application with name or address of the server, user name and password. Connection itself realizes an instance of the `HTTPSConnection` class. Example of basic constructor usage, with server `mail.company.tld`, user name `admin` and password `123456`:
 	
-	HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
+```java
+HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
+```
 
 This will create a server connection. For secure communication is used HTTPS. If the server SSL certificate is not already installed in the client TrustStore or is not signed by an certification authority, it is created and saved. To disable this function (i.e. to not create an connection, if the certificate is not trusted), user can call the more advanced constructor:
 	
