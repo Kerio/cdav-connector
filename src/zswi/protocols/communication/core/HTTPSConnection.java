@@ -98,6 +98,8 @@ public class HTTPSConnection {
 	private boolean installCert;
 	/** keystore password */
 	private String keystorePass;
+	/** domain */
+	private String domain;
 
 	/** default contacts path */
 	private String defaultContactsPath;
@@ -128,6 +130,9 @@ public class HTTPSConnection {
 		this(servername, username, password, DEF_SSL_PORT, true);
 	}
 
+	public HTTPSConnection(String servername, String domain, String username, String password) throws InstallCertException, InitKeystoreException {
+	  this(servername, domain, username, password, DEF_SSL_PORT, true);
+	}
 
 	/**
 		Constructor of https connection.
@@ -137,9 +142,13 @@ public class HTTPSConnection {
 		@param installCert add server ssl certificate to truststore  ('true' mean yes)
 	 */
 	public HTTPSConnection(String servername, String username, String password, int port, boolean installCert) throws InstallCertException, InitKeystoreException{
-		this( servername,  username,  password,  port,  installCert, DEF_KS_PASS);
+		this( servername, null, username,  password,  port,  installCert, DEF_KS_PASS);
 	}
-
+	
+	public HTTPSConnection(String servername, String domain, String username, String password, int port, boolean installCert) throws InstallCertException, InitKeystoreException{
+	  this( servername, domain, username,  password,  port,  installCert, DEF_KS_PASS);
+	}
+	
 	/**
 		Constructor of https connection.
 		@param servername server name
@@ -148,16 +157,21 @@ public class HTTPSConnection {
 		@param installCert add server ssl certificate to truststore  ('true' mean yes)
 		@param keystorePass keystore password
 	 */
-	public HTTPSConnection(String servername, String username, String password, int port, boolean installCert, String keystorePass) throws InstallCertException, InitKeystoreException {
+	public HTTPSConnection(String servername, String domain, String username, String password, int port, boolean installCert, String keystorePass) throws InstallCertException, InitKeystoreException {
 		this.servername = servername;
 		this.username = username;
 		this.password = password;
 		this.installCert = installCert;
 		this.port = port;
 		this.keystorePass = keystorePass;
+		if (domain == null) {
+		  this.domain = servername;
+		} else {
+		  this.domain = domain;
+		}
 
-		this.defaultContactsPath = "/contacts/" + servername + "/" + username + "/addressbook/";
-		this.defaultCalendarPath = "/full-calendars/" + servername + "/" + username + "/Calendar/";
+		this.defaultContactsPath = "/contacts/" + domain + "/" + username + "/addressbook/";
+		this.defaultCalendarPath = "/full-calendars/" + domain + "/" + username + "/Calendar/";
 
 		this.client = new DefaultHttpClient();
 		this.init();
@@ -294,7 +308,7 @@ public class HTTPSConnection {
 		@return list with ServerCalendar objects		
 	 */
 	public List<ServerCalendar> getCalendars() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
-		String response = this.propfind("propfind_calendars.txt", "/full-calendars/"+servername+"/"+username+"/");
+		String response = this.propfind("propfind_calendars.txt", "/full-calendars/"+domain+"/"+username+"/");
 		List<ServerCalendar> calendars = CalendarsGetter.getCalendars(response);
 		return calendars;
 	}
