@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:ical="http://apple.com/ns/ical/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="DAV" schemaLocation="allprop-calendarhomeset-response.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="ical.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:element name="default-alarm-vevent-datetime" type="xs:string"/>
+  <xs:element name="calendar">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-inbox">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-outbox">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="default-alarm-vevent-date" type="xs:string"/>
+  <xs:element name="schedule-calendar-transp">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="ns2:opaque"/>
+        <xs:element ref="ns2:transparent"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="opaque">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="transparent">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-default-calendar-URL" type="ns3:href"/>
+</xs:schema>

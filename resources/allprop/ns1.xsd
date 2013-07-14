@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ical="http://apple.com/ns/ical/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="DAV" schemaLocation="allprop-calendarhomeset-response.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="ical.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:element name="invite">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="dropbox-home">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="free-busy-url">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="notification">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="getctag" type="xs:string"/>
+  <xs:element name="schedule-default-tasks-URL" type="ns3:href"/>
+</xs:schema>

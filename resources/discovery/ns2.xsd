@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV:" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV:" schemaLocation="well-known-response.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:element name="calendar-home-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="calendar-user-address-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="schedule-inbox-URL">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="schedule-outbox-URL">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

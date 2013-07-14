@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ical="http://apple.com/ns/ical/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="DAV" schemaLocation="allprop-calendarhomeset-response.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="ical.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:element name="resource-class" type="xs:NCName"/>
+</xs:schema>
