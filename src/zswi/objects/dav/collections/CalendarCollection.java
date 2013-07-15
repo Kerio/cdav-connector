@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -16,8 +17,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
 
-public class CalendarCollection extends AbstractNotPrincipalCollection {
+public class CalendarCollection extends AbstractNotPrincipalCollection implements ICalDavSupported {
 
   java.net.URI addMember;
   java.net.URI resourceId;
@@ -27,6 +29,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection {
   String scheduleCalendarTransp;
   String calendarColor;
   BigInteger calendarOrder;
+  ArrayList<String> supportedCalendarComponentSet;
   //{caldav}supported-collation-set
 
   public CalendarCollection() {
@@ -135,6 +138,19 @@ public class CalendarCollection extends AbstractNotPrincipalCollection {
 
   protected void setCalendarOrder(BigInteger calendarOrder) {
     this.calendarOrder = calendarOrder;
+  }
+
+  @Override
+  public ArrayList<String> getSupportedCalendarComponentSet() {
+    if (supportedCalendarComponentSet == null) {
+      supportedCalendarComponentSet = new ArrayList<String>();
+    }
+    return supportedCalendarComponentSet;
+  }
+
+  @Override
+  public void setSupportedCalendarComponentSet(ArrayList<String> supportedCalendarComponentSet) {
+    this.supportedCalendarComponentSet = supportedCalendarComponentSet;
   }
 
 }

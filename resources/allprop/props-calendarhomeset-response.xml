@@ -1,0 +1,2618 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inheritable xmlns='http://twistedmatrix.com/xml_namespace/dav/'/>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inheritable xmlns='http://twistedmatrix.com/xml_namespace/dav/'/>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inheritable xmlns='http://twistedmatrix.com/xml_namespace/dav/'/>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inheritable xmlns='http://twistedmatrix.com/xml_namespace/dav/'/>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <creationdate>2013-06-15T08:32:00Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>Pascal Robert</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"af25b8784b4f67028ba833bdc9fd9a1c"</getetag>
+        <getlastmodified>Tue, 09 Jul 2013 20:19:59 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8914_19436</sync-token>
+        <pushkey xmlns='http://calendarserver.org/ns/'>/CalDAV/famillerobert.local/AD04C60B-3704-447B-8997-24F5ACF589C7/</pushkey>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>DirectoryCalendarHomeResource</resource-class>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'>
+          <supported-calendar-component-set>
+            <comp name='VEVENT'/>
+          </supported-calendar-component-set>
+          <supported-calendar-component-set>
+            <comp name='VTODO'/>
+          </supported-calendar-component-set>
+        </supported-calendar-component-sets>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VALARM
+X-WR-ALARMUID:B60C69A2-9E9E-4EB9-81C2-F5121DCD63FB
+UID:B60C69A2-9E9E-4EB9-81C2-F5121DCD63FB
+TRIGGER:-PT15H
+ATTACH;VALUE=URI:Basso
+ACTION:AUDIO
+END:VALARM
+]]></default-alarm-vevent-date>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VALARM
+X-WR-ALARMUID:59A445EC-E653-40C5-9867-6DA452E35E3A
+UID:59A445EC-E653-40C5-9867-6DA452E35E3A
+TRIGGER;VALUE=DATE-TIME:19760401T005545Z
+ACTION:NONE
+END:VALARM
+]]></default-alarm-vevent-datetime>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <resource-id/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <getctag xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/tasks/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <add-member>
+          <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/tasks/;add-member</href>
+        </add-member>
+        <creationdate>2013-06-15T08:32:00Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>tasks</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"52221073ac876f5ca9fa098dffb520a6"</getetag>
+        <getlastmodified>Sat, 15 Jun 2013 08:32:02 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resource-id>
+          <href>urn:uuid:1e02c4a6-8e6b-4bc6-93fa-a8e0bf9b1c26</href>
+        </resource-id>
+        <resourcetype>
+          <collection/>
+          <calendar xmlns='urn:ietf:params:xml:ns:caldav'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8916_19350</sync-token>
+        <calendar-color xmlns='http://apple.com/ns/ical/'>#E6C800FF</calendar-color>
+        <calendar-order xmlns='http://apple.com/ns/ical/'>1</calendar-order>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'>
+          <can-be-shared/>
+        </allowed-sharing-modes>
+        <getctag xmlns='http://calendarserver.org/ns/'>8916_19350</getctag>
+        <max-resources xmlns='http://calendarserver.org/ns/'>10000</max-resources>
+        <pushkey xmlns='http://calendarserver.org/ns/'>/CalDAV/famillerobert.local/AD04C60B-3704-447B-8997-24F5ACF589C7/</pushkey>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>CalendarCollectionResource</resource-class>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Apple Inc.//Mac OS X 10.8.4//EN
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:America/Montreal
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+DTSTART:20070311T020000
+TZNAME:HAE
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+DTSTART:20071104T020000
+TZNAME:HNE
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+]]></calendar-timezone>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'>100</max-attendees-per-instance>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'>3000</max-instances>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'>1048576</max-resource-size>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'>
+          <transparent/>
+        </schedule-calendar-transp>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'>
+          <comp name='VTODO'/>
+        </supported-calendar-component-set>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'>
+          <calendar-data version='2.0' content-type='text/calendar'/>
+        </supported-calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/notification/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>notification</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+          <notification xmlns='http://calendarserver.org/ns/'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8918_19352</sync-token>
+        <getctag xmlns='http://calendarserver.org/ns/'>8918_19352</getctag>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>StoreNotificationCollectionResource</resource-class>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <creationdate/>
+        <getetag/>
+        <getlastmodified/>
+        <resource-id/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <pushkey xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/dropbox/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+          <dropbox-home xmlns='http://calendarserver.org/ns/'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>DropboxCollection</resource-class>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <creationdate/>
+        <displayname/>
+        <getetag/>
+        <getlastmodified/>
+        <resource-id/>
+        <sync-token/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <getctag xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <pushkey xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <add-member>
+          <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar/;add-member</href>
+        </add-member>
+        <creationdate>2013-06-15T08:32:00Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>calendar</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"d69f7a2f25c60d040e2f63581e6c6905"</getetag>
+        <getlastmodified>Fri, 12 Jul 2013 05:28:05 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resource-id>
+          <href>urn:uuid:8f8a6cb2-4800-49ea-88ff-3c44c893e638</href>
+        </resource-id>
+        <resourcetype>
+          <collection/>
+          <calendar xmlns='urn:ietf:params:xml:ns:caldav'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8915_19436</sync-token>
+        <calendar-color xmlns='http://apple.com/ns/ical/'>#0E61B9FF</calendar-color>
+        <calendar-order xmlns='http://apple.com/ns/ical/'>2</calendar-order>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'>
+          <can-be-shared/>
+        </allowed-sharing-modes>
+        <getctag xmlns='http://calendarserver.org/ns/'>8915_19436</getctag>
+        <max-resources xmlns='http://calendarserver.org/ns/'>10000</max-resources>
+        <pushkey xmlns='http://calendarserver.org/ns/'>/CalDAV/famillerobert.local/AD04C60B-3704-447B-8997-24F5ACF589C7/</pushkey>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>CalendarCollectionResource</resource-class>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Apple Inc.//Mac OS X 10.8.4//EN
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:America/Montreal
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+DTSTART:20070311T020000
+TZNAME:HAE
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+DTSTART:20071104T020000
+TZNAME:HNE
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+]]></calendar-timezone>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'>100</max-attendees-per-instance>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'>3000</max-instances>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'>1048576</max-resource-size>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'>
+          <opaque/>
+        </schedule-calendar-transp>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'>
+          <comp name='VEVENT'/>
+        </supported-calendar-component-set>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'>
+          <calendar-data version='2.0' content-type='text/calendar'/>
+        </supported-calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/outbox/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write</href>
+            </principal>
+            <grant>
+              <privilege>
+                <schedule-send xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <protected/>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+          <privilege>
+            <schedule-send xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+        </current-user-privilege-set>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+          <schedule-outbox xmlns='urn:ietf:params:xml:ns:caldav'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule-send xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>schedule privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>old-style schedule privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>ScheduleOutboxResource</resource-class>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'>100</max-attendees-per-instance>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'>3000</max-instances>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'>1048576</max-resource-size>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'>
+          <comp name='VEVENT'/>
+          <comp name='VTODO'/>
+          <comp name='VTIMEZONE'/>
+          <comp name='VFREEBUSY'/>
+        </supported-calendar-component-set>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'>
+          <calendar-data version='2.0' content-type='text/calendar'/>
+        </supported-calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <creationdate/>
+        <displayname/>
+        <getetag/>
+        <getlastmodified/>
+        <resource-id/>
+        <sync-token/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <getctag xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <pushkey xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/freebusy</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <protected/>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+        </current-user-privilege-set>
+        <getcontentlength/>
+        <getcontenttype>text/calendar;charset=utf-8</getcontenttype>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <free-busy-url xmlns='http://calendarserver.org/ns/'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>schedule privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>old-style schedule privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>FreeBusyURLResource</resource-class>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <creationdate/>
+        <displayname/>
+        <getetag/>
+        <getlastmodified/>
+        <resource-id/>
+        <sync-token/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <getctag xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <pushkey xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/inbox/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <authenticated/>
+            </principal>
+            <grant>
+              <privilege>
+                <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+            </grant>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-read/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar-proxy-write/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <read/>
+              </privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <privilege>
+                <write/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <creationdate>2013-06-15T08:32:00Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>inbox</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"171c5c834d4e4521432591b6202b2ba9"</getetag>
+        <getlastmodified>Sun, 23 Jun 2013 15:34:21 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+          <schedule-inbox xmlns='urn:ietf:params:xml:ns:caldav'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule-deliver xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>schedule privileges for current principal</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <schedule xmlns='urn:ietf:params:xml:ns:caldav'/>
+              </privilege>
+              <description xml:lang='en'>old-style schedule privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8917_19435</sync-token>
+        <getctag xmlns='http://calendarserver.org/ns/'>8917_19435</getctag>
+        <max-resources xmlns='http://calendarserver.org/ns/'>10000</max-resources>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>StoreScheduleInboxResource</resource-class>
+        <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'>100</max-attendees-per-instance>
+        <max-instances xmlns='urn:ietf:params:xml:ns:caldav'>3000</max-instances>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'>1048576</max-resource-size>
+        <supported-calendar-component-set xmlns='urn:ietf:params:xml:ns:caldav'>
+          <comp name='VEVENT'/>
+          <comp name='VTODO'/>
+          <comp name='VTIMEZONE'/>
+          <comp name='VFREEBUSY'/>
+        </supported-calendar-component-set>
+        <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'>
+          <calendar-data version='2.0' content-type='text/calendar'/>
+        </supported-calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <resource-id/>
+        <calendar-color xmlns='http://apple.com/ns/ical/'/>
+        <calendar-order xmlns='http://apple.com/ns/ical/'/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <pushkey xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <calendar-timezone xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <schedule-calendar-transp xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <supported-calendar-component-sets xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-date xmlns='urn:ietf:params:xml:ns:caldav'/>
+        <default-alarm-vevent-datetime xmlns='urn:ietf:params:xml:ns:caldav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+</multistatus>

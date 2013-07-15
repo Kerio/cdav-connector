@@ -22,6 +22,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import net.fortuna.ical4j.data.ParserException;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -82,8 +84,9 @@ public class DavStore {
    * @throws URISyntaxException 
    * @throws ClientProtocolException 
    * @throws JAXBException 
+   * @throws ParserException 
    */
-  public DavStore(String username, String password) throws NamingException, ClientProtocolException, URISyntaxException, IOException, JAXBException {
+  public DavStore(String username, String password) throws NamingException, ClientProtocolException, URISyntaxException, IOException, JAXBException, ParserException {
     _supportedFeatures = new ArrayList<DavFeature>();
     _username = username;
     _password = password;
@@ -206,7 +209,7 @@ public class DavStore {
     EntityUtils.consume(response.getEntity());
   }
   
-  protected void fetchPrincipalsCollection() throws URISyntaxException, JAXBException, ClientProtocolException, IOException {
+  protected void fetchPrincipalsCollection() throws URISyntaxException, JAXBException, ClientProtocolException, IOException, ParserException {
     PropfindRequest req = new PropfindRequest(initUri("/"), 0);
     InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 

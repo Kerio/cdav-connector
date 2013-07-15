@@ -1,15 +1,17 @@
 package zswi.objects.dav.collections;
 
+import java.math.BigInteger;
+
 public abstract class AbstractNotPrincipalCollection extends AbstractDavCollection {
 
   /** http://tools.ietf.org/html/rfc4918#section-14.17 */
   PrincipalCollection owner;
   
   /** http://tools.ietf.org/html/rfc4331#section-3 */
-  long quotaAvailableBytes;
+  BigInteger quotaAvailableBytes;
   
   /** http://tools.ietf.org/html/rfc4331#section-4 */
-  long quotaUsedBytes;
+  BigInteger quotaUsedBytes;
   
   /** http://tools.ietf.org/html/rfc6578#section-4 */
   java.net.URI syncToken;
@@ -25,20 +27,20 @@ public abstract class AbstractNotPrincipalCollection extends AbstractDavCollecti
     this.owner = owner;
   }
   
-  public long getQuotaAvailableBytes() {
+  public BigInteger getQuotaAvailableBytes() {
     return quotaAvailableBytes;
   }
   
-  protected void setQuotaAvailableBytes(long quotaAvailableBytes) {
-    this.quotaAvailableBytes = quotaAvailableBytes;
+  protected void setQuotaAvailableBytes(BigInteger bigInteger) {
+    this.quotaAvailableBytes = bigInteger;
   }
   
-  public long getQuotaUsedBytes() {
+  public BigInteger getQuotaUsedBytes() {
     return quotaUsedBytes;
   }
   
-  protected void setQuotaUsedBytes(long quotaUsedBytes) {
-    this.quotaUsedBytes = quotaUsedBytes;
+  protected void setQuotaUsedBytes(BigInteger bigInteger) {
+    this.quotaUsedBytes = bigInteger;
   }
   
   public java.net.URI getSyncToken() {

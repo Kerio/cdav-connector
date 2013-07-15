@@ -2,13 +2,19 @@ package zswi.objects.dav.collections;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VAlarm;
@@ -25,8 +31,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.schemas.dav.allprop.Comp;
 import zswi.schemas.dav.allprop.Resourcetype;
 import zswi.schemas.dav.allprop.ScheduleCalendarTransp;
+import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
+import zswi.schemas.dav.allprop.SupportedReport;
+import zswi.schemas.dav.allprop.SupportedReportSet;
 
 public class CalendarHomeSet extends AbstractHomeSetCollection {
 
@@ -35,12 +45,12 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
   //{cal server}xmpp-uri
   net.fortuna.ical4j.model.component.VAlarm defaultAlarmVeventDate;
   net.fortuna.ical4j.model.component.VAlarm defaultAlarmVeventDatetime;
-  java.util.List supportedCalendarComponentSets;
+  ArrayList<String> supportedCalendarComponentSets;
   java.util.ArrayList<CalendarCollection> calendarCollections;
   
-  public CalendarHomeSet(DefaultHttpClient _httpClient, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException {
+  public CalendarHomeSet(DefaultHttpClient _httpClient, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException, ParserException {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
-    InputStream is = ClassLoader.getSystemResourceAsStream("allprop-calendarhomeset-request.xml");
+    InputStream is = ClassLoader.getSystemResourceAsStream("props-calendarhomeset-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 
@@ -61,13 +71,19 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
           if (response.getHref().equals(uriForRequest.getPath())) {
             
             setOwner(principals);
-            //setQuotaAvailableBytes(quotaAvailableBytes);
-            //setQuotaUsedBytes(quotaUsedBytes);
-            //setSyncToken(uriForRequest);
+            setQuotaAvailableBytes(propstat.getProp().getQuotaAvailableBytes());
+            setQuotaUsedBytes(propstat.getProp().getQuotaUsedBytes());
+            setSyncToken(new java.net.URI(propstat.getProp().getSyncToken()));
             setGetctag(propstat.getProp().getGetctag());
             setDefaultAlarmVeventDate(convertStringToValarm(propstat.getProp().getDefaultAlarmVeventDate()));
             setDefaultAlarmVeventDatetime(convertStringToValarm(propstat.getProp().getDefaultAlarmVeventDatetime()));
-            //setSupportedCalendarComponentSets(supportedCalendarComponentSets);
+            
+            for (SupportedCalendarComponentSet compSet: propstat.getProp().getSupportedCalendarComponentSets().getSupportedCalendarComponentSet()) {
+              for (Comp component: compSet.getComp()) {
+                  getSupportedCalendarComponentSets().add(component.getName());
+              }
+            }
+            
             setDisplayName(propstat.getProp().getDisplayname());
             setUri(response.getHref());
             principals.setCalendarHomeSet(this);
@@ -78,24 +94,40 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
             if (collectionType.getCalendar() != null) {
               CalendarCollection collection = new CalendarCollection();
               collection.setCalendarColor(propstat.getProp().getCalendarColor());
-              collection.setCalendarOrder(propstat.getProp().getCalendarOrder());
+              
+              String calendarOrder = propstat.getProp().getCalendarOrder();
+              if (calendarOrder != null) {
+                 BigInteger order = new BigInteger(calendarOrder);
+                 collection.setCalendarOrder(order);
+              }
+              
               collection.setDisplayName(propstat.getProp().getDisplayname());
               collection.setGetctag(propstat.getProp().getGetctag());
               collection.setOwner(principals);
               collection.setUri(response.getHref());
+              
               ScheduleCalendarTransp transparency = propstat.getProp().getScheduleCalendarTransp();
               if (transparency.getOpaque() != null) {
                 collection.setScheduleCalendarTransp("OPAQUE");                
               } else {
                 collection.setScheduleCalendarTransp("TRANSPARENT");
               }
-              //collection.setQuotaAvailableBytes(quotaAvailableBytes);
-              //collection.setQuotaUsedBytes(quotaUsedBytes);
-              //collection.setSyncToken(uriForRequest);
-              //((CalendarCollection)collection).setCalendarTimezone(null);
-              //((CalendarCollection)collection).setMaxDateTime(creationDate);
-              //((CalendarCollection)collection).setMinDateTime(creationDate);
-              //((CalendarCollection)collection).setResourceId(uriForRequest);
+              
+              collection.setQuotaAvailableBytes(propstat.getProp().getQuotaAvailableBytes());
+              collection.setQuotaUsedBytes(propstat.getProp().getQuotaUsedBytes());
+              collection.setSyncToken(new java.net.URI(propstat.getProp().getSyncToken()));
+              
+              StringReader sin = new StringReader(propstat.getProp().getCalendarTimezone());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarTimeZone = builder.build(sin);
+              collection.setCalendarTimezone(calendarTimeZone);
+              
+              collection.setResourceId(new java.net.URI(propstat.getProp().getResourceId().getHref()));
+              
+              SupportedCalendarComponentSet set = propstat.getProp().getSupportedCalendarComponentSet();
+              for (Comp component: set.getComp()) {
+                collection.getSupportedCalendarComponentSet().add(component.getName());
+              }
               
               getCalendarCollections().add(collection);
             }
@@ -152,11 +184,14 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
     this.defaultAlarmVeventDatetime = defaultAlarmVeventDatetime;
   }
 
-  public java.util.List getSupportedCalendarComponentSets() {
+  public java.util.ArrayList<String> getSupportedCalendarComponentSets() {
+    if (supportedCalendarComponentSets == null) {
+      supportedCalendarComponentSets = new ArrayList<String>();
+    }
     return supportedCalendarComponentSets;
   }
 
-  protected void setSupportedCalendarComponentSets(java.util.List supportedCalendarComponentSets) {
+  protected void setSupportedCalendarComponentSets(java.util.ArrayList<String> supportedCalendarComponentSets) {
     this.supportedCalendarComponentSets = supportedCalendarComponentSets;
   }
 
