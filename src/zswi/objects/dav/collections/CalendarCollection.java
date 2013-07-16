@@ -1,29 +1,9 @@
 package zswi.objects.dav.collections;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.xml.sax.SAXException;
-
-import zswi.protocols.caldav.CalendarsGetter;
-import zswi.protocols.caldav.ServerCalendar;
-import zswi.protocols.communication.core.requests.PropfindRequest;
-import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
 
 public class CalendarCollection extends AbstractNotPrincipalCollection implements ICalDavSupported {
 

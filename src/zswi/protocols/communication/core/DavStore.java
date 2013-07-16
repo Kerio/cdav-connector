@@ -2,6 +2,7 @@ package zswi.protocols.communication.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,7 +25,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -59,6 +64,9 @@ import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.caldav.VEvent_XML_Parser;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
+import zswi.schemas.dav.icalendarobjects.Response;
+import zswi.schemas.dav.userinfo.Multistatus;
+import zswi.schemas.dav.userinfo.Propstat;
 
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
@@ -356,14 +364,31 @@ public class DavStore {
     }
   }
   
-  public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException {
+  public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException, JAXBException {
 
+    ArrayList<ServerVEvent> result = new ArrayList<ServerVEvent>();
+    
     String path = calendar.getUri();
 
     String response = this.report("rep_events.txt", path, 1);
 
-    VEvent_XML_Parser parser = new VEvent_XML_Parser();
-    List<ServerVEvent> result = parser.parseMultiVEvent(response);
+    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
+    Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+    StringReader reader = new StringReader(response);
+    zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
+
+    for (Response xmlResponse: multistatus.getResponse()) {
+      String hrefForObject = xmlResponse.getHref();
+      for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
+        if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+          StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+          CalendarBuilder builder = new CalendarBuilder();
+          Calendar calendarData = builder.build(sin);
+          ServerVEvent calendarObject = new ServerVEvent((VEvent)calendarData.getComponent(Component.VEVENT), propstat.getProp().getGetetag(), hrefForObject);
+          result.add(calendarObject);
+        }
+      }
+    }
 
     return result;
   }
