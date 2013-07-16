@@ -11,13 +11,10 @@
   </xs:element>
   <xs:element name="response">
     <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="ns3:href">
-          <xs:sequence>
-            <xs:element maxOccurs="unbounded" ref="ns3:propstat"/>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
+      <xs:sequence>
+        <xs:element ref="ns3:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns3:propstat"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="propstat">
@@ -30,7 +27,7 @@
   </xs:element>
   <xs:element name="prop">
     <xs:complexType>
-      <xs:sequence>
+      <xs:sequence minOccurs="0">
         <xs:element ref="ns2:calendar-home-set"/>
         <xs:element ref="ns2:calendar-user-address-set"/>
         <xs:element ref="ns3:current-user-principal"/>
@@ -44,6 +41,8 @@
         <xs:element ref="ns2:schedule-inbox-URL"/>
         <xs:element ref="ns2:schedule-outbox-URL"/>
         <xs:element ref="ns3:supported-report-set"/>
+        <xs:element ref="ns1:calendar-proxy-write-for"/>
+        <xs:element ref="ns1:calendar-proxy-read-for"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -114,10 +113,5 @@
     <xs:complexType/>
   </xs:element>
   <xs:element name="status" type="xs:string"/>
-  <xs:complexType name="href">
-    <xs:sequence>
-      <xs:element ref="ns3:href"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="href" type="xs:string"/>
+  <xs:element name="href" type="xs:anyURI"/>
 </xs:schema>

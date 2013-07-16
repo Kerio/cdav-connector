@@ -22,4 +22,18 @@
   <xs:element name="calendarserver-principal-search">
     <xs:complexType/>
   </xs:element>
+  <xs:element name="calendar-proxy-write-for">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="calendar-proxy-read-for">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns3:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

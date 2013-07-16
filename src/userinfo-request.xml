@@ -14,5 +14,7 @@
         <C:schedule-inbox-URL xmlns:C="urn:ietf:params:xml:ns:caldav"/>
         <C:schedule-outbox-URL xmlns:C="urn:ietf:params:xml:ns:caldav"/>    
         <A:supported-report-set/>
+        <D:calendar-proxy-write-for xmlns:D="http://calendarserver.org/ns/"/>
+        <D:calendar-proxy-read-for xmlns:D="http://calendarserver.org/ns/"/>
     </A:prop>
 </A:propfind>

@@ -35,8 +35,6 @@ import zswi.schemas.dav.allprop.Comp;
 import zswi.schemas.dav.allprop.Resourcetype;
 import zswi.schemas.dav.allprop.ScheduleCalendarTransp;
 import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
-import zswi.schemas.dav.allprop.SupportedReport;
-import zswi.schemas.dav.allprop.SupportedReportSet;
 
 public class CalendarHomeSet extends AbstractHomeSetCollection {
 
@@ -92,7 +90,7 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
             
             Resourcetype collectionType = propstat.getProp().getResourcetype();
             if (collectionType.getCalendar() != null) {
-              CalendarCollection collection = new CalendarCollection();
+              CalendarCollection collection = new CalendarCollection(_httpClient);
               collection.setCalendarColor(propstat.getProp().getCalendarColor());
               
               String calendarOrder = propstat.getProp().getCalendarOrder();

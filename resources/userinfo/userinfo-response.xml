@@ -65,8 +65,22 @@
                         </report>
                     </supported-report>
                 </supported-report-set>
+                <calendar-proxy-write-for xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/principals/__uids__/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/18DB66E9-F75D-4C49-9166-679056F078EA/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5/</href>
+                </calendar-proxy-write-for>
+                <calendar-proxy-read-for xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/principals/__uids__/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/9D428284-FDC5-4D44-8348-7135E6D382E8/</href>
+                </calendar-proxy-read-for>
             </prop>
             <status>HTTP/1.1 200 OK</status>
+        </propstat>
+        <propstat>
+            <prop>
+            </prop>
+            <status>HTTP/1.1 404 Not Found</status>
         </propstat>
     </response>
 </multistatus>

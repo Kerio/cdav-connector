@@ -1,14 +1,27 @@
 package zswi.objects.dav.collections;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import zswi.objects.dav.enums.AutoScheduleMode;
 import zswi.objects.dav.enums.RecordType;
+import zswi.protocols.communication.core.DavStore;
+import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.dav.userinfo.Multistatus;
 import zswi.schemas.dav.userinfo.Propstat;
 
@@ -73,21 +86,45 @@ public class PrincipalCollection extends AbstractDavCollection {
   java.util.List<java.net.URI> groupMembership;
   */
   
-  public PrincipalCollection(InputStream content) throws JAXBException, URISyntaxException {
+  public PrincipalCollection(DavStore store, URI uri) throws JAXBException, URISyntaxException, ClientProtocolException, IOException {
+    
+    PropfindRequest req = new PropfindRequest(uri, 0);
+    InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
+
+    StringEntity se = new StringEntity(store.convertStreamToString(is));
+
+    se.setContentType("text/xml");
+    req.setEntity(se);
+
+    HttpResponse resp = store.httpClient().execute(req);
+    
     JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.userinfo");
     Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
 
-    Multistatus multistatus = (Multistatus)userInfounmarshaller.unmarshal(content);
+    Multistatus multistatus = (Multistatus)userInfounmarshaller.unmarshal(resp.getEntity().getContent());
     for (Propstat propstat: multistatus.getResponse().getPropstat()) {
       if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
         displayName = propstat.getProp().getDisplayname();
         calendarHomeSetUrl = new java.net.URI(propstat.getProp().getCalendarHomeSet().getHref());
         setUri(propstat.getProp().getPrincipalURL().getHref());
+        
+        for (String hrefWriteFor: propstat.getProp().getCalendarProxyWriteFor().getHref()) {
+          PrincipalCollection writeForCollection = new PrincipalCollection(store, store.initUri(hrefWriteFor));
+          getCalendarProxyWriteFor().add(writeForCollection);
+        }
+        
+        for (String hrefReadFor: propstat.getProp().getCalendarProxyReadFor().getHref()) {
+          PrincipalCollection readForCollection = new PrincipalCollection(store, store.initUri(hrefReadFor));
+          getCalendarProxyReadFor().add(readForCollection);
+        }
+        
         System.out.println(propstat.getProp().getDropboxHomeURL().getHref());
         System.out.println(propstat.getProp().getEmailAddressSet());
         System.out.println(propstat.getProp().getResourceId().getHref());
       }
     }
+    
+    EntityUtils.consume(resp.getEntity());
   }
   
   public CalendarHomeSet getCalendarHomeSet() {
@@ -139,10 +176,16 @@ public class PrincipalCollection extends AbstractDavCollection {
   }
   
   public java.util.List<PrincipalCollection> getCalendarProxyReadFor() {
+    if (calendarProxyReadFor == null) {
+      calendarProxyReadFor = new ArrayList<PrincipalCollection>();
+    }
     return calendarProxyReadFor;
   }
   
   public java.util.List<PrincipalCollection> getCalendarProxyWriteFor() {
+    if (calendarProxyWriteFor == null) {
+      calendarProxyWriteFor = new ArrayList<PrincipalCollection>();
+    }
     return calendarProxyWriteFor;
   }
   

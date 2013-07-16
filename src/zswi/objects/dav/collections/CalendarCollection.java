@@ -4,18 +4,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.xml.sax.SAXException;
 
+import zswi.protocols.caldav.CalendarsGetter;
+import zswi.protocols.caldav.ServerCalendar;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
 
@@ -31,44 +37,10 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   BigInteger calendarOrder;
   ArrayList<String> supportedCalendarComponentSet;
   //{caldav}supported-collation-set
+  DefaultHttpClient httpClient;
 
-  public CalendarCollection() {
-  }
-
-  public CalendarCollection(DefaultHttpClient _httpClient, URI uri) throws JAXBException, ClientProtocolException, IOException {
-    PropfindRequest req = new PropfindRequest(uri, 1);
-    InputStream is = ClassLoader.getSystemResourceAsStream("allprop-calendarhomeset-request.xml");
-
-    StringEntity se = new StringEntity(convertStreamToString(is));
-
-    se.setContentType("text/xml");
-    req.setEntity(se);
-
-    HttpResponse resp = _httpClient.execute(req);
-
-    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.allprop");
-    Unmarshaller appPropUnmarshaller = jc.createUnmarshaller();
-    zswi.schemas.dav.allprop.Multistatus unmarshalAllProp = (zswi.schemas.dav.allprop.Multistatus)appPropUnmarshaller.unmarshal(resp.getEntity().getContent());
-
-    for (zswi.schemas.dav.allprop.Response response: unmarshalAllProp.getResponse()) {
-      for (zswi.schemas.dav.allprop.Propstat propstat: response.getPropstat()) {
-        if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
-          /*
-          List<?> properties = propstat.getProp().getCreationdateOrCurrentUserPrincipalOrDisplayname();
-          for (Object property: properties) {
-            if (property instanceof zswi.schemas.dav.allprop.Resourcetype) {
-              Calendar calendarType = ((zswi.schemas.dav.allprop.Resourcetype)property).getCalendar();
-              if (calendarType != null) {
-                System.out.println("It's a calendar!");
-              }
-            }
-          }
-           */
-        }
-      }
-    }
-
-    EntityUtils.consume(resp.getEntity());
+  public CalendarCollection(DefaultHttpClient _httpClient) {
+    httpClient = _httpClient;
   }
 
   private String convertStreamToString(java.io.InputStream is) {

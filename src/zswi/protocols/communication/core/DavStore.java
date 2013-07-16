@@ -12,6 +12,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.naming.NamingException;
@@ -21,6 +22,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.fortuna.ical4j.data.ParserException;
 
@@ -45,11 +47,18 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
+import org.xml.sax.SAXException;
 
+import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
+import zswi.protocols.caldav.CalendarsGetter;
+import zswi.protocols.caldav.ServerCalendar;
+import zswi.protocols.caldav.ServerVEvent;
+import zswi.protocols.caldav.VEvent_XML_Parser;
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.protocols.communication.core.requests.ReportRequest;
 
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
@@ -233,19 +242,7 @@ public class DavStore {
 
     EntityUtils.consume(resp.getEntity());
 
-    req = new PropfindRequest(initUri(currentUserPrincipal), 0);
-    is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
-
-    se = new StringEntity(convertStreamToString(is));
-
-    se.setContentType("text/xml");
-    req.setEntity(se);
-
-    resp = httpClient().execute(req);
-    
-    PrincipalCollection principals = new PrincipalCollection(resp.getEntity().getContent());
-    
-    EntityUtils.consume(resp.getEntity());
+    PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal));
 
     CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
     _principalCollection = calHomeSet.getOwner();
@@ -256,7 +253,7 @@ public class DavStore {
     return _principalCollection;
   }
 
-  private URI initUri(String path) throws URISyntaxException {
+  public URI initUri(String path) throws URISyntaxException {
     URIBuilder uriBuilder = new URIBuilder();
     uriBuilder.setScheme(httpScheme()).setHost(_serverName).setPath(path).setPort(_port);
 
@@ -267,7 +264,7 @@ public class DavStore {
     return uriBuilder.build();
   }
 
-  private String convertStreamToString(java.io.InputStream is) {
+  public String convertStreamToString(java.io.InputStream is) {
     java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
     return s.hasNext() ? s.next() : "";
   } 
@@ -276,7 +273,7 @@ public class DavStore {
     return (_isSecure) ? "https" : "http";
   }
 
-  protected DefaultHttpClient httpClient() {
+  public DefaultHttpClient httpClient() {
     if (_httpClient == null) {
 
       _httpClient = new DefaultHttpClient();
@@ -357,6 +354,38 @@ public class DavStore {
     catch (URISyntaxException e) {
       e.printStackTrace();
     }
+  }
+  
+  public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException {
+
+    String path = calendar.getUri();
+
+    String response = this.report("rep_events.txt", path, 1);
+
+    VEvent_XML_Parser parser = new VEvent_XML_Parser();
+    List<ServerVEvent> result = parser.parseMultiVEvent(response);
+
+    return result;
+  }
+  
+  private String report(String filename, String path, int depth) throws ClientProtocolException, IOException, URISyntaxException {
+    ReportRequest req = new ReportRequest(initUri(path), depth);
+
+    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+
+    StringEntity se = new StringEntity(convertStreamToString(is));
+    
+    se.setContentType("text/xml");
+    req.setEntity(se);
+
+    HttpResponse resp = _httpClient.execute(req);
+
+    String response = "";
+    response += EntityUtils.toString(resp.getEntity());
+
+    EntityUtils.consume(resp.getEntity());
+
+    return response;
   }
 
 }
