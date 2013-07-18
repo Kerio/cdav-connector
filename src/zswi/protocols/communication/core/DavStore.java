@@ -23,17 +23,18 @@ import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -52,21 +53,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
-import org.xml.sax.SAXException;
 
 import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
-import zswi.protocols.caldav.CalendarsGetter;
-import zswi.protocols.caldav.ServerCalendar;
 import zswi.protocols.caldav.ServerVEvent;
-import zswi.protocols.caldav.VEvent_XML_Parser;
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.dav.icalendarobjects.Response;
-import zswi.schemas.dav.userinfo.Multistatus;
-import zswi.schemas.dav.userinfo.Propstat;
 
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
@@ -391,6 +387,51 @@ public class DavStore {
     }
 
     return result;
+  }
+  
+  /**
+   * @deprecated You should use addVCalendar instead
+   * @param collection
+   * @param event
+   * @return
+   * @throws URISyntaxException
+   * @throws ClientProtocolException
+   * @throws IOException
+   */
+  public boolean addVEvent(CalendarCollection collection, VEvent event) throws URISyntaxException, ClientProtocolException, IOException {
+    Calendar calendarForEvent = new Calendar();
+    calendarForEvent.getComponents().add(event);
+    
+    return addVCalendar(collection,calendarForEvent);    
+  }
+  
+  /**
+   * TODO It should verify if the component type is accepted for the collection
+   * TODO It should raise only one type of exception
+   * TODO It should check if all components have the same Uid, or else it should be rejected
+   * TODO It should reject the object if the base properties (SUMMARY, DTSTART, etc.) are not present
+   * 
+   * @param collection
+   * @param calendar
+   * @return
+   * @throws URISyntaxException
+   * @throws ClientProtocolException
+   * @throws IOException
+   */
+  public boolean addVCalendar(CalendarCollection collection, Calendar calendar) throws URISyntaxException, ClientProtocolException, IOException {
+    StringEntity se = new StringEntity(calendar.toString());
+    se.setContentType("text/calendar");
+
+    String uid = ((Component)calendar.getComponents().get(0)).getProperty(Property.UID).getValue();
+    PutRequest putReq = new PutRequest(initUri(collection.getUri() + uid + ".ics"));
+    putReq.setEntity(se);
+    HttpResponse resp = httpClient().execute(putReq);
+    EntityUtils.consume(resp.getEntity());
+    if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   private String report(String filename, String path, int depth) throws ClientProtocolException, IOException, URISyntaxException {
