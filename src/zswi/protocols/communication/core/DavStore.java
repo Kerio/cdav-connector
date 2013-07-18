@@ -30,6 +30,7 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -41,7 +42,6 @@ import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -85,6 +85,12 @@ public class DavStore {
   private PrincipalCollection _principalCollection;
 
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
+  
+  static {     
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_OUTLOOK_COMPATIBILITY, true);
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
+  }
 
   /**
    * Connect to a DAV store with credentials. The username must be an email address or a fully qualified http(s) URL, 
