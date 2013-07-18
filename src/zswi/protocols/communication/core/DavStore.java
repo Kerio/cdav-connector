@@ -67,7 +67,7 @@ import zswi.schemas.dav.icalendarobjects.Response;
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
  * 
- * @author probert
+ * @author Pascal Robert
  *
  */
 public class DavStore {
@@ -89,6 +89,8 @@ public class DavStore {
   /**
    * Connect to a DAV store with credentials. The username must be an email address or a fully qualified http(s) URL, 
    * because the domain will be extracted from the email address or from the HTTP(S) URL.
+   * 
+   * TODO should throw only one type of exception
    * 
    * @param username
    * @param password
@@ -125,6 +127,8 @@ public class DavStore {
    * Connect to a DAV store with credentials and a URL. The URL must be the location of 
    * the user's principals (e.g. http://mydomain.com/principals/users/myuser or something
    * similar).
+   *
+   * TODO should throw only one type of exception
    * 
    * @param username
    * @param password
@@ -258,19 +262,11 @@ public class DavStore {
   }
 
   public URI initUri(String path) throws URISyntaxException {
-    URIBuilder uriBuilder = new URIBuilder();
-    uriBuilder.setScheme(httpScheme()).setHost(_serverName).setPath(path).setPort(_port);
-
-    if (_username != null) {
-      uriBuilder.setUserInfo(_username, _password);
-    }
-
-    return uriBuilder.build();
+    return Utilities.initUri(path, httpScheme(), _serverName, _port, _username, _password);
   }
 
   public String convertStreamToString(java.io.InputStream is) {
-    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-    return s.hasNext() ? s.next() : "";
+    return Utilities.convertStreamToString(is);
   } 
 
   protected String httpScheme() {
