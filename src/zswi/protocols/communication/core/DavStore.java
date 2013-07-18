@@ -58,6 +58,7 @@ import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
+import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
@@ -83,7 +84,8 @@ public class DavStore {
   protected ArrayList<DavFeature> _supportedFeatures;
   protected HttpHost _targetHost;
   private PrincipalCollection _principalCollection;
-
+  private String PROPSTAT_OK = "HTTP/1.1 200 OK";
+  
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
   static {     
@@ -249,7 +251,7 @@ public class DavStore {
     Unmarshaller unmarshaller = jc.createUnmarshaller();
     zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
     for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
-      if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+      if (PROPSTAT_OK.equals(propstat.getStatus())) {
         currentUserPrincipal = propstat.getProp().getCurrentUserPrincipal().getHref();        
       }
     }
@@ -362,9 +364,29 @@ public class DavStore {
     }
   }
   
+  /**
+   * @deprecated Use getVCalendars instead
+   * 
+   */
   public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException, JAXBException {
 
     ArrayList<ServerVEvent> result = new ArrayList<ServerVEvent>();
+    List<ServerVCalendar> calendarObjects = getVCalendars(calendar);
+    
+    for (ServerVCalendar vCalendar: calendarObjects) {
+      Object event = vCalendar.getVCalendar().getComponent(Component.VEVENT);
+      if (event != null) {
+        ServerVEvent calendarObject = new ServerVEvent((VEvent)event, vCalendar.geteTag(), vCalendar.getPath());
+        result.add(calendarObject);
+      }
+    }
+    
+    return result;
+  }
+  
+  public List<ServerVCalendar> getVCalendars(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException, JAXBException {
+
+    ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
     
     String path = calendar.getUri();
 
@@ -378,11 +400,11 @@ public class DavStore {
     for (Response xmlResponse: multistatus.getResponse()) {
       String hrefForObject = xmlResponse.getHref();
       for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
-        if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+        if (PROPSTAT_OK.equals(propstat.getStatus())) {
           StringReader sin = new StringReader(propstat.getProp().getCalendarData());
           CalendarBuilder builder = new CalendarBuilder();
           Calendar calendarData = builder.build(sin);
-          ServerVEvent calendarObject = new ServerVEvent((VEvent)calendarData.getComponent(Component.VEVENT), propstat.getProp().getGetetag(), hrefForObject);
+          ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
           result.add(calendarObject);
         }
       }
@@ -390,6 +412,7 @@ public class DavStore {
 
     return result;
   }
+
   
   /**
    * @deprecated You should use addVCalendar instead
