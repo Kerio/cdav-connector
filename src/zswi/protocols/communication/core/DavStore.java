@@ -101,14 +101,9 @@ public class DavStore {
    * 
    * TODO should throw only one type of exception
    * 
-   * @param username
+   * @param username For auto-discovery, the username must contains the domain. You can either pass a email address (me@domain.com) or a HTTP url (https://me@domain.com).
    * @param password
-   * @throws NamingException Throw this exception if we can't find a SRV DNS record to locate the CalDAV server for the user.
-   * @throws IOException 
-   * @throws URISyntaxException 
-   * @throws ClientProtocolException 
-   * @throws JAXBException 
-   * @throws ParserException 
+   * @throws DavStoreException 
    */
   public DavStore(String username, String password) throws DavStoreException {
     _supportedFeatures = new ArrayList<DavFeature>();
@@ -401,7 +396,7 @@ public class DavStore {
    * @deprecated Use getVCalendars instead
    * 
    */
-  public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException, JAXBException {
+  public List<ServerVEvent> getVEvents(CalendarCollection calendar) throws DavStoreException {
 
     ArrayList<ServerVEvent> result = new ArrayList<ServerVEvent>();
     List<ServerVCalendar> calendarObjects = getVCalendars(calendar);
@@ -417,30 +412,41 @@ public class DavStore {
     return result;
   }
   
-  public List<ServerVCalendar> getVCalendars(CalendarCollection calendar) throws ClientProtocolException, IOException, URISyntaxException, ParserException, JAXBException {
-
+  public List<ServerVCalendar> getVCalendars(CalendarCollection calendar) throws DavStoreException {
     ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
     
     String path = calendar.getUri();
 
     String response = this.report("rep_events.txt", path, 1);
 
-    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
-    Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
-    StringReader reader = new StringReader(response);
-    zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
+      Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+      StringReader reader = new StringReader(response);
+      zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
 
-    for (Response xmlResponse: multistatus.getResponse()) {
-      String hrefForObject = xmlResponse.getHref();
-      for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
-        if (PROPSTAT_OK.equals(propstat.getStatus())) {
-          StringReader sin = new StringReader(propstat.getProp().getCalendarData());
-          CalendarBuilder builder = new CalendarBuilder();
-          Calendar calendarData = builder.build(sin);
-          ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
-          result.add(calendarObject);
+      for (Response xmlResponse: multistatus.getResponse()) {
+        String hrefForObject = xmlResponse.getHref();
+        for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
+          if (PROPSTAT_OK.equals(propstat.getStatus())) {
+            StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+            CalendarBuilder builder = new CalendarBuilder();
+            Calendar calendarData = builder.build(sin);
+            ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+            result.add(calendarObject);
+          }
         }
       }
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
     }
 
     return result;
@@ -452,11 +458,9 @@ public class DavStore {
    * @param collection
    * @param event
    * @return
-   * @throws URISyntaxException
-   * @throws ClientProtocolException
-   * @throws IOException
+   * @throws DavStoreException
    */
-  public boolean addVEvent(CalendarCollection collection, VEvent event) throws URISyntaxException, ClientProtocolException, IOException {
+  public boolean addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
     
@@ -472,49 +476,77 @@ public class DavStore {
    * @param collection
    * @param calendar
    * @return
-   * @throws URISyntaxException
-   * @throws ClientProtocolException
-   * @throws IOException
+   * @throws DavStoreException
    */
-  public boolean addVCalendar(CalendarCollection collection, Calendar calendar) throws URISyntaxException, ClientProtocolException, IOException {
-    StringEntity se = new StringEntity(calendar.toString());
-    se.setContentType("text/calendar");
+  public boolean addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException {
+    StringEntity se;
+    try {
+      se = new StringEntity(calendar.toString());
+      se.setContentType("text/calendar");
 
-    String uid = ((Component)calendar.getComponents().get(0)).getProperty(Property.UID).getValue();
-    PutRequest putReq = new PutRequest(initUri(collection.getUri() + uid + ".ics"));
-    putReq.setEntity(se);
-    HttpResponse resp = httpClient().execute(putReq);
-    EntityUtils.consume(resp.getEntity());
-    if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
-      return true;
-    } else {
-      return false;
+      Component calComponent = (Component)calendar.getComponents().get(0);
+      String uid = calComponent.getProperty(Property.UID).getValue();
+      PutRequest putReq = new PutRequest(initUri(collection.getUri() + uid + ".ics"));
+      putReq.setEntity(se);
+      HttpResponse resp = httpClient().execute(putReq);
+      EntityUtils.consume(resp.getEntity());
+      if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
     }
   }
   
-  private String report(String filename, String path, int depth) throws ClientProtocolException, IOException, URISyntaxException {
-    ReportRequest req = new ReportRequest(initUri(path), depth);
-
-    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
-
-    StringEntity se = new StringEntity(convertStreamToString(is));
-    
-    se.setContentType("text/xml");
-    req.setEntity(se);
-
-    HttpResponse resp = _httpClient.execute(req);
-
+  protected String report(String filename, String path, int depth) throws DavStoreException {
+    ReportRequest req;
     String response = "";
-    response += EntityUtils.toString(resp.getEntity());
 
-    EntityUtils.consume(resp.getEntity());
+    try {
+      req = new ReportRequest(initUri(path), depth);
+      InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+
+      StringEntity se = new StringEntity(convertStreamToString(is));
+
+      se.setContentType("text/xml");
+      req.setEntity(se);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      response += EntityUtils.toString(resp.getEntity());
+
+      EntityUtils.consume(resp.getEntity());
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
 
     return response;
   }
   
   public class DavStoreException extends Exception {
+    
     public DavStoreException(String reason) {
       super(reason);
+    }
+    
+    public DavStoreException(Throwable throwable) {
+      super(throwable);
     }
   }
 
