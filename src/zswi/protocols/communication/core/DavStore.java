@@ -3,6 +3,7 @@ package zswi.protocols.communication.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -109,13 +110,17 @@ public class DavStore {
    * @throws JAXBException 
    * @throws ParserException 
    */
-  public DavStore(String username, String password) throws NamingException, ClientProtocolException, URISyntaxException, IOException, JAXBException, ParserException {
+  public DavStore(String username, String password) throws DavStoreException {
     _supportedFeatures = new ArrayList<DavFeature>();
     _username = username;
     _password = password;
     _isSecure = false;
     extractUserDetails(username);
-    checkSrvRecords();
+    try {
+      checkSrvRecords();
+    } catch (NamingException namingEx) {
+      throw new DavStoreException("Couldn't find SRV records for the host " + _serverName);
+    }
     try {
       checkTxtRecords();
     } catch (NamingException namingEx) {
@@ -149,13 +154,7 @@ public class DavStore {
     try {
       checkWellKnownUrl();
     }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
+    catch (DavStoreException e) {
       e.printStackTrace();
     }
     fetchFeatures();
@@ -207,62 +206,96 @@ public class DavStore {
     _path = results.get("path");
   }
 
-  protected void checkWellKnownUrl() throws URISyntaxException, ClientProtocolException, IOException {
+  protected void checkWellKnownUrl() throws DavStoreException {
     httpClient().setRedirectStrategy(new NotRedirectStrategy());
 
-    PropfindRequest req = new PropfindRequest(new URL(httpScheme(), _serverName, _port, "/.well-known/caldav").toURI(), 0);
-    InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
+    PropfindRequest req;
+    try {
+      URL urlForRequest = new URL(httpScheme(), _serverName, _port, "/.well-known/caldav");
+      req = new PropfindRequest(urlForRequest.toURI(), 0);
+      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
-    StringEntity se = new StringEntity(convertStreamToString(is));
+      StringEntity se = new StringEntity(convertStreamToString(is));
 
-    se.setContentType("text/xml");
-    req.setEntity(se);
+      se.setContentType("text/xml");
+      req.setEntity(se);
 
-    HttpResponse response = httpClient().execute(req);
-    int status = response.getStatusLine().getStatusCode();
-    if (status >= 300 && status < 400) {
-      Header[] location = response.getHeaders("Location");
-      String urlFromHeader = location[0].getValue();
-      URL rootUrl = new URL(urlFromHeader);
-      _path = rootUrl.getPath();
-      _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
-      _serverName = rootUrl.getHost();
-    } else {
-      throw new IOException("No redirection found");
+      HttpResponse response = httpClient().execute(req);
+      int status = response.getStatusLine().getStatusCode();
+      if (status >= 300 && status < 400) {
+        Header[] location = response.getHeaders("Location");
+        String urlFromHeader = location[0].getValue();
+        URL rootUrl = new URL(urlFromHeader);
+        _path = rootUrl.getPath();
+        _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
+        _serverName = rootUrl.getHost();
+      } else {
+        throw new IOException("No redirection found");
+      }
+
+      EntityUtils.consume(response.getEntity());
     }
-
-    EntityUtils.consume(response.getEntity());
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + httpScheme() + _serverName +  _port + "/.well-known/caldav");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
   }
   
-  protected void fetchPrincipalsCollection() throws URISyntaxException, JAXBException, ClientProtocolException, IOException, ParserException {
-    PropfindRequest req = new PropfindRequest(initUri("/"), 0);
-    InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
+  protected void fetchPrincipalsCollection() throws DavStoreException {
+    PropfindRequest req;
+    try {
+      URI urlForRequest = initUri("/");
+      req = new PropfindRequest(urlForRequest, 0);
+      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
-    StringEntity se = new StringEntity(convertStreamToString(is));
+      StringEntity se = new StringEntity(convertStreamToString(is));
 
-    se.setContentType("text/xml");
-    req.setEntity(se);
+      se.setContentType("text/xml");
+      req.setEntity(se);
 
-    HttpResponse resp = httpClient().execute(req);
+      HttpResponse resp = httpClient().execute(req);
 
-    String currentUserPrincipal = null;
-    
-    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.discovery");
-    Unmarshaller unmarshaller = jc.createUnmarshaller();
-    zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
-    for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
-      if (PROPSTAT_OK.equals(propstat.getStatus())) {
-        currentUserPrincipal = propstat.getProp().getCurrentUserPrincipal().getHref();        
+      String currentUserPrincipal = null;
+
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.discovery");
+      Unmarshaller unmarshaller = jc.createUnmarshaller();
+      zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
+      for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
+        if (PROPSTAT_OK.equals(propstat.getStatus())) {
+          currentUserPrincipal = propstat.getProp().getCurrentUserPrincipal().getHref();        
+        }
       }
+
+      EntityUtils.consume(resp.getEntity());
+
+      PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal));
+
+      CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+      _principalCollection = calHomeSet.getOwner();
     }
-
-    EntityUtils.consume(resp.getEntity());
-
-    PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal));
-
-    CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
-    _principalCollection = calHomeSet.getOwner();
-    
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getReason());
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ClientProtocolException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
+    }
   }
   
   public PrincipalCollection principalCollection() {
@@ -477,6 +510,12 @@ public class DavStore {
     EntityUtils.consume(resp.getEntity());
 
     return response;
+  }
+  
+  public class DavStoreException extends Exception {
+    public DavStoreException(String reason) {
+      super(reason);
+    }
   }
 
 }
