@@ -62,12 +62,12 @@ import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
-import zswi.protocols.caldav.VEvent_XML_Parser;
 import zswi.protocols.communication.core.requests.DeleteRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
+import zswi.schemas.dav.discovery.Href;
 import zswi.schemas.dav.icalendarobjects.Response;
 
 /**
@@ -130,7 +130,7 @@ public class DavStore {
     _httpClient = null;
     
     fetchFeatures();
-    fetchPrincipalsCollection();
+    fetchPrincipalsCollection("/");
   }
 
   /**
@@ -141,8 +141,9 @@ public class DavStore {
    * @param username
    * @param password
    * @param url
+   * @throws DavStoreException 
    */
-  public DavStore(String username, String password, String url) {
+  public DavStore(String username, String password, String url) throws DavStoreException {
     _username = username;
     _password = password;
     extractUserDetails(url);
@@ -151,8 +152,12 @@ public class DavStore {
     }
     catch (DavStoreException e) {
       e.printStackTrace();
+    } finally {
+      _httpClient.getConnectionManager().shutdown();
+      _httpClient = null;
     }
     fetchFeatures();
+    fetchPrincipalsCollection(_path);
   }
 
   protected void extractUserDetails(String urlAsString) {
@@ -247,10 +252,10 @@ public class DavStore {
     }
   }
   
-  protected void fetchPrincipalsCollection() throws DavStoreException {
+  protected void fetchPrincipalsCollection(String path) throws DavStoreException {
     PropfindRequest req;
     try {
-      URI urlForRequest = initUri("/");
+      URI urlForRequest = initUri(path);
       req = new PropfindRequest(urlForRequest, 0);
       InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
@@ -268,34 +273,45 @@ public class DavStore {
       zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
       for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
         if (PROPSTAT_OK.equals(propstat.getStatus())) {
-          currentUserPrincipal = propstat.getProp().getCurrentUserPrincipal().getHref();        
+          Href hrefUserPrincipal = propstat.getProp().getCurrentUserPrincipal();
+          if (hrefUserPrincipal != null)
+            currentUserPrincipal = hrefUserPrincipal.getHref();
         }
       }
 
       EntityUtils.consume(resp.getEntity());
 
-      PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal));
-
-      CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
-      _principalCollection = calHomeSet.getOwner();
+      /*
+       *  Old and/or bad implementations like CommuniGate Pro 5.3.x don't have principals, so it's probably directly the calendar-home-set directly. 
+       *  We will fake principals in those cases.
+       */
+      if (currentUserPrincipal == null) {
+        PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true);
+        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));        
+        _principalCollection = calHomeSet.getOwner();
+      } else {
+        PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false);
+        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+        _principalCollection = calHomeSet.getOwner();
+      }      
     }
     catch (URISyntaxException e) {
-      throw new DavStoreException(e.getReason());
+      throw new DavStoreException(e);
     }
     catch (UnsupportedEncodingException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (ClientProtocolException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (IOException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (JAXBException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (ParserException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
   }
   
@@ -501,6 +517,7 @@ public class DavStore {
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
         Header[] headers = resp.getHeaders("Etag");
         ServerVCalendar vcalendar = new ServerVCalendar(calendar, headers[0].getValue(), urlForRequest.getPath());
+        // TODO should check if the Location header is present, if yes, should update the path with that value
         return vcalendar;
       } else {
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());

@@ -102,8 +102,7 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
             
           } else {
             
-            Resourcetype collectionType = propstat.getProp().getResourcetype();
-            if (collectionType.getCalendar() != null) {
+            if (isCalendarCollection(propstat.getProp())) {
               CalendarCollection collection = new CalendarCollection(_httpClient);
               collection.setCalendarColor(propstat.getProp().getCalendarColor());
               
@@ -135,9 +134,19 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
               String calendarTime = propstat.getProp().getCalendarTimezone();
               if ((calendarTime != null) && (calendarTime.length() > 0)) {
                 StringReader sin = new StringReader(calendarTime);
-                CalendarBuilder builder = new CalendarBuilder();
-                Calendar calendarTimeZone = builder.build(sin);
-                collection.setCalendarTimezone(calendarTimeZone);
+                try {
+                  CalendarBuilder builder = new CalendarBuilder();
+                  Calendar calendarTimeZone = builder.build(sin);
+                  collection.setCalendarTimezone(calendarTimeZone);
+                } catch (net.fortuna.ical4j.data.ParserException e) {
+                  /*
+                   *  TODO implement logging
+                   *  TODO if it's a VTIMEZONE root component, parse it and create a VCALENDAR object around it
+                   *  The RFC (http://tools.ietf.org/html/rfc4791#section-5.2.2) says that the timezone should be 
+                   *  a VCALENDAR component that includes a VTIMEZONE component, but some CalDAV servers (I'm looking 
+                   *  at you CommuniGate Pro!) stores a standalone VTIMEZONE component instead.
+                   */
+                }
               }
               
               ResourceId resourceId = propstat.getProp().getResourceId();
@@ -157,6 +166,15 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
     }
     
     EntityUtils.consume(resp.getEntity());
+  }
+  
+  protected boolean isCalendarCollection(zswi.schemas.dav.allprop.Prop properties) {
+    Resourcetype collectionType = properties.getResourcetype();
+
+    if (collectionType.getCalendar() != null)
+      return true;
+              
+    return false;
   }
   
   public VAlarm convertStringToValarm(String alarm) {

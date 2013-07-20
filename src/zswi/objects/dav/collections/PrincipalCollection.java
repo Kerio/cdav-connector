@@ -2,7 +2,6 @@ package zswi.objects.dav.collections;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,15 +12,15 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import zswi.objects.dav.enums.AutoScheduleMode;
 import zswi.objects.dav.enums.RecordType;
 import zswi.protocols.communication.core.DavStore;
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.schemas.dav.userinfo.CalendarProxyReadFor;
+import zswi.schemas.dav.userinfo.CalendarProxyWriteFor;
 import zswi.schemas.dav.userinfo.Multistatus;
 import zswi.schemas.dav.userinfo.Propstat;
 
@@ -86,7 +85,7 @@ public class PrincipalCollection extends AbstractDavCollection {
   java.util.List<java.net.URI> groupMembership;
   */
   
-  public PrincipalCollection(DavStore store, URI uri) throws JAXBException, URISyntaxException, ClientProtocolException, IOException {
+  public PrincipalCollection(DavStore store, URI uri, boolean isFakePrincipals) throws JAXBException, URISyntaxException, ClientProtocolException, IOException {
     
     PropfindRequest req = new PropfindRequest(uri, 0);
     InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
@@ -106,16 +105,27 @@ public class PrincipalCollection extends AbstractDavCollection {
       if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
         displayName = propstat.getProp().getDisplayname();
         calendarHomeSetUrl = new java.net.URI(propstat.getProp().getCalendarHomeSet().getHref());
-        setUri(propstat.getProp().getPrincipalURL().getHref());
-        
-        for (String hrefWriteFor: propstat.getProp().getCalendarProxyWriteFor().getHref()) {
-          PrincipalCollection writeForCollection = new PrincipalCollection(store, store.initUri(hrefWriteFor));
-          getCalendarProxyWriteFor().add(writeForCollection);
-        }
-        
-        for (String hrefReadFor: propstat.getProp().getCalendarProxyReadFor().getHref()) {
-          PrincipalCollection readForCollection = new PrincipalCollection(store, store.initUri(hrefReadFor));
-          getCalendarProxyReadFor().add(readForCollection);
+
+        if (isFakePrincipals) {
+          setUri(uri.getPath());
+        } else {
+          setUri(propstat.getProp().getPrincipalURL().getHref());
+
+          CalendarProxyWriteFor writeProxy = propstat.getProp().getCalendarProxyWriteFor();
+          if (writeProxy != null) {
+            for (String hrefWriteFor: writeProxy.getHref()) {
+              PrincipalCollection writeForCollection = new PrincipalCollection(store, store.initUri(hrefWriteFor), isFakePrincipals);
+              getCalendarProxyWriteFor().add(writeForCollection);
+            }
+          }
+
+          CalendarProxyReadFor readProxy = propstat.getProp().getCalendarProxyReadFor();
+          if (readProxy != null) {
+            for (String hrefReadFor: readProxy.getHref()) {
+              PrincipalCollection readForCollection = new PrincipalCollection(store, store.initUri(hrefReadFor), isFakePrincipals);
+              getCalendarProxyReadFor().add(readForCollection);
+            }
+          }
         }
         
         //System.out.println(propstat.getProp().getDropboxHomeURL().getHref());
