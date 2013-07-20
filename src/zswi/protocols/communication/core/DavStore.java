@@ -34,6 +34,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -61,9 +62,12 @@ import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
+import zswi.protocols.caldav.VEvent_XML_Parser;
+import zswi.protocols.communication.core.requests.DeleteRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
+import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.dav.icalendarobjects.Response;
 
 /**
@@ -85,7 +89,7 @@ public class DavStore {
   protected ArrayList<DavFeature> _supportedFeatures;
   protected HttpHost _targetHost;
   private PrincipalCollection _principalCollection;
-  private String PROPSTAT_OK = "HTTP/1.1 200 OK";
+  public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
@@ -98,8 +102,6 @@ public class DavStore {
   /**
    * Connect to a DAV store with credentials. The username must be an email address or a fully qualified http(s) URL, 
    * because the domain will be extracted from the email address or from the HTTP(S) URL.
-   * 
-   * TODO should throw only one type of exception
    * 
    * @param username For auto-discovery, the username must contains the domain. You can either pass a email address (me@domain.com) or a HTTP url (https://me@domain.com).
    * @param password
@@ -135,8 +137,6 @@ public class DavStore {
    * Connect to a DAV store with credentials and a URL. The URL must be the location of 
    * the user's principals (e.g. http://mydomain.com/principals/users/myuser or something
    * similar).
-   *
-   * TODO should throw only one type of exception
    * 
    * @param username
    * @param password
@@ -220,7 +220,13 @@ public class DavStore {
       if (status >= 300 && status < 400) {
         Header[] location = response.getHeaders("Location");
         String urlFromHeader = location[0].getValue();
-        URL rootUrl = new URL(urlFromHeader);
+        URL rootUrl;
+        // Kerio returns a relative URL
+        try {
+          rootUrl = new URL(urlFromHeader);
+        } catch (MalformedURLException e) {
+          rootUrl = initUri(urlFromHeader).toURL();
+        }
         _path = rootUrl.getPath();
         _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
         _serverName = rootUrl.getHost();
@@ -460,11 +466,12 @@ public class DavStore {
    * @return
    * @throws DavStoreException
    */
-  public boolean addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException {
+  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
     
-    return addVCalendar(collection,calendarForEvent);    
+    ServerVCalendar vCalendar = addVCalendar(collection,calendarForEvent);
+    return new ServerVEvent(event, vCalendar.geteTag(), vCalendar.getPath());
   }
   
   /**
@@ -478,7 +485,7 @@ public class DavStore {
    * @return
    * @throws DavStoreException
    */
-  public boolean addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException {
+  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
@@ -486,14 +493,17 @@ public class DavStore {
 
       Component calComponent = (Component)calendar.getComponents().get(0);
       String uid = calComponent.getProperty(Property.UID).getValue();
-      PutRequest putReq = new PutRequest(initUri(collection.getUri() + uid + ".ics"));
+      URI urlForRequest = initUri(collection.getUri() + uid + ".ics");
+      PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
       HttpResponse resp = httpClient().execute(putReq);
       EntityUtils.consume(resp.getEntity());
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
-        return true;
+        Header[] headers = resp.getHeaders("Etag");
+        ServerVCalendar vcalendar = new ServerVCalendar(calendar, headers[0].getValue(), urlForRequest.getPath());
+        return vcalendar;
       } else {
-        return false;
+        throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
       }
     }
     catch (UnsupportedEncodingException e) {
@@ -505,6 +515,84 @@ public class DavStore {
     catch (IOException e) {
       throw new DavStoreException(e.getMessage());
     }
+  }
+  
+  /**
+   * @deprecated Use updateVCalendar instead
+   * @param event
+   * @return
+   * @throws DavStoreException
+   */
+  public boolean updateVEvent(ServerVEvent event) throws DavStoreException {
+    // vEvent must be enclosed in Calendar, otherwise is not added
+    Calendar calendarForEvent = new Calendar();
+    calendarForEvent.getComponents().add(event.getVevent());
+
+    StringEntity se = null;
+    try {
+      se = new StringEntity(calendarForEvent.toString());
+      se.setContentType("text/calendar");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+
+    return this.updateVCard(se, event.geteTag(), event.getPath());
+  }
+  
+  public boolean updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
+    // vEvent must be enclosed in Calendar, otherwise is not added
+    StringEntity se = null;
+    try {
+      se = new StringEntity(calendar.getVCalendar().toString());
+      se.setContentType("text/calendar");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+
+    return this.updateVCard(se, calendar.geteTag(), calendar.getPath());
+  }
+  
+  protected boolean updateVCard(HttpEntity entity, String etag, String path) throws DavStoreException {
+    UpdateRequest updateReq;
+    try {
+      updateReq = new UpdateRequest(initUri(path), etag);
+      updateReq.setEntity(entity);
+      HttpResponse resp = httpClient().execute(updateReq);
+
+      EntityUtils.consume(resp.getEntity());
+      if(resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) return true;
+      else return false;
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ClientProtocolException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+  }
+  
+  /**
+   * @deprecated Use deleteVCalendar instead
+   */
+  public boolean deleteVEvent(ServerVEvent event) throws ClientProtocolException, URISyntaxException, IOException {
+    return this.delete(event.getPath(), event.geteTag());
+  }
+  
+  public boolean deleteVCalendar(ServerVCalendar calendar) throws ClientProtocolException, URISyntaxException, IOException {
+    return this.delete(calendar.getPath(), calendar.geteTag());
+  }
+  
+  protected boolean delete(String path, String etag) throws URISyntaxException, ClientProtocolException, IOException{
+    DeleteRequest del = new DeleteRequest(initUri(path), etag);
+    HttpResponse resp = httpClient().execute(del);
+    EntityUtils.consume(resp.getEntity());
+    if(resp.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) return true;
+    else return false;
   }
   
   protected String report(String filename, String path, int depth) throws DavStoreException {

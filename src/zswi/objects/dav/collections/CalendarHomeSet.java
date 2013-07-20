@@ -32,9 +32,11 @@ import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.dav.allprop.Comp;
+import zswi.schemas.dav.allprop.ResourceId;
 import zswi.schemas.dav.allprop.Resourcetype;
 import zswi.schemas.dav.allprop.ScheduleCalendarTransp;
 import zswi.schemas.dav.allprop.SupportedCalendarComponentSet;
+import zswi.schemas.dav.allprop.SupportedCalendarComponentSets;
 
 public class CalendarHomeSet extends AbstractHomeSetCollection {
 
@@ -71,14 +73,26 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
             setOwner(principals);
             setQuotaAvailableBytes(propstat.getProp().getQuotaAvailableBytes());
             setQuotaUsedBytes(propstat.getProp().getQuotaUsedBytes());
-            setSyncToken(new java.net.URI(propstat.getProp().getSyncToken()));
             setGetctag(propstat.getProp().getGetctag());
-            setDefaultAlarmVeventDate(convertStringToValarm(propstat.getProp().getDefaultAlarmVeventDate()));
-            setDefaultAlarmVeventDatetime(convertStringToValarm(propstat.getProp().getDefaultAlarmVeventDatetime()));
             
-            for (SupportedCalendarComponentSet compSet: propstat.getProp().getSupportedCalendarComponentSets().getSupportedCalendarComponentSet()) {
-              for (Comp component: compSet.getComp()) {
+            String syncToken = propstat.getProp().getSyncToken();
+            if (syncToken != null)
+              setSyncToken(new java.net.URI(syncToken));
+                        
+            String defaultAlarmDate = propstat.getProp().getDefaultAlarmVeventDate();
+            if (defaultAlarmDate != null)
+              setDefaultAlarmVeventDate(convertStringToValarm(defaultAlarmDate));
+            
+            String defaultAlarmDatetime = propstat.getProp().getDefaultAlarmVeventDatetime();
+            if (defaultAlarmDatetime != null) 
+              setDefaultAlarmVeventDatetime(convertStringToValarm(propstat.getProp().getDefaultAlarmVeventDatetime()));
+            
+            SupportedCalendarComponentSets componentSets = propstat.getProp().getSupportedCalendarComponentSets();
+            if (componentSets != null) {
+              for (SupportedCalendarComponentSet compSet: componentSets.getSupportedCalendarComponentSet()) {
+                for (Comp component: compSet.getComp()) {
                   getSupportedCalendarComponentSets().add(component.getName());
+                }
               }
             }
             
@@ -113,14 +127,22 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
               
               collection.setQuotaAvailableBytes(propstat.getProp().getQuotaAvailableBytes());
               collection.setQuotaUsedBytes(propstat.getProp().getQuotaUsedBytes());
-              collection.setSyncToken(new java.net.URI(propstat.getProp().getSyncToken()));
               
-              StringReader sin = new StringReader(propstat.getProp().getCalendarTimezone());
-              CalendarBuilder builder = new CalendarBuilder();
-              Calendar calendarTimeZone = builder.build(sin);
-              collection.setCalendarTimezone(calendarTimeZone);
+              String syncToken = propstat.getProp().getSyncToken();
+              if (syncToken != null)
+                collection.setSyncToken(new java.net.URI(syncToken));
               
-              collection.setResourceId(new java.net.URI(propstat.getProp().getResourceId().getHref()));
+              String calendarTime = propstat.getProp().getCalendarTimezone();
+              if ((calendarTime != null) && (calendarTime.length() > 0)) {
+                StringReader sin = new StringReader(calendarTime);
+                CalendarBuilder builder = new CalendarBuilder();
+                Calendar calendarTimeZone = builder.build(sin);
+                collection.setCalendarTimezone(calendarTimeZone);
+              }
+              
+              ResourceId resourceId = propstat.getProp().getResourceId();
+              if (resourceId != null)
+                collection.setResourceId(new java.net.URI(resourceId.getHref()));
               
               SupportedCalendarComponentSet set = propstat.getProp().getSupportedCalendarComponentSet();
               for (Comp component: set.getComp()) {

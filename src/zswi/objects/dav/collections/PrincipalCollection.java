@@ -118,9 +118,9 @@ public class PrincipalCollection extends AbstractDavCollection {
           getCalendarProxyReadFor().add(readForCollection);
         }
         
-        System.out.println(propstat.getProp().getDropboxHomeURL().getHref());
-        System.out.println(propstat.getProp().getEmailAddressSet());
-        System.out.println(propstat.getProp().getResourceId().getHref());
+        //System.out.println(propstat.getProp().getDropboxHomeURL().getHref());
+        //System.out.println(propstat.getProp().getEmailAddressSet());
+        //System.out.println(propstat.getProp().getResourceId().getHref());
       }
     }
     
