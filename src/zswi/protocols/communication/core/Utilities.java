@@ -10,13 +10,13 @@ public class Utilities {
 
   public static URI initUri(String path, String scheme, String serverName, int port, String username, String password) throws URISyntaxException {
     URIBuilder uriBuilder = new URIBuilder();
-    String encodedPath = path;
+    String decodedPath = path;
     try {
-      encodedPath = java.net.URLDecoder.decode(path, "UTF-8");
+      decodedPath = java.net.URLDecoder.decode(path, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       System.out.println(e);
     }
-    uriBuilder.setScheme(scheme).setHost(serverName).setPath(encodedPath).setPort(port);
+    uriBuilder.setScheme(scheme).setHost(serverName).setPath(decodedPath).setPort(port);
 
     if (username != null) {
       uriBuilder.setUserInfo(username, password);

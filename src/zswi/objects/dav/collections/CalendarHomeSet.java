@@ -118,10 +118,10 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
               collection.setUri(response.getHref());
               
               ScheduleCalendarTransp transparency = propstat.getProp().getScheduleCalendarTransp();
-              if (transparency.getOpaque() != null) {
-                collection.setScheduleCalendarTransp("OPAQUE");                
-              } else {
+              if ((transparency != null) && (transparency.getTransparent() != null)) {
                 collection.setScheduleCalendarTransp("TRANSPARENT");
+              } else {
+                collection.setScheduleCalendarTransp("OPAQUE");                
               }
               
               collection.setQuotaAvailableBytes(propstat.getProp().getQuotaAvailableBytes());

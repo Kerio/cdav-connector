@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV:" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
-  <xs:import namespace="DAV:" schemaLocation="well-known-response.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="well-known-response.xsd"/>
   <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
   <xs:element name="dropbox-home-URL">
     <xs:complexType>

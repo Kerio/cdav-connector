@@ -42,7 +42,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -68,7 +68,9 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.dav.discovery.Href;
+import zswi.schemas.dav.discovery.PrincipalURL;
 import zswi.schemas.dav.icalendarobjects.Response;
+import zswi.schemas.dav.userinfo.CurrentUserPrincipal;
 
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
@@ -122,14 +124,17 @@ public class DavStore {
       checkTxtRecords();
     } catch (NamingException namingEx) {
       logger.info("We didn't find any TXT records, will try well_know URLs");
-      checkWellKnownUrl();
+      try {
+        checkWellKnownUrl();
+      } catch (NoRedirectFoundException e) {
+        logger.info(e.getMessage());
+      }
     } 
     
     /* After we have found the well known URL, we clear the current httpClient. Why? Because the host returned by the well known URL might be different. */
     _httpClient.getConnectionManager().shutdown();
     _httpClient = null;
     
-    fetchFeatures();
     fetchPrincipalsCollection("/");
   }
 
@@ -150,13 +155,20 @@ public class DavStore {
     try {
       checkWellKnownUrl();
     }
-    catch (DavStoreException e) {
+    catch (NoRedirectFoundException e) {
       e.printStackTrace();
     } finally {
       _httpClient.getConnectionManager().shutdown();
       _httpClient = null;
     }
-    fetchFeatures();
+    URL rootUrl;
+    try {
+      rootUrl = new URL(url);
+      _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
+    }
+    catch (MalformedURLException e) {
+      throw new DavStoreException(e);
+    }
     fetchPrincipalsCollection(_path);
   }
 
@@ -206,7 +218,7 @@ public class DavStore {
     _path = results.get("path");
   }
 
-  protected void checkWellKnownUrl() throws DavStoreException {
+  protected void checkWellKnownUrl() throws DavStoreException, NoRedirectFoundException {
     httpClient().setRedirectStrategy(new NotRedirectStrategy());
 
     PropfindRequest req;
@@ -236,7 +248,7 @@ public class DavStore {
         _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
         _serverName = rootUrl.getHost();
       } else {
-        throw new IOException("No redirection found");
+        throw new NoRedirectFoundException("No redirection found");
       }
 
       EntityUtils.consume(response.getEntity());
@@ -273,9 +285,15 @@ public class DavStore {
       zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
       for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
         if (PROPSTAT_OK.equals(propstat.getStatus())) {
-          Href hrefUserPrincipal = propstat.getProp().getCurrentUserPrincipal();
-          if (hrefUserPrincipal != null)
+          zswi.schemas.dav.discovery.CurrentUserPrincipal hrefUserPrincipal = propstat.getProp().getCurrentUserPrincipal();
+          PrincipalURL principalUrl = propstat.getProp().getPrincipalURL();
+          if ((hrefUserPrincipal != null) && (hrefUserPrincipal.getHref() != null)) {
             currentUserPrincipal = hrefUserPrincipal.getHref();
+          } else if ((principalUrl != null) && (principalUrl.getHref() != null)) {
+            currentUserPrincipal = principalUrl.getHref();
+          } else {
+            logger.warning("No URL found for principals at " + path);
+          }
         }
       }
 
@@ -287,11 +305,13 @@ public class DavStore {
        */
       if (currentUserPrincipal == null) {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true);
-        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));        
+        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        fetchFeatures(calHomeSet.getUri());
         _principalCollection = calHomeSet.getOwner();
       } else {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+        fetchFeatures(calHomeSet.getUri());
         _principalCollection = calHomeSet.getOwner();
       }      
     }
@@ -388,12 +408,14 @@ public class DavStore {
     return _supportedFeatures;
   }
 
-  public void fetchFeatures() {
+  public void fetchFeatures(String path) {
     _supportedFeatures = new ArrayList<DavFeature>();
     try {
-      HttpHead headersMethod = new HttpHead(new URL(httpScheme(), _serverName, _port, _path).toURI());
+      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, _path).toURI());
       HttpResponse response = httpClient().execute(headersMethod);
       Header[] davHeaders = response.getHeaders("DAV");
+      EntityUtils.consume(response.getEntity());
+      
       for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
         Header header = davHeaders[davIndex];
         String[] featuresAsString = header.getValue().split(",");
@@ -516,8 +538,13 @@ public class DavStore {
       EntityUtils.consume(resp.getEntity());
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
         Header[] headers = resp.getHeaders("Etag");
-        ServerVCalendar vcalendar = new ServerVCalendar(calendar, headers[0].getValue(), urlForRequest.getPath());
+        String etag = "";
+        if (headers.length == 1) {
+          etag = headers[0].getValue();
+        }
+        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, urlForRequest.getPath());
         // TODO should check if the Location header is present, if yes, should update the path with that value
+        // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcalendar;
       } else {
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
@@ -651,6 +678,17 @@ public class DavStore {
     }
     
     public DavStoreException(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public class NoRedirectFoundException extends Exception {
+    
+    public NoRedirectFoundException(String reason) {
+      super(reason);
+    }
+    
+    public NoRedirectFoundException(Throwable throwable) {
       super(throwable);
     }
   }

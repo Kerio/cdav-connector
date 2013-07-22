@@ -9,13 +9,10 @@
   </xs:element>
   <xs:element name="response">
     <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="ns1:href">
-          <xs:sequence>
-            <xs:element maxOccurs="unbounded" ref="ns1:propstat"/>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
+      <xs:sequence>
+        <xs:element ref="ns1:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns1:propstat"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="propstat">
@@ -28,19 +25,22 @@
   </xs:element>
   <xs:element name="prop">
     <xs:complexType>
-      <xs:choice>
-        <xs:element ref="ns1:principal-URL"/>
-        <xs:sequence>
+      <xs:sequence>
+        <xs:sequence minOccurs="0">
           <xs:element ref="ns1:current-user-principal"/>
           <xs:element ref="ns1:resourcetype"/>
         </xs:sequence>
-      </xs:choice>
+        <xs:element ref="ns1:principal-URL"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="principal-URL">
-    <xs:complexType/>
+  <xs:element name="current-user-principal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:href"/>
+      </xs:sequence>
+    </xs:complexType>
   </xs:element>
-  <xs:element name="current-user-principal" type="ns1:href"/>
   <xs:element name="resourcetype">
     <xs:complexType>
       <xs:sequence>
@@ -51,11 +51,13 @@
   <xs:element name="collection">
     <xs:complexType/>
   </xs:element>
+  <xs:element name="principal-URL">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="status" type="xs:string"/>
-  <xs:complexType name="href">
-    <xs:sequence>
-      <xs:element ref="ns1:href"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:element name="href" type="xs:string"/>
 </xs:schema>
