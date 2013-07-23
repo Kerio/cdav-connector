@@ -304,12 +304,12 @@ public class DavStore {
        *  We will fake principals in those cases.
        */
       if (currentUserPrincipal == null) {
-        PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true);
+        PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
         fetchFeatures(calHomeSet.getUri());
         _principalCollection = calHomeSet.getOwner();
       } else {
-        PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false);
+        PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
         fetchFeatures(calHomeSet.getUri());
         _principalCollection = calHomeSet.getOwner();
