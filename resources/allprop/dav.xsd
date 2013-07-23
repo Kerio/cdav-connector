@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ical="http://apple.com/ns/ical/" xmlns:ns3="http://calendarserver.org/ns/" xmlns:ns1="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ns4="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="allprop-calendarhomeset-response.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="ical.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns3.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns4.xsd"/>
+  <xs:element name="inheritable">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="resource-class" type="xs:NCName"/>
+</xs:schema>

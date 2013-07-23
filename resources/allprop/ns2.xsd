@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:ical="http://apple.com/ns/ical/" xmlns:ns3="http://calendarserver.org/ns/" xmlns:ns1="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ns4="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="allprop-calendarhomeset-response.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="ical.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns3.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns4.xsd"/>
+  <xs:element name="calendar">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-inbox">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-outbox">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="calendar-multiget">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="calendar-query">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="free-busy-query">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="calendar-timezone" type="xs:string"/>
+  <xs:element name="max-attendees-per-instance" type="xs:string"/>
+  <xs:element name="max-instances" type="xs:string"/>
+  <xs:element name="max-resource-size" type="xs:string"/>
+  <xs:element name="schedule-calendar-transp">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element ref="ns2:opaque"/>
+        <xs:element ref="ns2:transparent"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="opaque">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="transparent">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-calendar-component-sets">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns2:supported-calendar-component-set"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="supported-calendar-data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns2:calendar-data"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="calendar-data">
+    <xs:complexType>
+      <xs:attribute name="content-type" use="required"/>
+      <xs:attribute name="version" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="default-alarm-vevent-date" type="xs:string"/>
+  <xs:element name="default-alarm-vevent-datetime" type="xs:string"/>
+  <xs:element name="read-free-busy">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-deliver">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-send">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-calendar-component-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns2:comp"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="comp">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
