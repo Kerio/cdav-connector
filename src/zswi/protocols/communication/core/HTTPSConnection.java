@@ -521,8 +521,7 @@ public class HTTPSConnection {
 	// Private assisting methods, connection initialization
 
 	private String convertStreamToString(java.io.InputStream is) {
-	    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-	    return s.hasNext() ? s.next() : "";
+	  return Utilities.convertStreamToString(is);
 	}	
 	
 	
@@ -586,14 +585,7 @@ public class HTTPSConnection {
 		@return final URI
 	 */
 	private URI initUri(String path) throws URISyntaxException {
-		URIBuilder uriBuilder = new URIBuilder();
-		uriBuilder.setScheme(SCHEME_HTTPS).setHost(servername).setPath(path);
-
-		if (username != null) {
-			uriBuilder.setUserInfo(username, password);
-		}
-
-		return uriBuilder.build();
+    return Utilities.initUri(path, SCHEME_HTTPS, servername, 443, username, password);
 	}
 
 }

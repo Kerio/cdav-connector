@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+    <response>
+        <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        <propstat>
+            <prop>
+                <calendar-home-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+                </calendar-home-set>
+                <calendar-user-address-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                    <href xmlns='DAV:'>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+                    <href xmlns='DAV:'>/principals/users/probert/</href>
+                    <href xmlns='DAV:'>urn:uuid:AD04C60B-3704-447B-8997-24F5ACF589C7</href>
+                </calendar-user-address-set>
+                <current-user-principal>
+                    <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+                </current-user-principal>
+                <displayname>Pascal Robert</displayname>
+                <dropbox-home-URL xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/dropbox/</href>
+                </dropbox-home-URL>
+                <email-address-set xmlns='http://calendarserver.org/ns/'/>
+                <notification-URL xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/notification/</href>
+                </notification-URL>
+                <principal-collection-set>
+                    <href>/principals/</href>
+                </principal-collection-set>
+                <principal-URL>
+                    <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+                </principal-URL>
+                <resource-id>
+                    <href>urn:uuid:AD04C60B-3704-447B-8997-24F5ACF589C7</href>
+                </resource-id>
+                <schedule-inbox-URL xmlns='urn:ietf:params:xml:ns:caldav'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/inbox/</href>
+                </schedule-inbox-URL>
+                <schedule-outbox-URL xmlns='urn:ietf:params:xml:ns:caldav'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/outbox/</href>
+                </schedule-outbox-URL>
+                <supported-report-set>
+                    <supported-report>
+                        <report>
+                            <acl-principal-prop-set/>
+                        </report>
+                    </supported-report>
+                    <supported-report>
+                        <report>
+                            <principal-match/>
+                        </report>
+                    </supported-report>
+                    <supported-report>
+                        <report>
+                            <principal-property-search/>
+                        </report>
+                    </supported-report>
+                    <supported-report>
+                        <report>
+                            <expand-property/>
+                        </report>
+                    </supported-report>
+                    <supported-report>
+                        <report>
+                            <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+                        </report>
+                    </supported-report>
+                </supported-report-set>
+                <calendar-proxy-write-for xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/principals/__uids__/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/18DB66E9-F75D-4C49-9166-679056F078EA/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5/</href>
+                </calendar-proxy-write-for>
+                <calendar-proxy-read-for xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/principals/__uids__/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+                    <href xmlns='DAV:'>/principals/__uids__/9D428284-FDC5-4D44-8348-7135E6D382E8/</href>
+                </calendar-proxy-read-for>
+            </prop>
+            <status>HTTP/1.1 200 OK</status>
+        </propstat>
+        <propstat>
+            <prop>
+            </prop>
+            <status>HTTP/1.1 404 Not Found</status>
+        </propstat>
+    </response>
+</multistatus>

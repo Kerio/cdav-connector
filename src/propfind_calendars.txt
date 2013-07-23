@@ -6,5 +6,6 @@
     <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
     <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
     <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+    <A:resourcetype xmlns:A="DAV:"/>
   </A:prop>
 </A:propfind>
