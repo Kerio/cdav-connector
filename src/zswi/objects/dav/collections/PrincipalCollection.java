@@ -156,11 +156,11 @@ public class PrincipalCollection extends AbstractDavCollection {
       
       JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.proxies");
       Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
-
-      EntityUtils.consume(resp.getEntity());
       
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_MULTI_STATUS) {
         zswi.schemas.dav.proxies.Multistatus multistatus = (zswi.schemas.dav.proxies.Multistatus)userInfounmarshaller.unmarshal(resp.getEntity().getContent());
+        EntityUtils.consume(resp.getEntity());
+        
         for (zswi.schemas.dav.proxies.Propstat propstat: multistatus.getResponse().getPropstat()) {
           if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
             for (zswi.schemas.dav.proxies.Prop prop: propstat.getProp()) {

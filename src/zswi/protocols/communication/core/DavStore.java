@@ -67,10 +67,8 @@ import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
-import zswi.schemas.dav.discovery.Href;
 import zswi.schemas.dav.discovery.PrincipalURL;
 import zswi.schemas.dav.icalendarobjects.Response;
-import zswi.schemas.dav.userinfo.CurrentUserPrincipal;
 
 /**
  * Connect to a CalDAV/CardDAV server by auto-discovery
@@ -92,6 +90,7 @@ public class DavStore {
   protected HttpHost _targetHost;
   private PrincipalCollection _principalCollection;
   public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
+  public static final String TYPE_CALENDAR = "text/calendar; charset=utf-8";
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
@@ -149,10 +148,15 @@ public class DavStore {
    * @throws DavStoreException 
    */
   public DavStore(String username, String password, String url) throws DavStoreException {
+    URL rootUrl;
+
     _username = username;
     _password = password;
+    _isSecure = false;
     extractUserDetails(url);
+
     try {
+      _isSecure = (url.startsWith("https")) ? true : false;
       checkWellKnownUrl();
     }
     catch (NoRedirectFoundException e) {
@@ -161,7 +165,7 @@ public class DavStore {
       _httpClient.getConnectionManager().shutdown();
       _httpClient = null;
     }
-    URL rootUrl;
+    
     try {
       rootUrl = new URL(url);
       _isSecure = (rootUrl.getProtocol().equals("https")) ? true : false;
@@ -169,6 +173,7 @@ public class DavStore {
     catch (MalformedURLException e) {
       throw new DavStoreException(e);
     }
+    
     fetchPrincipalsCollection(_path);
   }
 
@@ -527,7 +532,7 @@ public class DavStore {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
-      se.setContentType("text/calendar");
+      se.setContentType(TYPE_CALENDAR);
 
       Component calComponent = (Component)calendar.getComponents().get(0);
       String uid = calComponent.getProperty(Property.UID).getValue();
@@ -575,7 +580,7 @@ public class DavStore {
     StringEntity se = null;
     try {
       se = new StringEntity(calendarForEvent.toString());
-      se.setContentType("text/calendar");
+      se.setContentType(TYPE_CALENDAR);
     }
     catch (UnsupportedEncodingException e) {
       throw new DavStoreException(e);
@@ -589,7 +594,7 @@ public class DavStore {
     StringEntity se = null;
     try {
       se = new StringEntity(calendar.getVCalendar().toString());
-      se.setContentType("text/calendar");
+      se.setContentType(TYPE_CALENDAR);
     }
     catch (UnsupportedEncodingException e) {
       throw new DavStoreException(e);

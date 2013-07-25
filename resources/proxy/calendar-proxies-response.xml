@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+    <response>
+        <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        <propstat>
+            <prop>
+                <calendar-proxy-write-for xmlns='http://calendarserver.org/ns/'>
+                    <response xmlns='DAV:'>
+                        <href>/principals/__uids__/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+                        <propstat>
+                            <prop>
+                                <displayname>Room (read/write)</displayname>
+                                <calendar-user-address-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                                    <href xmlns='DAV:'>/principals/__uids__/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+                                    <href xmlns='DAV:'>/principals/locations/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+                                    <href xmlns='DAV:'>urn:uuid:3EF74711-26DB-4F03-BCEA-FEB976982E4D</href>
+                                </calendar-user-address-set>
+                            </prop>
+                            <status>HTTP/1.1 200 OK</status>
+                        </propstat>
+                        <propstat>
+                            <prop>
+                                <email-address-set xmlns='http://calendarserver.org/ns/'/>
+                            </prop>
+                            <status>HTTP/1.1 404 Not Found</status>
+                        </propstat>
+                    </response>
+                    <response xmlns='DAV:'>
+                        <href>/principals/__uids__/18DB66E9-F75D-4C49-9166-679056F078EA/</href>
+                        <propstat>
+                            <prop>
+                                <displayname>Resources (read/write)</displayname>
+                                <email-address-set xmlns='http://calendarserver.org/ns/'/>
+                                <calendar-user-address-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                                    <href xmlns='DAV:'>/principals/__uids__/18DB66E9-F75D-4C49-9166-679056F078EA/</href>
+                                    <href xmlns='DAV:'>/principals/resources/18DB66E9-F75D-4C49-9166-679056F078EA/</href>
+                                    <href xmlns='DAV:'>urn:uuid:18DB66E9-F75D-4C49-9166-679056F078EA</href>
+                                </calendar-user-address-set>
+                            </prop>
+                            <status>HTTP/1.1 200 OK</status>
+                        </propstat>
+                    </response>
+                </calendar-proxy-write-for>
+                <calendar-proxy-read-for xmlns='http://calendarserver.org/ns/'>
+                    <response xmlns='DAV:'>
+                        <href>/principals/__uids__/8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5/</href>
+                        <propstat>
+                            <prop>
+                                <displayname>Resource (read-only)</displayname>
+                                <email-address-set xmlns='http://calendarserver.org/ns/'/>
+                                <calendar-user-address-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                                    <href xmlns='DAV:'>/principals/__uids__/8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5/</href>
+                                    <href xmlns='DAV:'>/principals/resources/8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5/</href>
+                                    <href xmlns='DAV:'>urn:uuid:8C80FC10-4BB2-4D0D-ABC1-96C9CC1035B5</href>
+                                </calendar-user-address-set>
+                            </prop>
+                            <status>HTTP/1.1 200 OK</status>
+                        </propstat>
+                    </response>
+                    <response xmlns='DAV:'>
+                        <href>/principals/__uids__/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+                        <propstat>
+                            <prop>
+                                <displayname>Room (read-only)</displayname>
+                                <email-address-set xmlns='http://calendarserver.org/ns/'/>
+                                <calendar-user-address-set xmlns='urn:ietf:params:xml:ns:caldav'>
+                                    <href xmlns='DAV:'>/principals/__uids__/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+                                    <href xmlns='DAV:'>/principals/locations/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+                                    <href xmlns='DAV:'>urn:uuid:632ED82A-31F1-4B83-A332-B9C45376154B</href>
+                                </calendar-user-address-set>
+                            </prop>
+                            <status>HTTP/1.1 200 OK</status>
+                        </propstat>
+                    </response>
+                </calendar-proxy-read-for>
+            </prop>
+            <status>HTTP/1.1 200 OK</status>
+        </propstat>
+    </response>
+</multistatus>
