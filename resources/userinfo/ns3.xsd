@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:carddav" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="userinfo-response.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:element name="addressbook-home-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

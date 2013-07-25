@@ -14,5 +14,6 @@
         <C:schedule-inbox-URL xmlns:C="urn:ietf:params:xml:ns:caldav"/>
         <C:schedule-outbox-URL xmlns:C="urn:ietf:params:xml:ns:caldav"/>    
         <A:supported-report-set/>
+        <D:addressbook-home-set xmlns:D="urn:ietf:params:xml:ns:carddav"/>
     </A:prop>
 </A:propfind>
