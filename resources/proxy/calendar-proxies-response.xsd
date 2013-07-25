@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:element name="multistatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns3:response"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns3:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns3:propstat"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="propstat">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns3:prop"/>
+        <xs:element ref="ns3:status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0">
+          <xs:element ref="ns1:calendar-proxy-read-for"/>
+          <xs:element ref="ns1:calendar-proxy-write-for"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="ns3:displayname"/>
+        <xs:element minOccurs="0" ref="ns1:email-address-set"/>
+        <xs:element minOccurs="0" ref="ns2:calendar-user-address-set"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="displayname" type="xs:string"/>
+  <xs:element name="status" type="xs:string"/>
+  <xs:element name="href" type="xs:anyURI"/>
+</xs:schema>
