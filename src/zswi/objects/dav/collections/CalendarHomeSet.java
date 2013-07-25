@@ -200,11 +200,6 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
     }
     return null;
   }
-  
-  private String convertStreamToString(java.io.InputStream is) {
-    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-    return s.hasNext() ? s.next() : "";
-  } 
 
   public net.fortuna.ical4j.model.component.VAlarm getDefaultAlarmVeventDate() {
     return defaultAlarmVeventDate;
