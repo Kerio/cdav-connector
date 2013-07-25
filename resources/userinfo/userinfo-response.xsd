@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
   <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
   <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns3.xsd"/>
   <xs:element name="multistatus">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:response"/>
+        <xs:element ref="ns4:response"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="response">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
-        <xs:element maxOccurs="unbounded" ref="ns3:propstat"/>
+        <xs:element ref="ns4:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns4:propstat"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="propstat">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:prop"/>
-        <xs:element ref="ns3:status"/>
+        <xs:element ref="ns4:prop"/>
+        <xs:element ref="ns4:status"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -30,26 +31,27 @@
       <xs:sequence minOccurs="0">
         <xs:element ref="ns2:calendar-home-set"/>
         <xs:element ref="ns2:calendar-user-address-set"/>
-        <xs:element ref="ns3:current-user-principal"/>
-        <xs:element ref="ns3:displayname"/>
+        <xs:element ref="ns4:current-user-principal"/>
+        <xs:element ref="ns4:displayname"/>
         <xs:element ref="ns1:dropbox-home-URL"/>
         <xs:element ref="ns1:email-address-set"/>
         <xs:element ref="ns1:notification-URL"/>
-        <xs:element ref="ns3:principal-collection-set"/>
-        <xs:element ref="ns3:principal-URL"/>
-        <xs:element ref="ns3:resource-id"/>
+        <xs:element ref="ns4:principal-collection-set"/>
+        <xs:element ref="ns4:principal-URL"/>
+        <xs:element ref="ns4:resource-id"/>
         <xs:element ref="ns2:schedule-inbox-URL"/>
         <xs:element ref="ns2:schedule-outbox-URL"/>
-        <xs:element ref="ns3:supported-report-set"/>
+        <xs:element ref="ns4:supported-report-set"/>
         <xs:element ref="ns1:calendar-proxy-write-for"/>
         <xs:element ref="ns1:calendar-proxy-read-for"/>
+        <xs:element ref="ns3:addressbook-home-set"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="current-user-principal">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -57,45 +59,45 @@
   <xs:element name="principal-collection-set">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="principal-URL">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="resource-id">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="supported-report-set">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="ns3:supported-report"/>
+        <xs:element maxOccurs="unbounded" ref="ns4:supported-report"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="supported-report">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:report"/>
+        <xs:element ref="ns4:report"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="report">
     <xs:complexType>
       <xs:choice>
-        <xs:element ref="ns3:acl-principal-prop-set"/>
-        <xs:element ref="ns3:expand-property"/>
-        <xs:element ref="ns3:principal-match"/>
-        <xs:element ref="ns3:principal-property-search"/>
+        <xs:element ref="ns4:acl-principal-prop-set"/>
+        <xs:element ref="ns4:expand-property"/>
+        <xs:element ref="ns4:principal-match"/>
+        <xs:element ref="ns4:principal-property-search"/>
         <xs:element ref="ns1:calendarserver-principal-search"/>
       </xs:choice>
     </xs:complexType>

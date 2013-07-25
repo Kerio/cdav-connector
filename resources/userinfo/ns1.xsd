@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns3="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
   <xs:import namespace="DAV" schemaLocation="userinfo-response.xsd"/>
   <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns3.xsd"/>
   <xs:element name="dropbox-home-URL">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -15,7 +16,7 @@
   <xs:element name="notification-URL">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ns3:href"/>
+        <xs:element ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -25,14 +26,14 @@
   <xs:element name="calendar-proxy-write-for">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="ns3:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="calendar-proxy-read-for">
     <xs:complexType>
       <xs:sequence>
-        <xs:element maxOccurs="unbounded" ref="ns3:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns4:href"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

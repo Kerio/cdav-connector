@@ -23,11 +23,6 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     httpClient = _httpClient;
   }
 
-  private String convertStreamToString(java.io.InputStream is) {
-    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-    return s.hasNext() ? s.next() : "";
-  } 
-
   public java.net.URI getAddMember() {
     return addMember;
   }
