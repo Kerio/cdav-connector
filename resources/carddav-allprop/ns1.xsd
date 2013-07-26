@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="props-adressbookhomeset-response.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns3.xsd"/>
+  <xs:element name="calendarserver-principal-search">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="allowed-sharing-modes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:can-be-shared"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="can-be-shared">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="getctag" type="xs:string"/>
+  <xs:element name="invite">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="max-resources" type="xs:string"/>
+  <xs:element name="shared-url">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="pushkey" type="xs:string"/>
+</xs:schema>

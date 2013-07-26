@@ -32,6 +32,8 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
+import net.sourceforge.cardme.engine.VCardEngine;
+import net.sourceforge.cardme.vcard.VCard;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -56,12 +58,15 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import zswi.objects.dav.collections.AddressBookCollection;
+import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
+import zswi.protocols.carddav.ServerVCard;
 import zswi.protocols.communication.core.requests.DeleteRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
@@ -312,11 +317,13 @@ public class DavStore {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
         fetchFeatures(calHomeSet.getUri());
+        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
         _principalCollection = calHomeSet.getOwner();
       } else {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
         fetchFeatures(calHomeSet.getUri());
+        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
         _principalCollection = calHomeSet.getOwner();
       }      
     }
@@ -601,6 +608,43 @@ public class DavStore {
     }
 
     return this.updateVCard(se, calendar.geteTag(), calendar.getPath());
+  }
+  
+  public List<ServerVCard> getVCards(AddressBookCollection collection) throws DavStoreException {
+
+    String reportResponse = this.report("addressbook-query-request.xml", collection.getUri(), 1);
+    List<ServerVCard> result = new ArrayList<ServerVCard>();
+
+    if (reportResponse.length() > 0) {
+      JAXBContext jc;
+      try {
+        jc = JAXBContext.newInstance("zswi.schemas.carddav.objects");
+        Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+        StringReader reader = new StringReader(reportResponse);
+        zswi.schemas.carddav.objects.Multistatus multistatus = (zswi.schemas.carddav.objects.Multistatus)userInfounmarshaller.unmarshal(reader);
+
+        for (zswi.schemas.carddav.objects.Response xmlResponse: multistatus.getResponse()) {
+          String hrefForObject = xmlResponse.getHref();
+          for (zswi.schemas.carddav.objects.Propstat propstat: xmlResponse.getPropstat()) {
+            if (PROPSTAT_OK.equals(propstat.getStatus())) {
+              String sin = propstat.getProp().getAddressData();
+              VCardEngine builder = new VCardEngine();
+              VCard cardData = builder.parse(sin);
+              ServerVCard calendarObject = new ServerVCard(cardData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            }
+          }
+        }
+      }
+      catch (JAXBException e) {
+        throw new DavStoreException(e);
+      }
+      catch (IOException e) {
+        throw new DavStoreException(e);
+      }
+    }
+
+    return result;
   }
   
   protected boolean updateVCard(HttpEntity entity, String etag, String path) throws DavStoreException {
