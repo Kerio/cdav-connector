@@ -550,7 +550,7 @@ public class DavStore {
       response = this.report("rep_events.txt", path, 1);
     }
     catch (NotImplemented e1) {
-      // TODO if it fails with 501 Implemented, it should try to fetch the vCards with a PROPFIND followed by a calendar-multiget
+      // ç
       e1.printStackTrace();
     }
 
@@ -594,8 +594,10 @@ public class DavStore {
    * @param event
    * @return
    * @throws DavStoreException
+   * @throws NotSupportedComponent 
+   * @throws UidConflict 
    */
-  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException {
+  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
     
@@ -610,8 +612,10 @@ public class DavStore {
    * @param calendar
    * @return
    * @throws DavStoreException
+   * @throws UidConflict 
+   * @throws NotSupportedComponent 
    */
-  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException {
+  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
@@ -622,14 +626,14 @@ public class DavStore {
       // TODO should be moved to a method so that updateVCalendar can use it to (and easier to override if needed)
       for (Object component: calendar.getComponents()) {
         if (!(collection.getSupportedCalendarComponentSet().contains(((Component)component).getName()))) {
-          throw new DavStoreException("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
+          throw new NotSupportedComponent("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
         }
         Property uidForComponent = ((Component)component).getProperty(Property.UID);
         if (uid == null) {
           uid = uidForComponent.getValue();
         } else {
           if (!(uid.equals(uidForComponent.getValue()))) {
-            throw new DavStoreException("The UID of every component of this calendar must be the same. The culprit is " + uidForComponent.getValue() + ".");
+            throw new UidConflict("The UID of every component of this calendar must be the same. The culprit is " + uidForComponent.getValue() + ".");
           }
         }
       }
@@ -1149,6 +1153,28 @@ public class DavStore {
     }
     
     public NotImplemented(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public class UidConflict extends Exception {
+    
+    public UidConflict(String reason) {
+      super(reason);
+    }
+    
+    public UidConflict(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public class NotSupportedComponent extends Exception {
+    
+    public NotSupportedComponent(String reason) {
+      super(reason);
+    }
+    
+    public NotSupportedComponent(Throwable throwable) {
       super(throwable);
     }
   }
