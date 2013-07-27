@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:A="DAV" xmlns:B="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="multiget-request.xsd"/>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="A:getetag"/>
+        <xs:element ref="B:address-data"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getetag">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="href" type="xs:string"/>
+</xs:schema>

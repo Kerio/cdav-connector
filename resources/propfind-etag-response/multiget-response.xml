@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<D:multistatus xmlns:B="urn:ietf:params:xml:ns:carddav" xmlns:D="DAV:">
+    <D:response>
+        <D:href>/CardDAV/$Contacts$/cgpitem1.vcf</D:href>
+        <D:propstat>
+            <D:prop>
+                <B:address-data>BEGIN:VCARD
+                    PRODID:CommuniGate Pro 5.4.10
+                    VERSION:3.0
+                    ADR;TYPE=WORK:;;;North Pole;;H0H 0H0;Canada
+                    EMAIL:santa@claus.np
+                    FN:Claus\, Santa
+                    N:Clause;Santa;;;
+                    REV:20130727T091525Z
+                    UID:1374916525.1.probert@cgp.macti.lan
+                    END:VCARD
+                </B:address-data>
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <D:getetag>&quot;343729131-1&quot;</D:getetag>
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response>
+    <D:response>
+        <D:href>/CardDAV/$Contacts$/cgpitem2.vcf</D:href>
+        <D:propstat>
+            <D:prop>
+                <D:getetag>&quot;343729131-1&quot;</D:getetag>
+                <B:address-data>BEGIN:VCARD
+                    PRODID:CommuniGate Pro 5.4.10
+                    VERSION:3.0
+                    FN:Robert\, Pascal
+                    N:Robert;Pascal;;;
+                    REV:20130727T091525Z
+                    UID:1374916525.1.probert@cgp.macti.lan
+                    END:VCARD
+                </B:address-data>
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+    </D:response>
+</D:multistatus>

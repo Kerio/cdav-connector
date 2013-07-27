@@ -3,6 +3,7 @@ package zswi.protocols.communication.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -23,7 +24,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Validator;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -32,7 +35,6 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
-import net.fortuna.ical4j.util.UidGenerator;
 import net.sourceforge.cardme.engine.VCardEngine;
 import net.sourceforge.cardme.io.VCardWriter;
 import net.sourceforge.cardme.vcard.VCard;
@@ -74,6 +76,8 @@ import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
+import zswi.schemas.carddav.multiget.AddressbookMultiget;
+import zswi.schemas.carddav.multiget.ObjectFactory;
 import zswi.schemas.dav.discovery.PrincipalURL;
 import zswi.schemas.dav.icalendarobjects.Response;
 
@@ -476,7 +480,14 @@ public class DavStore {
     
     String path = calendar.getUri();
 
-    String response = this.report("rep_events.txt", path, 1);
+    String response = "";
+    try {
+      response = this.report("rep_events.txt", path, 1);
+    }
+    catch (NotImplemented e1) {
+      // TODO if it fails with 501 Implemented, it should try to fetch the vCards with a PROPFIND followed by a calendar-multiget
+      e1.printStackTrace();
+    }
 
     JAXBContext jc;
     try {
@@ -621,7 +632,18 @@ public class DavStore {
   
   public List<ServerVCard> getVCards(AddressBookCollection collection) throws DavStoreException {
 
-    String reportResponse = this.report("addressbook-query-request.xml", collection.getUri(), 1);
+    String reportResponse = "";
+    try {
+      reportResponse = this.report("addressbook-query-request.xml", collection.getUri(), 1);
+    }
+    catch (NotImplemented e1) {
+      try {
+        return fetchVCardsByMultiget(collection);
+      }
+      catch (NotImplemented e) {
+        throw new DavStoreException(e);
+      }
+    }
     List<ServerVCard> result = new ArrayList<ServerVCard>();
 
     if (reportResponse.length() > 0) {
@@ -654,6 +676,112 @@ public class DavStore {
     }
 
     return result;
+  }
+  
+  protected List<ServerVCard> fetchVCardsByMultiget(AddressBookCollection collection) throws DavStoreException, NotImplemented {
+    List<ServerVCard> result = new ArrayList<ServerVCard>();
+
+    PropfindRequest req;
+    try {
+      req = new PropfindRequest(initUri(collection.getUri()), 1);
+      InputStream is = ClassLoader.getSystemResourceAsStream("propfind-etag-request.xml");
+
+      StringEntity se = new StringEntity(convertStreamToString(is));
+
+      se.setContentType("text/xml");
+      req.setEntity(se);
+
+      HttpResponse response = httpClient().execute(req);
+      int status = response.getStatusLine().getStatusCode();
+      if (status < 300) {
+        JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.propfind.etag");
+        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        zswi.schemas.dav.propfind.etag.Multistatus unmarshal = (zswi.schemas.dav.propfind.etag.Multistatus)unmarshaller.unmarshal(response.getEntity().getContent());
+
+        EntityUtils.consume(response.getEntity());
+        
+        List<zswi.schemas.dav.propfind.etag.Response> responses = unmarshal.getResponse();
+        for (zswi.schemas.dav.propfind.etag.Response xmlResponse: responses) {
+          String href = xmlResponse.getHref();
+          if (PROPSTAT_OK.equals(xmlResponse.getPropstat().getStatus())) {
+            String etag = xmlResponse.getPropstat().getProp().getGetetag();
+            ServerVCard card = new ServerVCard(null, etag, href);
+            result.add(card);
+          }
+        }
+        result = doAddressBookMultiget(result, collection);
+      } else {
+        EntityUtils.consume(response.getEntity());
+      }
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + httpScheme() + _serverName +  _port + "/.well-known/caldav");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    
+    return result;
+  }
+
+  protected List<ServerVCard> doAddressBookMultiget(List<ServerVCard> listFromPropfind, AddressBookCollection collection) throws DavStoreException, NotImplemented {
+    List<ServerVCard> filteredArray = new ArrayList<ServerVCard>();
+
+    zswi.schemas.carddav.multiget.ObjectFactory factory = new ObjectFactory();
+    
+    zswi.schemas.carddav.multiget.Getetag etagProp = factory.createGetetag();
+    zswi.schemas.carddav.multiget.AddressData addressDataProp = factory.createAddressData();
+    zswi.schemas.carddav.multiget.Prop requestProp = factory.createProp();
+    requestProp.setAddressData(addressDataProp);
+    requestProp.setGetetag(etagProp);
+
+    AddressbookMultiget multiget = factory.createAddressbookMultiget();
+    multiget.setProp(requestProp);
+
+    for (ServerVCard card: listFromPropfind) {
+      multiget.getHref().add(card.getPath());
+    }
+
+    try {
+      StringWriter sw = new StringWriter();
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.carddav.multiget");
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      marshaller.marshal(multiget, sw);
+          
+      String response = this.report(sw, collection.getUri(), 1);
+      
+      jc = JAXBContext.newInstance("zswi.schemas.carddav.multiget.response");
+      Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+      StringReader reader = new StringReader(response);
+      zswi.schemas.carddav.multiget.response.Multistatus multistatus = (zswi.schemas.carddav.multiget.response.Multistatus)userInfounmarshaller.unmarshal(reader);
+      for (zswi.schemas.carddav.multiget.response.Response xmlResponse: multistatus.getResponse()) {
+        String hrefForObject = xmlResponse.getHref();
+        for (zswi.schemas.carddav.multiget.response.Propstat propstat: xmlResponse.getPropstat()) {
+          if (PROPSTAT_OK.equals(propstat.getStatus())) {
+            String sin = propstat.getProp().getAddressData();
+            VCardEngine builder = new VCardEngine();
+            VCard cardData = builder.parse(sin);
+            ServerVCard calendarObject = new ServerVCard(cardData, propstat.getProp().getGetetag(), hrefForObject);
+            filteredArray.add(calendarObject);
+          }
+        }
+      }
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+    
+    return filteredArray;
   }
   
   public ServerVCard addVCard(AddressBookCollection collection, VCard card) throws DavStoreException {
@@ -763,20 +891,24 @@ public class DavStore {
     else return false;
   }
   
-  protected String report(String filename, String path, int depth) throws DavStoreException {
+  protected String report(StringEntity body, String path, int depth) throws DavStoreException, NotImplemented {
     ReportRequest req;
     String response = "";
 
     try {
       req = new ReportRequest(initUri(path), depth);
-      InputStream is = ClassLoader.getSystemResourceAsStream(filename);
-
-      StringEntity se = new StringEntity(convertStreamToString(is));
-
-      se.setContentType("text/xml");
-      req.setEntity(se);
+      body.setContentType("text/xml");
+      req.setEntity(body);
 
       HttpResponse resp = _httpClient.execute(req);
+
+      if (resp.getStatusLine().getStatusCode() == 501) {
+        EntityUtils.consume(resp.getEntity());
+        throw new NotImplemented(resp.getStatusLine().getReasonPhrase());
+      } else if (resp.getStatusLine().getStatusCode() >= 400) {
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException(resp.getStatusLine().getReasonPhrase());
+      }
 
       response += EntityUtils.toString(resp.getEntity());
 
@@ -793,6 +925,34 @@ public class DavStore {
     }
 
     return response;
+
+  }
+  
+  protected String report(StringWriter body, String path, int depth) throws DavStoreException, NotImplemented {
+    String response = "";
+    StringEntity se;
+    try {
+      se = new StringEntity(body.toString());
+      response = report(se, path, depth);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+    return response;
+  }
+  
+  protected String report(String filename, String path, int depth) throws DavStoreException, NotImplemented {
+    String response = "";
+    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+    StringEntity se;
+    try {
+      se = new StringEntity(convertStreamToString(is));
+      response = report(se, path, depth);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+    return response;
   }
   
   public class DavStoreException extends Exception {
@@ -802,6 +962,17 @@ public class DavStore {
     }
     
     public DavStoreException(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public class NotImplemented extends Exception {
+    
+    public NotImplemented(String reason) {
+      super(reason);
+    }
+    
+    public NotImplemented(Throwable throwable) {
       super(throwable);
     }
   }
