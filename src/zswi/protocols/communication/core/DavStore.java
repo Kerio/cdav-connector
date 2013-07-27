@@ -582,7 +582,7 @@ public class DavStore {
    * @return
    * @throws DavStoreException
    */
-  public boolean updateVEvent(ServerVEvent event) throws DavStoreException {
+  public void updateVEvent(ServerVEvent event) throws DavStoreException {
     // vEvent must be enclosed in Calendar, otherwise is not added
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event.getVevent());
@@ -596,10 +596,13 @@ public class DavStore {
       throw new DavStoreException(e);
     }
 
-    return this.updateVCard(se, event.geteTag(), event.getPath());
+    String newEtag = this.updateObject(se, event.geteTag(), event.getPath());
+    if (newEtag != null) {
+      event.seteTag(newEtag);
+    }
   }
   
-  public boolean updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
+  public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
     // vEvent must be enclosed in Calendar, otherwise is not added
     StringEntity se = null;
     try {
@@ -610,7 +613,10 @@ public class DavStore {
       throw new DavStoreException(e);
     }
 
-    return this.updateVCard(se, calendar.geteTag(), calendar.getPath());
+    String newEtag = this.updateObject(se, calendar.geteTag(), calendar.getPath());
+    if (newEtag != null) {
+      calendar.seteTag(newEtag);
+    }
   }
   
   public List<ServerVCard> getVCards(AddressBookCollection collection) throws DavStoreException {
@@ -688,7 +694,7 @@ public class DavStore {
     }
   }
   
-  public boolean updateVCard(ServerVCard card) throws DavStoreException {
+  public void updateVCard(ServerVCard card) throws DavStoreException {
     StringEntity se = null;
     try {
       VCardWriter writer = new VCardWriter();
@@ -700,10 +706,13 @@ public class DavStore {
       throw new DavStoreException(e);
     }
 
-    return this.updateVCard(se, card.geteTag(), card.getPath());
+    String newEtag = this.updateObject(se, card.geteTag(), card.getPath());
+    if (newEtag != null) {
+      card.seteTag(newEtag);
+    }
   }
   
-  protected boolean updateVCard(HttpEntity entity, String etag, String path) throws DavStoreException {
+  protected String updateObject(HttpEntity entity, String etag, String path) throws DavStoreException {
     UpdateRequest updateReq;
     try {
       updateReq = new UpdateRequest(initUri(path), etag);
@@ -711,8 +720,13 @@ public class DavStore {
       HttpResponse resp = httpClient().execute(updateReq);
 
       EntityUtils.consume(resp.getEntity());
-      if(resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) return true;
-      else return false;
+      
+      if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+        Header[] headers = resp.getHeaders("Etag");
+        if (headers.length == 1) {
+          return headers[0].getValue();
+        }
+      }
     }
     catch (URISyntaxException e) {
       throw new DavStoreException(e);
@@ -723,6 +737,11 @@ public class DavStore {
     catch (IOException e) {
       throw new DavStoreException(e);
     }
+    return null;
+  }
+  
+  public boolean deleteVCard(ServerVCard card) throws ClientProtocolException, URISyntaxException, IOException {
+    return this.delete(card.getPath(), card.geteTag());
   }
   
   /**
