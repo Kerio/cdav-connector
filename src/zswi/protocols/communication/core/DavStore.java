@@ -31,6 +31,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
@@ -603,8 +604,6 @@ public class DavStore {
   }
   
   /**
-   * TODO It should verify if the component type is accepted for the collection
-   * TODO It should raise only one type of exception
    * TODO It should check if all components have the same Uid, or else it should be rejected
    * TODO It should reject the object if the base properties (SUMMARY, DTSTART, etc.) are not present
    * 
@@ -619,6 +618,15 @@ public class DavStore {
       se = new StringEntity(calendar.toString());
       se.setContentType(TYPE_CALENDAR);
 
+      boolean isAcceptableComponentType = true;
+      for (Object component: calendar.getComponents()) {
+        if (!(collection.getSupportedCalendarComponentSet().contains(((Component)component).getName()))) {
+          isAcceptableComponentType = false;
+        }
+      }
+      
+      if (!isAcceptableComponentType) throw new DavStoreException("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
+      
       Component calComponent = (Component)calendar.getComponents().get(0);
       String uid = calComponent.getProperty(Property.UID).getValue();
       
