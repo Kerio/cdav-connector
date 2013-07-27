@@ -32,7 +32,9 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
+import net.fortuna.ical4j.util.UidGenerator;
 import net.sourceforge.cardme.engine.VCardEngine;
+import net.sourceforge.cardme.io.VCardWriter;
 import net.sourceforge.cardme.vcard.VCard;
 
 import org.apache.http.Header;
@@ -96,6 +98,7 @@ public class DavStore {
   private PrincipalCollection _principalCollection;
   public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
   public static final String TYPE_CALENDAR = "text/calendar; charset=utf-8";
+  public static final String TYPE_VCARD = "text/vcard; charset=utf-8";
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
@@ -645,6 +648,44 @@ public class DavStore {
     }
 
     return result;
+  }
+  
+  public ServerVCard addVCard(AddressBookCollection collection, VCard card) throws DavStoreException {
+    StringEntity se;
+    try {
+      VCardWriter writer = new VCardWriter();
+      writer.setVCard(card);
+      se = new StringEntity(writer.buildVCardString());
+      se.setContentType(TYPE_VCARD);
+      
+      URI urlForRequest = initUri(collection.getUri() + card.getUID().getID() + ".ics");
+      PutRequest putReq = new PutRequest(urlForRequest);
+      putReq.setEntity(se);
+      HttpResponse resp = httpClient().execute(putReq);
+      EntityUtils.consume(resp.getEntity());
+      if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        Header[] headers = resp.getHeaders("Etag");
+        String etag = "";
+        if (headers.length == 1) {
+          etag = headers[0].getValue();
+        }
+        ServerVCard vcard = new ServerVCard(card, etag, urlForRequest.getPath());
+        // TODO should check if the Location header is present, if yes, should update the path with that value
+        // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
+        return vcard;
+      } else {
+        throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
+      }
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
   }
   
   protected boolean updateVCard(HttpEntity entity, String etag, String path) throws DavStoreException {
