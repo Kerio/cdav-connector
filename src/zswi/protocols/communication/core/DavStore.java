@@ -362,14 +362,18 @@ public class DavStore {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
         fetchFeatures(calHomeSet.getUri());
-        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
         _principalCollection = calHomeSet.getOwner();
       } else {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
-        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
-        fetchFeatures(calHomeSet.getUri());
-        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
-        _principalCollection = calHomeSet.getOwner();
+        if (principals.getCalendarHomeSetUrl() != null) {
+          CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+          fetchFeatures(calHomeSet.getUri());
+          _principalCollection = calHomeSet.getOwner();
+        }
+        if (principals.getAddressbookHomeSetUrl() != null) {
+          new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+        }
       }      
     }
     catch (URISyntaxException e) {
