@@ -617,33 +617,51 @@ public class DavStore {
 
       Component calComponent = (Component)calendar.getComponents().get(0);
       String uid = calComponent.getProperty(Property.UID).getValue();
+      
       URI urlForRequest = initUri(collection.getUri() + uid + ".ics");
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
+      
       HttpResponse resp = httpClient().execute(putReq);
       EntityUtils.consume(resp.getEntity());
+      
+      String path = urlForRequest.getPath();
+      
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        
         Header[] headers = resp.getHeaders("Etag");
         String etag = "";
         if (headers.length == 1) {
           etag = headers[0].getValue();
         }
-        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, urlForRequest.getPath());
-        // TODO should check if the Location header is present, if yes, should update the path with that value
-        // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
+        
+        Header[] locations = resp.getHeaders("Location");
+        if (locations.length == 1) {
+          try {
+            URL locationUrl = new URL(locations[0].getValue());
+            path = locationUrl.getPath();
+          } catch (MalformedURLException urle) {
+            // It might be just a path, so let's take this instead
+            if (locations[0].getValue().length() > 0)
+              path = locations[0].getValue();
+          }
+        }
+        
+        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path);
+        // TODO if Location and ETag are not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcalendar;
       } else {
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
       }
     }
     catch (UnsupportedEncodingException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (URISyntaxException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (IOException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
   }
   
@@ -896,15 +914,33 @@ public class DavStore {
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
       HttpResponse resp = httpClient().execute(putReq);
+      
       EntityUtils.consume(resp.getEntity());
+      
+      String path = urlForRequest.getPath();
+      
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        
         Header[] headers = resp.getHeaders("Etag");
         String etag = "";
+        
         if (headers.length == 1) {
           etag = headers[0].getValue();
         }
-        ServerVCard vcard = new ServerVCard(card, etag, urlForRequest.getPath());
-        // TODO should check if the Location header is present, if yes, should update the path with that value
+        
+        Header[] locations = resp.getHeaders("Location");
+        if (locations.length == 1) {
+          try {
+            URL locationUrl = new URL(locations[0].getValue());
+            path = locationUrl.getPath();
+          } catch (MalformedURLException urle) {
+            // It might be just a path, so let's take this instead
+            if (locations[0].getValue().length() > 0)
+              path = locations[0].getValue();
+          }
+        }
+        
+        ServerVCard vcard = new ServerVCard(card, etag, path);
         // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcard;
       } else {
