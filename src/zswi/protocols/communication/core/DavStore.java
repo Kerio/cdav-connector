@@ -26,7 +26,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Validator;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -82,7 +81,7 @@ import zswi.schemas.dav.discovery.PrincipalURL;
 import zswi.schemas.dav.icalendarobjects.Response;
 
 /**
- * Connect to a CalDAV/CardDAV server by auto-discovery
+ * Connect to a CalDAV/CardDAV server by auto-discovery or by a specific URL.
  * 
  * @author Pascal Robert
  *
@@ -106,6 +105,9 @@ public class DavStore {
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
+  /**
+   * Static block so that iCal4j parser is less severe.
+   */
   static {     
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_OUTLOOK_COMPATIBILITY, true);
@@ -115,6 +117,10 @@ public class DavStore {
   /**
    * Connect to a DAV store with credentials. The username must be an email address or a fully qualified http(s) URL, 
    * because the domain will be extracted from the email address or from the HTTP(S) URL.
+   * 
+   * It will works only if SRV records for _caldavs._tcp.yourdomain.com or _caldav._tcp.yourdomain.com
+   * 
+   * If you don't have any SRV records for your CalDAV/CardDAV service, please use the constructor with the url argument
    * 
    * @param username For auto-discovery, the username must contains the domain. You can either pass a email address (me@domain.com) or a HTTP url (https://me@domain.com).
    * @param password
@@ -154,6 +160,10 @@ public class DavStore {
    * the user's principals (e.g. http://mydomain.com/principals/users/myuser or something
    * similar).
    * 
+   * For example, a URL for Google Calendar would like: https://www.google.com/calendar/dav/myuser%40gmail.com/user/
+   * 
+   * You need to pass the URL to the principals, NOT to a calendar or address book collection!
+   * 
    * @param username
    * @param password
    * @param url
@@ -189,6 +199,11 @@ public class DavStore {
     fetchPrincipalsCollection(_path);
   }
 
+  /**
+   * This method will extract the username and domain from a HTTP(s) URL or an email address.
+   * 
+   * @param urlAsString
+   */
   protected void extractUserDetails(String urlAsString) {
     try {
       URL urlForUser = new URL(urlAsString);
@@ -212,6 +227,11 @@ public class DavStore {
     }
   }
 
+  /**
+   * Check if we can find a _caldavs._tcp. or _caldav._tcp. SRV record for the domain of the user.
+   * 
+   * @throws NamingException
+   */
   protected void checkSrvRecords() throws NamingException {
     HashMap<String, String> results;
     try {
@@ -225,6 +245,11 @@ public class DavStore {
     _serverName = results.get("host");
   }
 
+  /**
+   * Check if we can find a URL to the user's DAV principals in a TXT DNS record, with the URL in a "path" key.
+   * 
+   * @throws NamingException
+   */
   protected void checkTxtRecords() throws NamingException {
     HashMap<String, String> results = new HashMap<String, String>();
     if (_isSecure) {
@@ -235,6 +260,12 @@ public class DavStore {
     _path = results.get("path");
   }
 
+  /**
+   * Check if the server have a /.well-known/caldav URL that will redirect us to the location of the user's DAV principals.
+   * 
+   * @throws DavStoreException
+   * @throws NoRedirectFoundException
+   */
   protected void checkWellKnownUrl() throws DavStoreException, NoRedirectFoundException {
     httpClient().setRedirectStrategy(new NotRedirectStrategy());
 
@@ -281,6 +312,13 @@ public class DavStore {
     }
   }
   
+  /**
+   * Query the path to see if it contains a link to the user's DAV principals. If we found the principals, 
+   * we will fetch the calendar home set and the addressbook home set, and their associated collections.
+   * 
+   * @param path
+   * @throws DavStoreException
+   */
   protected void fetchPrincipalsCollection(String path) throws DavStoreException {
     PropfindRequest req;
     try {
@@ -354,6 +392,11 @@ public class DavStore {
     }
   }
   
+  /**
+   * Return the user's DAV principals.
+   * 
+   * @return
+   */
   public PrincipalCollection principalCollection() {
     return _principalCollection;
   }
@@ -423,10 +466,20 @@ public class DavStore {
     return _httpClient;
   }
 
+  /**
+   * 
+   * @return A list of enums that details which DAV/CalDAV/CardDAV features this server implements.
+   */
   public ArrayList<DavFeature> supportedFeatures() {
     return _supportedFeatures;
   }
 
+  /**
+   * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
+   * the "DAV" header of the response (done by a OPTIONS request).
+   * 
+   * @param path URL path to the calendar home set or a calendar collection.
+   */
   public void fetchFeatures(String path) {
     _supportedFeatures = new ArrayList<DavFeature>();
     try {
@@ -475,6 +528,13 @@ public class DavStore {
     return result;
   }
   
+  /**
+   * Get the list of all iCalendar objects from a calendar collection.
+   * 
+   * @param calendar
+   * @return
+   * @throws DavStoreException
+   */
   public List<ServerVCalendar> getVCalendars(CalendarCollection calendar) throws DavStoreException {
     ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
     
@@ -613,6 +673,12 @@ public class DavStore {
     }
   }
   
+  /**
+   * Update an iCalendar object by pushing it (PUT request) to the server.
+   * 
+   * @param calendar
+   * @throws DavStoreException
+   */
   public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
     // vEvent must be enclosed in Calendar, otherwise is not added
     StringEntity se = null;
@@ -630,6 +696,13 @@ public class DavStore {
     }
   }
   
+  /**
+   * Get all vCards from an addressbook collection.
+   * 
+   * @param collection
+   * @return
+   * @throws DavStoreException
+   */
   public List<ServerVCard> getVCards(AddressBookCollection collection) throws DavStoreException {
 
     String reportResponse = "";
@@ -678,6 +751,16 @@ public class DavStore {
     return result;
   }
   
+  /**
+   * Some servers (hello CommuniGate Pro 5.4) don't support the addressbook-query request, even if it's a required of the spec.
+   * If that's the case, we will try to find the vCards objects in the collection by doing a PROPFIND request to find all 
+   * links (href) and eTag for the objects, and do to a adressbook-multiget request after.
+   * 
+   * @param collection
+   * @return
+   * @throws DavStoreException
+   * @throws NotImplemented
+   */
   protected List<ServerVCard> fetchVCardsByMultiget(AddressBookCollection collection) throws DavStoreException, NotImplemented {
     List<ServerVCard> result = new ArrayList<ServerVCard>();
 
@@ -730,6 +813,15 @@ public class DavStore {
     return result;
   }
 
+  /**
+   * Do the addressbook-multiget request (usually called from fetchVCardsByMultiget).
+   * 
+   * @param listFromPropfind
+   * @param collection
+   * @return
+   * @throws DavStoreException
+   * @throws NotImplemented
+   */
   protected List<ServerVCard> doAddressBookMultiget(List<ServerVCard> listFromPropfind, AddressBookCollection collection) throws DavStoreException, NotImplemented {
     List<ServerVCard> filteredArray = new ArrayList<ServerVCard>();
 
@@ -784,6 +876,14 @@ public class DavStore {
     return filteredArray;
   }
   
+  /**
+   * Add a vCard object in the collection.
+   * 
+   * @param collection
+   * @param card
+   * @return
+   * @throws DavStoreException
+   */
   public ServerVCard addVCard(AddressBookCollection collection, VCard card) throws DavStoreException {
     StringEntity se;
     try {
@@ -822,6 +922,12 @@ public class DavStore {
     }
   }
   
+  /**
+   * Update a vCard object in the collection.
+   * 
+   * @param card
+   * @throws DavStoreException
+   */
   public void updateVCard(ServerVCard card) throws DavStoreException {
     StringEntity se = null;
     try {
@@ -868,6 +974,15 @@ public class DavStore {
     return null;
   }
   
+  /**
+   * Delete a vCard object by doing a DELETE request on the path of the vCard object on the server.
+   * 
+   * @param card
+   * @return
+   * @throws ClientProtocolException
+   * @throws URISyntaxException
+   * @throws IOException
+   */
   public boolean deleteVCard(ServerVCard card) throws ClientProtocolException, URISyntaxException, IOException {
     return this.delete(card.getPath(), card.geteTag());
   }
@@ -879,6 +994,15 @@ public class DavStore {
     return this.delete(event.getPath(), event.geteTag());
   }
   
+  /**
+   * Delete a iCalendar object by doing a DELETE request on the path of the iCalendar object on the server.
+   * 
+   * @param calendar
+   * @return
+   * @throws ClientProtocolException
+   * @throws URISyntaxException
+   * @throws IOException
+   */
   public boolean deleteVCalendar(ServerVCalendar calendar) throws ClientProtocolException, URISyntaxException, IOException {
     return this.delete(calendar.getPath(), calendar.geteTag());
   }
