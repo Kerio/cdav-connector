@@ -658,7 +658,7 @@ public class DavStore {
       se = new StringEntity(writer.buildVCardString());
       se.setContentType(TYPE_VCARD);
       
-      URI urlForRequest = initUri(collection.getUri() + card.getUID().getID() + ".ics");
+      URI urlForRequest = initUri(collection.getUri() + card.getUID().getUID() + ".ics");
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
       HttpResponse resp = httpClient().execute(putReq);
@@ -686,6 +686,21 @@ public class DavStore {
     catch (IOException e) {
       throw new DavStoreException(e.getMessage());
     }
+  }
+  
+  public boolean updateVCard(ServerVCard card) throws DavStoreException {
+    StringEntity se = null;
+    try {
+      VCardWriter writer = new VCardWriter();
+      writer.setVCard(card.getVcard());
+      se = new StringEntity(writer.buildVCardString());
+      se.setContentType(TYPE_VCARD);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+
+    return this.updateVCard(se, card.geteTag(), card.getPath());
   }
   
   protected boolean updateVCard(HttpEntity entity, String etag, String path) throws DavStoreException {
