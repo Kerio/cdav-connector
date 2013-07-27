@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<B:addressbook-multiget xmlns:B="urn:ietf:params:xml:ns:carddav">
+    <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <B:address-data/>
+    </A:prop>
+    <A:href xmlns:A="DAV:">/CardDAV/$Contacts$/cgpitem1.vcf</A:href>
+    <A:href xmlns:A="DAV:">/CardDAV/$Contacts$/cgpitem1.vcf</A:href>
+</B:addressbook-multiget>

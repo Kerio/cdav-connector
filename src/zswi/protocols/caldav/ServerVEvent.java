@@ -11,7 +11,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 public class ServerVEvent {
 
 	private VEvent vevent;
-	private	final String eTag;
+	private	String eTag;
 	private String path;
 	
 	public ServerVEvent(VEvent vevent, String eTag, String path){
@@ -35,4 +35,8 @@ public class ServerVEvent {
 	public String geteTag() {
 		return eTag;
 	}
+	
+  public void seteTag(String eTag) {
+    this.eTag = eTag;
+  }
 }

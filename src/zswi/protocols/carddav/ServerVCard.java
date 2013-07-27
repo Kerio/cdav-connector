@@ -10,7 +10,7 @@ import net.sourceforge.cardme.vcard.VCard;
  */
 public class ServerVCard {
 	private VCard vcard;
-	private	final String eTag;
+	private	String eTag;
 	private String path;
 	
 	public ServerVCard(VCard vcard, String eTag, String path){
@@ -35,5 +35,8 @@ public class ServerVCard {
 		return eTag;
 	}
 
+  public void seteTag(String eTag) {
+    this.eTag = eTag;
+  }
 
 }

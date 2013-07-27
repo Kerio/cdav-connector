@@ -11,7 +11,7 @@ import net.fortuna.ical4j.model.Calendar;
 public class ServerVCalendar {
 
 	private Calendar vcalendar;
-	private	final String eTag;
+	private String eTag;
 	private String path;
 	
 	public ServerVCalendar(Calendar vcalendar, String eTag, String path){
@@ -35,4 +35,8 @@ public class ServerVCalendar {
 	public String geteTag() {
 		return eTag;
 	}
+	
+  public void seteTag(String eTag) {
+    this.eTag = eTag;
+  }
 }

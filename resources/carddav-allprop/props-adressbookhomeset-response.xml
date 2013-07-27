@@ -1,0 +1,514 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+  <response>
+    <href>/addressbooks/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inheritable xmlns='http://twistedmatrix.com/xml_namespace/dav/'/>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <creationdate>2013-06-15T09:22:23Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <displayname>Pascal Robert</displayname>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"0fe71c3418a39fcc336effe3a56e4893"</getetag>
+        <getlastmodified>Tue, 09 Jul 2013 21:51:16 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resourcetype>
+          <collection/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8921_19359</sync-token>
+        <pushkey xmlns='http://calendarserver.org/ns/'>/CardDAV/famillerobert.local/AD04C60B-3704-447B-8997-24F5ACF589C7/</pushkey>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>DirectoryAddressBookHomeResource</resource-class>
+        <default-addressbook-URL xmlns='urn:ietf:params:xml:ns:carddav'>
+          <href xmlns='DAV:'>/addressbooks/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/addressbook/</href>
+        </default-addressbook-URL>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <add-member/>
+        <resource-id/>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'/>
+        <getctag xmlns='http://calendarserver.org/ns/'/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <max-resources xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:carddav'/>
+        <supported-address-data xmlns='urn:ietf:params:xml:ns:carddav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/addressbooks/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/addressbook/</href>
+    <propstat>
+      <prop>
+        <acl>
+          <ace>
+            <principal>
+              <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </principal>
+            <grant>
+              <privilege>
+                <all/>
+              </privilege>
+            </grant>
+            <protected/>
+            <inherited>
+              <href>/addressbooks/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+            </inherited>
+          </ace>
+        </acl>
+        <acl-restrictions/>
+        <add-member>
+          <href>/addressbooks/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/addressbook/;add-member</href>
+        </add-member>
+        <creationdate>2013-06-15T09:22:23Z</creationdate>
+        <current-user-principal>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </current-user-principal>
+        <current-user-privilege-set>
+          <privilege>
+            <all/>
+          </privilege>
+          <privilege>
+            <read/>
+          </privilege>
+          <privilege>
+            <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+          </privilege>
+          <privilege>
+            <write/>
+          </privilege>
+          <privilege>
+            <write-properties/>
+          </privilege>
+          <privilege>
+            <write-content/>
+          </privilege>
+          <privilege>
+            <bind/>
+          </privilege>
+          <privilege>
+            <unbind/>
+          </privilege>
+          <privilege>
+            <unlock/>
+          </privilege>
+          <privilege>
+            <read-acl/>
+          </privilege>
+          <privilege>
+            <write-acl/>
+          </privilege>
+          <privilege>
+            <read-current-user-privilege-set/>
+          </privilege>
+        </current-user-privilege-set>
+        <getcontentlength/>
+        <getcontenttype>httpd/unix-directory</getcontenttype>
+        <getetag>"f7125bdd10a01655f961992c86f7f685"</getetag>
+        <getlastmodified>Sat, 15 Jun 2013 09:24:08 GMT</getlastmodified>
+        <inherited-acl-set/>
+        <owner>
+          <href>/principals/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/</href>
+        </owner>
+        <principal-collection-set>
+          <href>/principals/</href>
+        </principal-collection-set>
+        <quota-available-bytes>104857600</quota-available-bytes>
+        <quota-used-bytes>0</quota-used-bytes>
+        <resource-id>
+          <href>urn:uuid:59dcbe2b-be7c-42ff-9239-b716f1bb70e6</href>
+        </resource-id>
+        <resourcetype>
+          <collection/>
+          <addressbook xmlns='urn:ietf:params:xml:ns:carddav'/>
+        </resourcetype>
+        <supported-privilege-set>
+          <supported-privilege>
+            <privilege>
+              <all/>
+            </privilege>
+            <description xml:lang='en'>all privileges</description>
+            <supported-privilege>
+              <privilege>
+                <read/>
+              </privilege>
+              <description xml:lang='en'>read resource</description>
+              <supported-privilege>
+                <privilege>
+                  <read-free-busy xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </privilege>
+                <description xml:lang='en'>allow free busy report query</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write/>
+              </privilege>
+              <description xml:lang='en'>write resource</description>
+              <supported-privilege>
+                <privilege>
+                  <write-properties/>
+                </privilege>
+                <description xml:lang='en'>write resource properties</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <write-content/>
+                </privilege>
+                <description xml:lang='en'>write resource content</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <bind/>
+                </privilege>
+                <description xml:lang='en'>add child resource</description>
+              </supported-privilege>
+              <supported-privilege>
+                <privilege>
+                  <unbind/>
+                </privilege>
+                <description xml:lang='en'>remove child resource</description>
+              </supported-privilege>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <unlock/>
+              </privilege>
+              <description xml:lang='en'>unlock resource without ownership of lock</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-acl/>
+              </privilege>
+              <description xml:lang='en'>read resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <write-acl/>
+              </privilege>
+              <description xml:lang='en'>write resource access control list</description>
+            </supported-privilege>
+            <supported-privilege>
+              <privilege>
+                <read-current-user-privilege-set/>
+              </privilege>
+              <description xml:lang='en'>read privileges for current principal</description>
+            </supported-privilege>
+          </supported-privilege>
+        </supported-privilege-set>
+        <supported-report-set>
+          <supported-report>
+            <report>
+              <acl-principal-prop-set/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-match/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <principal-property-search/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <expand-property/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendarserver-principal-search xmlns='http://calendarserver.org/ns/'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <calendar-multiget xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <free-busy-query xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-query xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <addressbook-multiget xmlns='urn:ietf:params:xml:ns:carddav'/>
+            </report>
+          </supported-report>
+          <supported-report>
+            <report>
+              <sync-collection/>
+            </report>
+          </supported-report>
+        </supported-report-set>
+        <supportedlock>
+          <lockentry>
+            <lockscope>
+              <exclusive/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+          <lockentry>
+            <lockscope>
+              <shared/>
+            </lockscope>
+            <locktype>
+              <write/>
+            </locktype>
+          </lockentry>
+        </supportedlock>
+        <sync-token>data:,8922_19359</sync-token>
+        <allowed-sharing-modes xmlns='http://calendarserver.org/ns/'>
+          <can-be-shared/>
+        </allowed-sharing-modes>
+        <getctag xmlns='http://calendarserver.org/ns/'>8922_19359</getctag>
+        <max-resources xmlns='http://calendarserver.org/ns/'>10000</max-resources>
+        <pushkey xmlns='http://calendarserver.org/ns/'>/CardDAV/famillerobert.local/AD04C60B-3704-447B-8997-24F5ACF589C7/</pushkey>
+        <resource-class xmlns='http://twistedmatrix.com/xml_namespace/dav/'>AddressBookCollectionResource</resource-class>
+        <max-resource-size xmlns='urn:ietf:params:xml:ns:carddav'>1048576</max-resource-size>
+        <supported-address-data xmlns='urn:ietf:params:xml:ns:carddav'>
+          <address-data-type version='3.0' content-type='text/vcard'/>
+        </supported-address-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <displayname/>
+        <invite xmlns='http://calendarserver.org/ns/'/>
+        <shared-url xmlns='http://calendarserver.org/ns/'/>
+        <default-addressbook-URL xmlns='urn:ietf:params:xml:ns:carddav'/>
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+</multistatus>
