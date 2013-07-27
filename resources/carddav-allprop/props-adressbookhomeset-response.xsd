@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:carddav" schemaLocation="ns3.xsd"/>
+  <xs:element name="multistatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns4:response"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns4:propstat"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="propstat">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:prop"/>
+        <xs:element ref="ns4:status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns4:acl"/>
+          <xs:element ref="ns4:acl-restrictions"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:add-member"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns4:creationdate"/>
+          <xs:element ref="ns4:current-user-principal"/>
+          <xs:element ref="ns4:current-user-privilege-set"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:displayname"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns4:getcontentlength"/>
+          <xs:element ref="ns4:getcontenttype"/>
+          <xs:element ref="ns4:getetag"/>
+          <xs:element ref="ns4:getlastmodified"/>
+          <xs:element ref="ns4:inherited-acl-set"/>
+          <xs:element ref="ns4:owner"/>
+          <xs:element ref="ns4:principal-collection-set"/>
+          <xs:element ref="ns4:quota-available-bytes"/>
+          <xs:element ref="ns4:quota-used-bytes"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:resource-id"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns4:resourcetype"/>
+          <xs:element ref="ns4:supported-privilege-set"/>
+          <xs:element ref="ns4:supported-report-set"/>
+          <xs:element ref="ns4:supportedlock"/>
+          <xs:element ref="ns4:sync-token"/>
+        </xs:sequence>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:allowed-sharing-modes"/>
+          <xs:element ref="ns1:getctag"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:invite"/>
+        <xs:element minOccurs="0" ref="ns1:max-resources"/>
+        <xs:choice>
+          <xs:element ref="ns1:shared-url"/>
+          <xs:sequence>
+            <xs:element ref="ns1:pushkey"/>
+            <xs:element ref="dav:resource-class"/>
+          </xs:sequence>
+        </xs:choice>
+        <xs:choice>
+          <xs:element ref="ns3:default-addressbook-URL"/>
+          <xs:sequence>
+            <xs:element ref="ns3:max-resource-size"/>
+            <xs:element ref="ns3:supported-address-data"/>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="acl">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:ace"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ace">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:principal"/>
+        <xs:element ref="ns4:grant"/>
+        <xs:element ref="ns4:protected"/>
+        <xs:choice>
+          <xs:element ref="ns4:inherited"/>
+          <xs:element ref="dav:inheritable"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="principal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="grant">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:privilege"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="protected">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="inherited">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="acl-restrictions">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="add-member">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="creationdate" type="xs:dateTime"/>
+  <xs:element name="current-user-principal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="current-user-privilege-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns4:privilege"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="displayname" type="xs:string"/>
+  <xs:element name="getcontentlength">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="getcontenttype" type="xs:string"/>
+  <xs:element name="getetag" type="xs:string"/>
+  <xs:element name="getlastmodified" type="xs:string"/>
+  <xs:element name="inherited-acl-set">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="owner">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="principal-collection-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="quota-available-bytes" type="xs:integer"/>
+  <xs:element name="quota-used-bytes" type="xs:integer"/>
+  <xs:element name="resource-id">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="resourcetype">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:collection"/>
+        <xs:element minOccurs="0" ref="ns3:addressbook"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="collection">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-privilege-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:supported-privilege"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="supported-report-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns4:supported-report"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="supported-report">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:report"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="report">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="ns4:acl-principal-prop-set"/>
+        <xs:element ref="ns4:expand-property"/>
+        <xs:element ref="ns4:principal-match"/>
+        <xs:element ref="ns4:principal-property-search"/>
+        <xs:element ref="ns4:sync-collection"/>
+        <xs:element ref="ns1:calendarserver-principal-search"/>
+        <xs:element ref="ns2:calendar-multiget"/>
+        <xs:element ref="ns2:calendar-query"/>
+        <xs:element ref="ns2:free-busy-query"/>
+        <xs:element ref="ns3:addressbook-multiget"/>
+        <xs:element ref="ns3:addressbook-query"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="acl-principal-prop-set">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="expand-property">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="principal-match">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="principal-property-search">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="sync-collection">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supportedlock">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns4:lockentry"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="lockentry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:lockscope"/>
+        <xs:element ref="ns4:locktype"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="lockscope">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="ns4:exclusive"/>
+        <xs:element ref="ns4:shared"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="exclusive">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="shared">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="locktype">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns4:write"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sync-token" type="xs:anyURI"/>
+  <xs:element name="status" type="xs:string"/>
+  <xs:element name="href" type="xs:anyURI"/>
+  <xs:element name="privilege">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="ns4:write"/>
+        <xs:element ref="ns4:all"/>
+        <xs:element ref="ns4:bind"/>
+        <xs:element ref="ns4:read"/>
+        <xs:element ref="ns4:read-acl"/>
+        <xs:element ref="ns4:read-current-user-privilege-set"/>
+        <xs:element ref="ns4:unbind"/>
+        <xs:element ref="ns4:unlock"/>
+        <xs:element ref="ns4:write-acl"/>
+        <xs:element ref="ns4:write-content"/>
+        <xs:element ref="ns4:write-properties"/>
+        <xs:element ref="ns2:read-free-busy"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="all">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="bind">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="read">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="read-acl">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="read-current-user-privilege-set">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="unbind">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="unlock">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="write-acl">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="write-content">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="write-properties">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-privilege">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="ns4:privilege"/>
+        <xs:element ref="ns4:supported-privilege"/>
+        <xs:element ref="ns4:description"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="description">
+    <xs:complexType mixed="true">
+      <xs:attribute ref="xml:lang" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="write">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

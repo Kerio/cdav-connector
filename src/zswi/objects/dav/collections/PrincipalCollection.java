@@ -23,11 +23,8 @@ import zswi.objects.dav.enums.RecordType;
 import zswi.protocols.communication.core.DavStore;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
-import zswi.schemas.dav.userinfo.CalendarProxyReadFor;
-import zswi.schemas.dav.userinfo.CalendarProxyWriteFor;
 import zswi.schemas.dav.userinfo.Multistatus;
 import zswi.schemas.dav.userinfo.Propstat;
-import zswi.schemas.dav.userinfo.Report;
 
 public class PrincipalCollection extends AbstractDavCollection {
 
@@ -49,7 +46,8 @@ public class PrincipalCollection extends AbstractDavCollection {
   
   /** http://tools.ietf.org/html/rfc6352#section-7.1.1 */
   AddressBookHomeSet addressbookHomeSet;
-  
+  java.net.URI addressbookHomeSetUrl;
+
   /** namespace: http://calendarserver.org/ns/ */
   boolean autoSchedule;
 
@@ -113,7 +111,8 @@ public class PrincipalCollection extends AbstractDavCollection {
         
         displayName = propstat.getProp().getDisplayname();
         calendarHomeSetUrl = new java.net.URI(propstat.getProp().getCalendarHomeSet().getHref());
-
+        addressbookHomeSetUrl = new java.net.URI(propstat.getProp().getAddressbookHomeSet().getHref());
+        
         if (isFakePrincipals) {
           setUri(uri.getPath());
         } else {
@@ -174,6 +173,8 @@ public class PrincipalCollection extends AbstractDavCollection {
             }
           }
         }
+      } else {
+        EntityUtils.consume(resp.getEntity());
       }
     }
     catch (Exception e) {
@@ -235,6 +236,14 @@ public class PrincipalCollection extends AbstractDavCollection {
   
   public AddressBookHomeSet getAddressbookHomeSet() {
     return addressbookHomeSet;
+  }
+  
+  protected void setAddressBookHomeSet(AddressBookHomeSet _addressbookHomeSet) {
+    addressbookHomeSet = _addressbookHomeSet;
+  }
+  
+  public java.net.URI getAddressbookHomeSetUrl() {
+    return addressbookHomeSetUrl;
   }
   
   public boolean isAutoSchedule() {

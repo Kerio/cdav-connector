@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:carddav" xmlns:ns1="http://calendarserver.org/ns/" xmlns:ns4="DAV" xmlns:ns2="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/" xmlns:ns3="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="props-adressbookhomeset-response.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns2.xsd"/>
+  <xs:element name="addressbook">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="addressbook-multiget">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="addressbook-query">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="default-addressbook-URL">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns4:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="max-resource-size" type="xs:string"/>
+  <xs:element name="supported-address-data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns3:address-data-type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="address-data-type">
+    <xs:complexType>
+      <xs:attribute name="content-type" use="required"/>
+      <xs:attribute name="version" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

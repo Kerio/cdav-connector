@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:carddav" xmlns:A="DAV" xmlns:B="urn:ietf:params:xml:ns:carddav">
+  <xs:import namespace="DAV" schemaLocation="A.xsd"/>
+  <xs:element name="addressbook-multiget">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="A:prop"/>
+        <xs:element maxOccurs="unbounded" ref="A:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="address-data">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

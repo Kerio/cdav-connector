@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dav:propfind xmlns:dav="DAV:" xmlns:ical="http://apple.com/ns/ical/"
+	xmlns:cs="http://calendarserver.org/ns/" xmlns:icloud="http://me.com/_namespace/"
+	xmlns:carddav="urn:ietf:params:xml:ns:carddav" xmlns:twisted="http://twistedmatrix.com/xml_namespace/dav/">
+	<dav:prop>
+		<dav:acl />
+		<dav:acl-restrictions />
+		<dav:add-member />
+		<dav:creationdate />
+		<dav:current-user-principal />
+		<dav:current-user-privilege-set />
+		<dav:displayname />
+		<dav:getcontentlength />
+		<dav:getcontenttype />
+		<dav:getetag />
+		<dav:getlastmodified />
+		<dav:inherited-acl-set />
+		<dav:owner />
+		<dav:principal-collection-set />
+		<dav:quota-available-bytes />
+		<dav:quota-used-bytes />
+		<dav:resource-id />
+		<dav:resourcetype />
+		<dav:supported-privilege-set />
+		<dav:supported-report-set />
+		<dav:supportedlock />
+		<dav:sync-token />
+		<cs:allowed-sharing-modes />
+		<cs:getctag />
+		<cs:invite />
+		<cs:max-resources />
+		<cs:pushkey />
+		<cs:shared-url />
+		<twisted:resource-class />
+		<carddav:default-addressbook-URL />
+		<carddav:max-resource-size />
+		<carddav:supported-address-data />
+	</dav:prop>
+</dav:propfind>
