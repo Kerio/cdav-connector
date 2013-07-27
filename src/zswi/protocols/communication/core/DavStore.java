@@ -31,9 +31,9 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.sourceforge.cardme.engine.VCardEngine;
 import net.sourceforge.cardme.io.VCardWriter;
@@ -604,7 +604,6 @@ public class DavStore {
   }
   
   /**
-   * TODO It should check if all components have the same Uid, or else it should be rejected
    * TODO It should reject the object if the base properties (SUMMARY, DTSTART, etc.) are not present
    * 
    * @param collection
@@ -618,18 +617,23 @@ public class DavStore {
       se = new StringEntity(calendar.toString());
       se.setContentType(TYPE_CALENDAR);
 
-      boolean isAcceptableComponentType = true;
+      String uid = null;
+      
+      // TODO should be moved to a method so that updateVCalendar can use it to (and easier to override if needed)
       for (Object component: calendar.getComponents()) {
         if (!(collection.getSupportedCalendarComponentSet().contains(((Component)component).getName()))) {
-          isAcceptableComponentType = false;
+          throw new DavStoreException("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
+        }
+        Property uidForComponent = ((Component)component).getProperty(Property.UID);
+        if (uid == null) {
+          uid = uidForComponent.getValue();
+        } else {
+          if (!(uid.equals(uidForComponent.getValue()))) {
+            throw new DavStoreException("The UID of every component of this calendar must be the same. The culprit is " + uidForComponent.getValue() + ".");
+          }
         }
       }
-      
-      if (!isAcceptableComponentType) throw new DavStoreException("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
-      
-      Component calComponent = (Component)calendar.getComponents().get(0);
-      String uid = calComponent.getProperty(Property.UID).getValue();
-      
+                  
       URI urlForRequest = initUri(collection.getUri() + uid + ".ics");
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
