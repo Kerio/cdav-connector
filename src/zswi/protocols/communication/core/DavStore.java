@@ -32,6 +32,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.sourceforge.cardme.engine.VCardEngine;
@@ -556,17 +557,17 @@ public class DavStore {
    * @throws DavStoreException
    * @throws NotSupportedComponent 
    * @throws UidConflict 
+   * @throws ValidationException 
    */
-  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent {
+  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
     
-    ServerVCalendar vCalendar = addVCalendar(collection,calendarForEvent);
+    ServerVCalendar vCalendar = addVCalendar(collection, calendarForEvent);
     return new ServerVEvent(event, vCalendar.geteTag(), vCalendar.getPath());
   }
   
   /**
-   * TODO It should reject the object if the base properties (SUMMARY, DTSTART, etc.) are not present
    * 
    * @param collection
    * @param calendar
@@ -574,30 +575,16 @@ public class DavStore {
    * @throws DavStoreException
    * @throws UidConflict 
    * @throws NotSupportedComponent 
+   * @throws ValidationException 
    */
-  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent {
+  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
       se.setContentType(TYPE_CALENDAR);
-
-      String uid = null;
       
-      // TODO should be moved to a method so that updateVCalendar can use it to (and easier to override if needed)
-      for (Object component: calendar.getComponents()) {
-        if (!(collection.getSupportedCalendarComponentSet().contains(((Component)component).getName()))) {
-          throw new NotSupportedComponent("The calendar object contains components not acceptable for this collection, only " + collection.getSupportedCalendarComponentSet() + " are accepted");
-        }
-        Property uidForComponent = ((Component)component).getProperty(Property.UID);
-        if (uid == null) {
-          uid = uidForComponent.getValue();
-        } else {
-          if (!(uid.equals(uidForComponent.getValue()))) {
-            throw new UidConflict("The UID of every component of this calendar must be the same. The culprit is " + uidForComponent.getValue() + ".");
-          }
-        }
-      }
-                  
+      String uid = Utilities.checkComponentsValidity(collection, calendar);
+      
       URI urlForRequest = initUri(collection.getUri() + uid + ".ics");
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
@@ -627,7 +614,7 @@ public class DavStore {
           }
         }
         
-        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path);
+        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path, collection);
         // TODO if Location and ETag are not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcalendar;
       } else {
@@ -644,7 +631,7 @@ public class DavStore {
       throw new DavStoreException(e);
     }
   }
-  
+
   /**
    * @deprecated Use updateVCalendar instead
    * @param event
@@ -676,9 +663,15 @@ public class DavStore {
    * 
    * @param calendar
    * @throws DavStoreException
+   * @throws ValidationException 
+   * @throws UidConflict 
+   * @throws NotSupportedComponent 
    */
-  public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
+  public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException, NotSupportedComponent, UidConflict, ValidationException {
     // vEvent must be enclosed in Calendar, otherwise is not added
+
+    Utilities.checkComponentsValidity(calendar.getParentCollection(), calendar.getVCalendar());
+
     StringEntity se = null;
     try {
       se = new StringEntity(calendar.getVCalendar().toString());
@@ -1113,7 +1106,35 @@ HTTP/1.1 207 Multistatus
 </a:response>
 </a:multistatus>
  */
-      if ((resp.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) && (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK)) {
+      int statusCode = resp.getStatusLine().getStatusCode();
+      if ((statusCode != HttpStatus.SC_CREATED) && (statusCode != HttpStatus.SC_OK)) {
+        String bodyOfResponse = EntityUtils.toString(resp.getEntity());
+                
+        if (statusCode == HttpStatus.SC_FORBIDDEN) {
+          jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+          Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+          StringReader reader = new StringReader(bodyOfResponse);
+          zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+          if (error.getErrorDescription() != null) {
+            throw new DavStoreException(error.getErrorDescription());
+          }
+          if (error.getResourceMustBeNull() != null) {
+            throw new DavStoreException("A resource MUST NOT exist at the Request-URI");
+          }
+          if (error.getCalendarCollectionLocationOk() != null) {
+            throw new DavStoreException("The Request-URI MUST identify a location where a calendar collection can be created");
+          }            
+          if (error.getValidCalendarData() != null) {
+            throw new DavStoreException("The time zone specified in the CALDAV:calendar-timezone property MUST be a valid iCalendar object containing a single valid VTIMEZONE component");
+          }
+          if (error.getNeedsPrivilege() != null) {
+            throw new DavStoreException("The DAV:bind privilege MUST be granted to the current user on the parent collection of the Request-URI.");
+          }
+          if (error.getInitializeCalendarCollection() != null) {
+            throw new DavStoreException("A new calendar collection exists at the Request-URI.");
+          }
+        }
+        
         throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
       }
     }
@@ -1249,7 +1270,7 @@ HTTP/1.1 207 Multistatus
     }
   }
   
-  public class DavStoreException extends Exception {
+  public static class DavStoreException extends Exception {
     
     public DavStoreException(String reason) {
       super(reason);
@@ -1260,7 +1281,7 @@ HTTP/1.1 207 Multistatus
     }
   }
   
-  public class NotImplemented extends Exception {
+  public static class NotImplemented extends Exception {
     
     public NotImplemented(String reason) {
       super(reason);
@@ -1271,7 +1292,7 @@ HTTP/1.1 207 Multistatus
     }
   }
   
-  public class UidConflict extends Exception {
+  public static class UidConflict extends Exception {
     
     public UidConflict(String reason) {
       super(reason);
@@ -1282,7 +1303,7 @@ HTTP/1.1 207 Multistatus
     }
   }
   
-  public class NotSupportedComponent extends Exception {
+  public static class NotSupportedComponent extends Exception {
     
     public NotSupportedComponent(String reason) {
       super(reason);
@@ -1293,7 +1314,7 @@ HTTP/1.1 207 Multistatus
     }
   }
   
-  public class NoRedirectFoundException extends Exception {
+  public static class NoRedirectFoundException extends Exception {
     
     public NoRedirectFoundException(String reason) {
       super(reason);

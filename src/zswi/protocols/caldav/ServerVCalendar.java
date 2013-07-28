@@ -1,6 +1,7 @@
 package zswi.protocols.caldav;
 
 import net.fortuna.ical4j.model.Calendar;
+import zswi.objects.dav.collections.CalendarCollection;
 
 /**
  * Server VCalendar represents a vCalendar downloaded from the server.
@@ -10,33 +11,43 @@ import net.fortuna.ical4j.model.Calendar;
  */
 public class ServerVCalendar {
 
-	private Calendar vcalendar;
-	private String eTag;
-	private String path;
-	
-	public ServerVCalendar(Calendar vcalendar, String eTag, String path){
-		this.vcalendar = vcalendar;
-		this.eTag = eTag;
-		this.path = path;
-	}
+  private Calendar vcalendar;
+  private String eTag;
+  private String path;
+  private CalendarCollection parentCollection;
 
-	public String getPath() {
-		return path;
-	}
+  public ServerVCalendar(Calendar vcalendar, String eTag, String path){
+    this.vcalendar = vcalendar;
+    this.eTag = eTag;
+    this.path = path;
+  }
 
-	public Calendar getVCalendar() {
-		return vcalendar;
-	}
+  public ServerVCalendar(Calendar vcalendar, String eTag, String path, CalendarCollection parentCollection){
+    this(vcalendar, eTag, path);
+    this.parentCollection = parentCollection;
+  }
 
-	public void setVCalendar(Calendar vcalendar) {
-		this.vcalendar = vcalendar;
-	}
+  public String getPath() {
+    return path;
+  }
 
-	public String geteTag() {
-		return eTag;
-	}
-	
+  public Calendar getVCalendar() {
+    return vcalendar;
+  }
+
+  public void setVCalendar(Calendar vcalendar) {
+    this.vcalendar = vcalendar;
+  }
+
+  public String geteTag() {
+    return eTag;
+  }
+
   public void seteTag(String eTag) {
     this.eTag = eTag;
+  }
+  
+  public CalendarCollection getParentCollection() {
+    return parentCollection;
   }
 }
