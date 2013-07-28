@@ -63,6 +63,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
 import zswi.objects.dav.collections.AbstractDavCollection;
+import zswi.objects.dav.collections.AbstractNotPrincipalCollection;
 import zswi.objects.dav.collections.AddressBookCollection;
 import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
@@ -1069,73 +1070,71 @@ public class DavStore {
 
       HttpResponse resp = _httpClient.execute(req);
 
-      // TODO need to parse the error when status code is 403 and return the content of the error in the exception. Have to check if the response is text/xml
-/*
-HTTP/1.1 403 Forbidden
- 
-<error xmlns='DAV:'>
-  <resource-must-be-null/>
-  <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>Resource already exists</error-description>
-</error>
-
-<D:error xmlns:D="DAV:">
-    <D:resource-must-be-null/>
-</D:error>
-
-<error xmlns='DAV:'>
-  <calendar-collection-location-ok xmlns='urn:ietf:params:xml:ns:caldav'/>
-  <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>Cannot create a calendar collection inside another calendar collection</error-description>
-</error>
-
-HTTP/1.1 207 Multistatus
-
-<?xml version="1.0" encoding="UTF-8"?>
-<a:multistatus xmlns:a="DAV:" xmlns:c="http://apple.com/ns/ical/" xmlns:d="urn:ietf:params:xml:ns:caldav" xmlns:b="xml:">
-<a:response>
-  <a:href>/full-calendars/kerio.famillerobert.lan/admin/12348</a:href>
-  <a:propstat>
-    <a:status>HTTP/1.1 200 OK</a:status>
-    <a:prop>
-      <a:displayname>Sans titre</a:displayname>
-    </a:prop>
-  </a:propstat>
-  <a:propstat>
-    <a:status>HTTP/1.1 403 Forbidden</a:status>
-    <a:prop><d:calendar-free-busy-set/></a:prop>
-  </a:propstat>
-</a:response>
-</a:multistatus>
- */
       int statusCode = resp.getStatusLine().getStatusCode();
       if ((statusCode != HttpStatus.SC_CREATED) && (statusCode != HttpStatus.SC_OK)) {
         String bodyOfResponse = EntityUtils.toString(resp.getEntity());
                 
-        if (statusCode == HttpStatus.SC_FORBIDDEN) {
-          jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
-          Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
-          StringReader reader = new StringReader(bodyOfResponse);
-          zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
-          if (error.getErrorDescription() != null) {
-            throw new DavStoreException(error.getErrorDescription());
-          }
-          if (error.getResourceMustBeNull() != null) {
-            throw new DavStoreException("A resource MUST NOT exist at the Request-URI");
-          }
-          if (error.getCalendarCollectionLocationOk() != null) {
-            throw new DavStoreException("The Request-URI MUST identify a location where a calendar collection can be created");
-          }            
-          if (error.getValidCalendarData() != null) {
-            throw new DavStoreException("The time zone specified in the CALDAV:calendar-timezone property MUST be a valid iCalendar object containing a single valid VTIMEZONE component");
-          }
-          if (error.getNeedsPrivilege() != null) {
-            throw new DavStoreException("The DAV:bind privilege MUST be granted to the current user on the parent collection of the Request-URI.");
-          }
-          if (error.getInitializeCalendarCollection() != null) {
-            throw new DavStoreException("A new calendar collection exists at the Request-URI.");
-          }
-        }
+        EntityUtils.consume(resp.getEntity());
         
-        throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+          /* 
+           * TODO need to parse the error when status code is 207 Multistatus.
+           * The collection creation MIGHT have worked. In my tests, Kerio Connect was sending back the following response, but the collection was indeed created.
+           * So we must check if the collection was created before throwing a exception.
+           */
+          /*
+          HTTP/1.1 207 Multistatus
+
+          <?xml version="1.0" encoding="UTF-8"?>
+          <a:multistatus xmlns:a="DAV:" xmlns:c="http://apple.com/ns/ical/" xmlns:d="urn:ietf:params:xml:ns:caldav" xmlns:b="xml:">
+          <a:response>
+            <a:href>/full-calendars/kerio.famillerobert.lan/admin/12348</a:href>
+            <a:propstat>
+              <a:status>HTTP/1.1 200 OK</a:status>
+              <a:prop>
+                <a:displayname>Sans titre</a:displayname>
+              </a:prop>
+            </a:propstat>
+            <a:propstat>
+              <a:status>HTTP/1.1 403 Forbidden</a:status>
+              <a:prop><d:calendar-free-busy-set/></a:prop>
+            </a:propstat>
+          </a:response>
+          </a:multistatus>
+           */
+          throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        
+        } else {
+
+          if (statusCode == HttpStatus.SC_FORBIDDEN) {
+            jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+            Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+            StringReader reader = new StringReader(bodyOfResponse);
+            zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+            if (error.getErrorDescription() != null) {
+              throw new DavStoreException(error.getErrorDescription());
+            }
+            if (error.getResourceMustBeNull() != null) {
+              throw new DavStoreException("A resource MUST NOT exist at the Request-URI");
+            }
+            if (error.getCalendarCollectionLocationOk() != null) {
+              throw new DavStoreException("The Request-URI MUST identify a location where a calendar collection can be created");
+            }            
+            if (error.getValidCalendarData() != null) {
+              throw new DavStoreException("The time zone specified in the CALDAV:calendar-timezone property MUST be a valid iCalendar object containing a single valid VTIMEZONE component");
+            }
+            if (error.getNeedsPrivilege() != null) {
+              throw new DavStoreException("The DAV:bind privilege MUST be granted to the current user on the parent collection of the Request-URI.");
+            }
+            if (error.getInitializeCalendarCollection() != null) {
+              throw new DavStoreException("A new calendar collection exists at the Request-URI.");
+            }
+          }
+
+          throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        }
+      } else {
+        EntityUtils.consume(resp.getEntity());
       }
     }
     catch (URISyntaxException e) {
@@ -1151,7 +1150,50 @@ HTTP/1.1 207 Multistatus
       throw new DavStoreException(e.getMessage());
     }
   }
-  
+
+  // TODO should check if DELETE method is allowed for this collection and throw a different exception if that's the case
+  public void deleteCollection(AbstractNotPrincipalCollection collection) throws ClientProtocolException, URISyntaxException, IOException, DavStoreException {
+    try {
+      DeleteRequest del = new DeleteRequest(initUri(collection.getUri()), collection.getGetetag());
+      HttpResponse resp = httpClient().execute(del);
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+      if ((statusCode != HttpStatus.SC_NO_CONTENT) && (statusCode != HttpStatus.SC_OK)) {
+        String bodyOfResponse = EntityUtils.toString(resp.getEntity());
+
+        EntityUtils.consume(resp.getEntity());      
+
+        if (statusCode == HttpStatus.SC_FORBIDDEN) {
+          if ((bodyOfResponse != null) && (bodyOfResponse.length() > 1)) {
+            JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+            Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+            StringReader reader = new StringReader(bodyOfResponse);
+            zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+            if (error.getErrorDescription() != null) {
+              throw new DavStoreException(error.getErrorDescription());
+            } 
+          }
+        }
+
+        throw new DavStoreException("We couldn't delete the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+      } else {
+        EntityUtils.consume(resp.getEntity());
+      }   
+    }       
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + collection.getUri());
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+  }
+
   protected String report(StringEntity body, String path, int depth) throws DavStoreException, NotImplemented {
     ReportRequest req;
     String response = "";
