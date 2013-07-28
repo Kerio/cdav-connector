@@ -33,7 +33,6 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.sourceforge.cardme.engine.VCardEngine;
 import net.sourceforge.cardme.io.VCardWriter;
@@ -72,10 +71,12 @@ import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
 import zswi.protocols.communication.core.requests.DeleteRequest;
+import zswi.protocols.communication.core.requests.MkCalendarRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
+import zswi.schemas.caldav.mkcalendar.Mkcalendar;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
 import zswi.schemas.carddav.multiget.ObjectFactory;
 import zswi.schemas.dav.discovery.PrincipalURL;
@@ -97,12 +98,13 @@ public class DavStore {
   protected Integer _port;
   protected DefaultHttpClient _httpClient;
   protected boolean _isSecure;
-  protected ArrayList<DavFeature> _supportedFeatures;
   protected HttpHost _targetHost;
   private PrincipalCollection _principalCollection;
   public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
   public static final String TYPE_CALENDAR = "text/calendar; charset=utf-8";
   public static final String TYPE_VCARD = "text/vcard; charset=utf-8";
+  protected ArrayList<String> _allowedMethods;
+  protected ArrayList<DavFeature> _supportedFeatures;
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
@@ -480,6 +482,8 @@ public class DavStore {
   }
 
   /**
+   * TODO this method should be called each a collection is called, and the features/allowed methods should be stored inside the collection data structure
+   * 
    * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
    * the "DAV" header of the response (done by a OPTIONS request).
    * 
@@ -487,10 +491,15 @@ public class DavStore {
    */
   public void fetchFeatures(String path) {
     _supportedFeatures = new ArrayList<DavFeature>();
+    _allowedMethods = new ArrayList<String>();
+    
     try {
-      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, _path).toURI());
+      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, path).toURI());
+
       HttpResponse response = httpClient().execute(headersMethod);
       Header[] davHeaders = response.getHeaders("DAV");
+      Header[] allowHeaders = response.getHeaders("Allow");
+
       EntityUtils.consume(response.getEntity());
       
       for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
@@ -499,6 +508,15 @@ public class DavStore {
         for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
           DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
           _supportedFeatures.add(feature);
+        }
+      }
+      
+      for (int index = 0; index < allowHeaders.length; index++) {
+        Header header = allowHeaders[index];
+        String[] methodsAsString = header.getValue().split(",");
+        for (int methodIndex = 0; methodIndex < methodsAsString.length; methodIndex++) {
+          String feature = methodsAsString[methodIndex].trim();
+          _allowedMethods.add(feature);
         }
       }
     }
@@ -1069,6 +1087,107 @@ public class DavStore {
     EntityUtils.consume(resp.getEntity());
     if(resp.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) return true;
     else return false;
+  }
+  
+  // TODO Must do a OPTIONS request on the calendar-home-set to see if MKCALENDAR is allowed. If not, you can't create new collections
+  public void addCalendarCollection(CalendarCollection collection) throws DavStoreException {
+    MkCalendarRequest req;
+
+    try {
+      req = new MkCalendarRequest(initUri(collection.getUri()));
+      if (!(_allowedMethods.contains(req.getMethod()))) {
+        throw new DavStoreException("The calendar home-set doesn't allow the MKCALENDAR method");
+      }
+
+      zswi.schemas.caldav.mkcalendar.ObjectFactory factory = new zswi.schemas.caldav.mkcalendar.ObjectFactory();
+
+      zswi.schemas.caldav.mkcalendar.SupportedCalendarComponentSet supportedCalendarCompSet = factory.createSupportedCalendarComponentSet();
+      for (String componentType: collection.getSupportedCalendarComponentSet()) {
+        zswi.schemas.caldav.mkcalendar.Comp component = factory.createComp();
+        component.setName(componentType);
+        supportedCalendarCompSet.getComp().add(component);
+      }
+      
+      zswi.schemas.caldav.mkcalendar.Prop propElement = factory.createProp();
+      propElement.setCalendarColor(collection.getCalendarColor());
+      propElement.setCalendarOrder(collection.getCalendarOrder());
+      if (collection.getCalendarTimezone() != null) {
+        propElement.setCalendarTimezone(collection.getCalendarTimezone().toString());
+      }
+      propElement.setDisplayname(collection.getDisplayName());
+      propElement.setSupportedCalendarComponentSet(supportedCalendarCompSet);
+      
+      zswi.schemas.caldav.mkcalendar.Set setElement = factory.createSet();
+      setElement.setProp(propElement);
+      
+      Mkcalendar mkcalendarElement = factory.createMkcalendar();
+      mkcalendarElement.setSet(setElement);
+      
+      StringWriter sw = new StringWriter();
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.mkcalendar");
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      marshaller.marshal(mkcalendarElement, sw);
+      
+      StringEntity body = new StringEntity(sw.toString());
+      body.setContentType("text/xml");
+      req.setEntity(body);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      // TODO need to parse the error when status code is 403 and return the content of the error in the exception. Have to check if the response is text/xml
+/*
+HTTP/1.1 403 Forbidden
+ 
+<error xmlns='DAV:'>
+  <resource-must-be-null/>
+  <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>Resource already exists</error-description>
+</error>
+
+<D:error xmlns:D="DAV:">
+    <D:resource-must-be-null/>
+</D:error>
+
+<error xmlns='DAV:'>
+  <calendar-collection-location-ok xmlns='urn:ietf:params:xml:ns:caldav'/>
+  <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>Cannot create a calendar collection inside another calendar collection</error-description>
+</error>
+
+HTTP/1.1 207 Multistatus
+
+<?xml version="1.0" encoding="UTF-8"?>
+<a:multistatus xmlns:a="DAV:" xmlns:c="http://apple.com/ns/ical/" xmlns:d="urn:ietf:params:xml:ns:caldav" xmlns:b="xml:">
+<a:response>
+  <a:href>/full-calendars/kerio.famillerobert.lan/admin/12348</a:href>
+  <a:propstat>
+    <a:status>HTTP/1.1 200 OK</a:status>
+    <a:prop>
+      <a:displayname>Sans titre</a:displayname>
+    </a:prop>
+  </a:propstat>
+  <a:propstat>
+    <a:status>HTTP/1.1 403 Forbidden</a:status>
+    <a:prop><d:calendar-free-busy-set/></a:prop>
+  </a:propstat>
+</a:response>
+</a:multistatus>
+ */
+      if ((resp.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) && (resp.getStatusLine().getStatusCode() != HttpStatus.SC_OK)) {
+        throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+      }
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + httpScheme() + _serverName +  _port + "/.well-known/caldav");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
   }
   
   protected String report(StringEntity body, String path, int depth) throws DavStoreException, NotImplemented {
