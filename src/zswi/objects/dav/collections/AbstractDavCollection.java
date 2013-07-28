@@ -1,5 +1,17 @@
 package zswi.objects.dav.collections;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.util.EntityUtils;
+
+import zswi.objects.dav.enums.DavFeature;
 import zswi.objects.dav.enums.ResourceType;
 
 
@@ -43,6 +55,9 @@ public abstract class AbstractDavCollection {
   
   /** namespace: http://twistedmatrix.com/xml_namespace/dav/ */
   String resourceClass;
+  
+  protected ArrayList<String> allowedMethods;
+  protected ArrayList<DavFeature> supportedFeatures;
   
   /** Always useful to have the URI of a DAV collection */
   String uri;
@@ -102,6 +117,28 @@ public abstract class AbstractDavCollection {
   protected String convertStreamToString(java.io.InputStream is) {
     java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
     return s.hasNext() ? s.next() : "";
-  } 
+  }
+  
+  public ArrayList<String> allowedMethods() {
+    if (allowedMethods == null) {
+      allowedMethods = new ArrayList<String>();
+    }
+    return allowedMethods;
+  }
 
+  public void setAllowedMethods(ArrayList<String> allowedMethods2) {
+    this.allowedMethods = allowedMethods2;
+  }
+  
+  public ArrayList<DavFeature> supportedFeatures() {
+    if (supportedFeatures == null) {
+      supportedFeatures = new ArrayList<DavFeature>();
+    }
+    return supportedFeatures;
+  }
+
+  public void setSupportedFeatures(ArrayList<DavFeature> supportedFeatures2) {
+    this.supportedFeatures = supportedFeatures2;
+  } 
+  
 }

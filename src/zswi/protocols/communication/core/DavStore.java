@@ -61,6 +61,7 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import zswi.objects.dav.collections.AbstractDavCollection;
 import zswi.objects.dav.collections.AddressBookCollection;
 import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
@@ -103,8 +104,6 @@ public class DavStore {
   public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
   public static final String TYPE_CALENDAR = "text/calendar; charset=utf-8";
   public static final String TYPE_VCARD = "text/vcard; charset=utf-8";
-  protected ArrayList<String> _allowedMethods;
-  protected ArrayList<DavFeature> _supportedFeatures;
   
   static final Logger logger = Logger.getLogger(DavStore.class.getName());
   
@@ -130,7 +129,6 @@ public class DavStore {
    * @throws DavStoreException 
    */
   public DavStore(String username, String password) throws DavStoreException {
-    _supportedFeatures = new ArrayList<DavFeature>();
     _username = username;
     _password = password;
     _isSecure = false;
@@ -364,18 +362,20 @@ public class DavStore {
       if (currentUserPrincipal == null) {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
-        fetchFeatures(calHomeSet.getUri());
-        new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        fetchFeatures(calHomeSet);
+        AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        fetchFeatures(addressBookSet);
         _principalCollection = calHomeSet.getOwner();
       } else {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
         if (principals.getCalendarHomeSetUrl() != null) {
           CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
-          fetchFeatures(calHomeSet.getUri());
+          fetchFeatures(calHomeSet);
           _principalCollection = calHomeSet.getOwner();
         }
         if (principals.getAddressbookHomeSetUrl() != null) {
-          new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+          AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+          fetchFeatures(addressBookSet);
         }
       }      
     }
@@ -471,64 +471,6 @@ public class DavStore {
       localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
     }
     return _httpClient;
-  }
-
-  /**
-   * 
-   * @return A list of enums that details which DAV/CalDAV/CardDAV features this server implements.
-   */
-  public ArrayList<DavFeature> supportedFeatures() {
-    return _supportedFeatures;
-  }
-
-  /**
-   * TODO this method should be called each a collection is called, and the features/allowed methods should be stored inside the collection data structure
-   * 
-   * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
-   * the "DAV" header of the response (done by a OPTIONS request).
-   * 
-   * @param path URL path to the calendar home set or a calendar collection.
-   */
-  public void fetchFeatures(String path) {
-    _supportedFeatures = new ArrayList<DavFeature>();
-    _allowedMethods = new ArrayList<String>();
-    
-    try {
-      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, path).toURI());
-
-      HttpResponse response = httpClient().execute(headersMethod);
-      Header[] davHeaders = response.getHeaders("DAV");
-      Header[] allowHeaders = response.getHeaders("Allow");
-
-      EntityUtils.consume(response.getEntity());
-      
-      for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
-        Header header = davHeaders[davIndex];
-        String[] featuresAsString = header.getValue().split(",");
-        for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
-          DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
-          _supportedFeatures.add(feature);
-        }
-      }
-      
-      for (int index = 0; index < allowHeaders.length; index++) {
-        Header header = allowHeaders[index];
-        String[] methodsAsString = header.getValue().split(",");
-        for (int methodIndex = 0; methodIndex < methodsAsString.length; methodIndex++) {
-          String feature = methodsAsString[methodIndex].trim();
-          _allowedMethods.add(feature);
-        }
-      }
-    }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
   }
   
   /**
@@ -1089,13 +1031,12 @@ public class DavStore {
     else return false;
   }
   
-  // TODO Must do a OPTIONS request on the calendar-home-set to see if MKCALENDAR is allowed. If not, you can't create new collections
   public void addCalendarCollection(CalendarCollection collection) throws DavStoreException {
     MkCalendarRequest req;
 
     try {
       req = new MkCalendarRequest(initUri(collection.getUri()));
-      if (!(_allowedMethods.contains(req.getMethod()))) {
+      if (!(this.principalCollection().getCalendarHomeSet().allowedMethods().contains(req.getMethod()))) {
         throw new DavStoreException("The calendar home-set doesn't allow the MKCALENDAR method");
       }
 
@@ -1252,6 +1193,60 @@ HTTP/1.1 207 Multistatus
       throw new DavStoreException(e);
     }
     return response;
+  }
+  
+  /**
+   * TODO this method should be called each a collection is called, and the features/allowed methods should be stored inside the collection data structure
+   * 
+   * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
+   * the "DAV" header of the response (done by a OPTIONS request).
+   * 
+   * @param path URL path to the calendar home set or a calendar collection.
+   */
+  public void fetchFeatures(AbstractDavCollection collection) {
+    ArrayList<DavFeature> supportedFeatures = new ArrayList<DavFeature>();
+    ArrayList<String> allowedMethods = new ArrayList<String>();
+    
+    try {
+      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, collection.getUri()).toURI());
+
+      HttpResponse response = httpClient().execute(headersMethod);
+      Header[] davHeaders = response.getHeaders("DAV");
+      Header[] allowHeaders = response.getHeaders("Allow");
+
+      EntityUtils.consume(response.getEntity());
+      
+      for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
+        Header header = davHeaders[davIndex];
+        String[] featuresAsString = header.getValue().split(",");
+        for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
+          DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
+          supportedFeatures.add(feature);
+        }
+      }
+      
+      collection.setSupportedFeatures(supportedFeatures);
+      
+      for (int index = 0; index < allowHeaders.length; index++) {
+        Header header = allowHeaders[index];
+        String[] methodsAsString = header.getValue().split(",");
+        for (int methodIndex = 0; methodIndex < methodsAsString.length; methodIndex++) {
+          String feature = methodsAsString[methodIndex].trim();
+          allowedMethods.add(feature);
+        }
+      }
+      
+      collection.setAllowedMethods(allowedMethods);
+    }
+    catch (ClientProtocolException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
   }
   
   public class DavStoreException extends Exception {
