@@ -31,7 +31,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.sourceforge.cardme.engine.VCardEngine;
@@ -47,6 +47,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
@@ -61,6 +62,8 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
+import zswi.objects.dav.collections.AbstractDavCollection;
+import zswi.objects.dav.collections.AbstractNotPrincipalCollection;
 import zswi.objects.dav.collections.AddressBookCollection;
 import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
@@ -70,11 +73,15 @@ import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
+import zswi.protocols.communication.core.requests.CopyRequest;
 import zswi.protocols.communication.core.requests.DeleteRequest;
+import zswi.protocols.communication.core.requests.MkCalendarRequest;
+import zswi.protocols.communication.core.requests.MoveRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
+import zswi.schemas.caldav.mkcalendar.Mkcalendar;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
 import zswi.schemas.carddav.multiget.ObjectFactory;
 import zswi.schemas.dav.discovery.PrincipalURL;
@@ -84,6 +91,15 @@ import zswi.schemas.dav.icalendarobjects.Response;
  * Connect to a CalDAV/CardDAV server by auto-discovery or by a specific URL.
  * 
  * @author Pascal Robert
+ *
+ * TODO PROPPATCH on collections
+ * TODO Checking those requirements http://tools.ietf.org/html/rfc4791#section-5.3.2.1
+ * TODO Sync changes from the server by checking the eTag values
+ * TODO Support calendar-query to find rooms, people, etc. See examples at http://tools.ietf.org/html/rfc4791#section-7.8
+ * TODO Implements free-busy-request http://tools.ietf.org/html/rfc4791#section-7.10 
+ * TODO Implement external attachments http://tools.ietf.org/html/rfc4791#section-8.5
+ * TODO Implement RFC 6638 http://tools.ietf.org/html/rfc6638
+ * TODO Implement sharing http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-sharing.txt
  *
  */
 public class DavStore {
@@ -96,7 +112,6 @@ public class DavStore {
   protected Integer _port;
   protected DefaultHttpClient _httpClient;
   protected boolean _isSecure;
-  protected ArrayList<DavFeature> _supportedFeatures;
   protected HttpHost _targetHost;
   private PrincipalCollection _principalCollection;
   public static final String PROPSTAT_OK = "HTTP/1.1 200 OK";
@@ -127,7 +142,6 @@ public class DavStore {
    * @throws DavStoreException 
    */
   public DavStore(String username, String password) throws DavStoreException {
-    _supportedFeatures = new ArrayList<DavFeature>();
     _username = username;
     _password = password;
     _isSecure = false;
@@ -361,15 +375,21 @@ public class DavStore {
       if (currentUserPrincipal == null) {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
         CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
-        fetchFeatures(calHomeSet.getUri());
-        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        fetchFeatures(calHomeSet);
+        AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
+        fetchFeatures(addressBookSet);
         _principalCollection = calHomeSet.getOwner();
       } else {
         PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
-        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
-        fetchFeatures(calHomeSet.getUri());
-        AddressBookHomeSet addressbookHomeSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
-        _principalCollection = calHomeSet.getOwner();
+        if (principals.getCalendarHomeSetUrl() != null) {
+          CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+          fetchFeatures(calHomeSet);
+          _principalCollection = calHomeSet.getOwner();
+        }
+        if (principals.getAddressbookHomeSetUrl() != null) {
+          AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+          fetchFeatures(addressBookSet);
+        }
       }      
     }
     catch (URISyntaxException e) {
@@ -465,48 +485,6 @@ public class DavStore {
     }
     return _httpClient;
   }
-
-  /**
-   * 
-   * @return A list of enums that details which DAV/CalDAV/CardDAV features this server implements.
-   */
-  public ArrayList<DavFeature> supportedFeatures() {
-    return _supportedFeatures;
-  }
-
-  /**
-   * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
-   * the "DAV" header of the response (done by a OPTIONS request).
-   * 
-   * @param path URL path to the calendar home set or a calendar collection.
-   */
-  public void fetchFeatures(String path) {
-    _supportedFeatures = new ArrayList<DavFeature>();
-    try {
-      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, _path).toURI());
-      HttpResponse response = httpClient().execute(headersMethod);
-      Header[] davHeaders = response.getHeaders("DAV");
-      EntityUtils.consume(response.getEntity());
-      
-      for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
-        Header header = davHeaders[davIndex];
-        String[] featuresAsString = header.getValue().split(",");
-        for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
-          DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
-          _supportedFeatures.add(feature);
-        }
-      }
-    }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    catch (URISyntaxException e) {
-      e.printStackTrace();
-    }
-  }
   
   /**
    * @deprecated Use getVCalendars instead
@@ -545,7 +523,7 @@ public class DavStore {
       response = this.report("rep_events.txt", path, 1);
     }
     catch (NotImplemented e1) {
-      // TODO if it fails with 501 Implemented, it should try to fetch the vCards with a PROPFIND followed by a calendar-multiget
+      // ç
       e1.printStackTrace();
     }
 
@@ -589,64 +567,83 @@ public class DavStore {
    * @param event
    * @return
    * @throws DavStoreException
+   * @throws NotSupportedComponent 
+   * @throws UidConflict 
+   * @throws ValidationException 
    */
-  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException {
+  public ServerVEvent addVEvent(CalendarCollection collection, VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
     
-    ServerVCalendar vCalendar = addVCalendar(collection,calendarForEvent);
+    ServerVCalendar vCalendar = addVCalendar(collection, calendarForEvent);
     return new ServerVEvent(event, vCalendar.geteTag(), vCalendar.getPath());
   }
   
   /**
-   * TODO It should verify if the component type is accepted for the collection
-   * TODO It should raise only one type of exception
-   * TODO It should check if all components have the same Uid, or else it should be rejected
-   * TODO It should reject the object if the base properties (SUMMARY, DTSTART, etc.) are not present
    * 
    * @param collection
    * @param calendar
    * @return
    * @throws DavStoreException
+   * @throws UidConflict 
+   * @throws NotSupportedComponent 
+   * @throws ValidationException 
    */
-  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException {
+  public ServerVCalendar addVCalendar(CalendarCollection collection, Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
       se.setContentType(TYPE_CALENDAR);
-
-      Component calComponent = (Component)calendar.getComponents().get(0);
-      String uid = calComponent.getProperty(Property.UID).getValue();
+      
+      String uid = Utilities.checkComponentsValidity(collection, calendar);
+      
       URI urlForRequest = initUri(collection.getUri() + uid + ".ics");
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
+      
       HttpResponse resp = httpClient().execute(putReq);
       EntityUtils.consume(resp.getEntity());
+      
+      String path = urlForRequest.getPath();
+      
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        
         Header[] headers = resp.getHeaders("Etag");
         String etag = "";
         if (headers.length == 1) {
           etag = headers[0].getValue();
         }
-        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, urlForRequest.getPath());
-        // TODO should check if the Location header is present, if yes, should update the path with that value
-        // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
+        
+        Header[] locations = resp.getHeaders("Location");
+        if (locations.length == 1) {
+          try {
+            URL locationUrl = new URL(locations[0].getValue());
+            path = locationUrl.getPath();
+          } catch (MalformedURLException urle) {
+            // It might be just a path, so let's take this instead
+            if (locations[0].getValue().length() > 0)
+              path = locations[0].getValue();
+          }
+        }
+        
+        ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path, collection);
+        // TODO if Location and ETag are not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcalendar;
       } else {
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
       }
     }
     catch (UnsupportedEncodingException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (URISyntaxException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
     catch (IOException e) {
-      throw new DavStoreException(e.getMessage());
+      throw new DavStoreException(e);
     }
   }
-  
+
   /**
    * @deprecated Use updateVCalendar instead
    * @param event
@@ -678,9 +675,15 @@ public class DavStore {
    * 
    * @param calendar
    * @throws DavStoreException
+   * @throws ValidationException 
+   * @throws UidConflict 
+   * @throws NotSupportedComponent 
    */
-  public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException {
+  public void updateVCalendar(ServerVCalendar calendar) throws DavStoreException, NotSupportedComponent, UidConflict, ValidationException {
     // vEvent must be enclosed in Calendar, otherwise is not added
+
+    Utilities.checkComponentsValidity(calendar.getParentCollection(), calendar.getVCalendar());
+
     StringEntity se = null;
     try {
       se = new StringEntity(calendar.getVCalendar().toString());
@@ -896,15 +899,33 @@ public class DavStore {
       PutRequest putReq = new PutRequest(urlForRequest);
       putReq.setEntity(se);
       HttpResponse resp = httpClient().execute(putReq);
+      
       EntityUtils.consume(resp.getEntity());
+      
+      String path = urlForRequest.getPath();
+      
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        
         Header[] headers = resp.getHeaders("Etag");
         String etag = "";
+        
         if (headers.length == 1) {
           etag = headers[0].getValue();
         }
-        ServerVCard vcard = new ServerVCard(card, etag, urlForRequest.getPath());
-        // TODO should check if the Location header is present, if yes, should update the path with that value
+        
+        Header[] locations = resp.getHeaders("Location");
+        if (locations.length == 1) {
+          try {
+            URL locationUrl = new URL(locations[0].getValue());
+            path = locationUrl.getPath();
+          } catch (MalformedURLException urle) {
+            // It might be just a path, so let's take this instead
+            if (locations[0].getValue().length() > 0)
+              path = locations[0].getValue();
+          }
+        }
+        
+        ServerVCard vcard = new ServerVCard(card, etag, path);
         // TODO if Location is not present, we should do a PROPFIND at the same URL to get the value of the getetag property
         return vcard;
       } else {
@@ -1015,6 +1036,235 @@ public class DavStore {
     else return false;
   }
   
+  public void addCalendarCollection(CalendarCollection collection) throws DavStoreException {
+    MkCalendarRequest req;
+
+    try {
+      req = new MkCalendarRequest(initUri(collection.getUri()));
+      if (!(this.principalCollection().getCalendarHomeSet().allowedMethods().contains(req.getMethod()))) {
+        throw new DavStoreException("The calendar home-set doesn't allow the MKCALENDAR method");
+      }
+
+      zswi.schemas.caldav.mkcalendar.ObjectFactory factory = new zswi.schemas.caldav.mkcalendar.ObjectFactory();
+
+      zswi.schemas.caldav.mkcalendar.SupportedCalendarComponentSet supportedCalendarCompSet = factory.createSupportedCalendarComponentSet();
+      for (String componentType: collection.getSupportedCalendarComponentSet()) {
+        zswi.schemas.caldav.mkcalendar.Comp component = factory.createComp();
+        component.setName(componentType);
+        supportedCalendarCompSet.getComp().add(component);
+      }
+      
+      zswi.schemas.caldav.mkcalendar.Prop propElement = factory.createProp();
+      propElement.setCalendarColor(collection.getCalendarColor());
+      propElement.setCalendarOrder(collection.getCalendarOrder());
+      if (collection.getCalendarTimezone() != null) {
+        propElement.setCalendarTimezone(collection.getCalendarTimezone().toString());
+      }
+      propElement.setDisplayname(collection.getDisplayName());
+      propElement.setSupportedCalendarComponentSet(supportedCalendarCompSet);
+      
+      zswi.schemas.caldav.mkcalendar.Set setElement = factory.createSet();
+      setElement.setProp(propElement);
+      
+      Mkcalendar mkcalendarElement = factory.createMkcalendar();
+      mkcalendarElement.setSet(setElement);
+      
+      StringWriter sw = new StringWriter();
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.mkcalendar");
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      marshaller.marshal(mkcalendarElement, sw);
+      
+      StringEntity body = new StringEntity(sw.toString());
+      body.setContentType("text/xml");
+      req.setEntity(body);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+      if ((statusCode != HttpStatus.SC_CREATED) && (statusCode != HttpStatus.SC_OK)) {
+        String bodyOfResponse = EntityUtils.toString(resp.getEntity());
+                
+        EntityUtils.consume(resp.getEntity());
+        
+        if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+          /* 
+           * TODO need to parse the error when status code is 207 Multistatus.
+           * The collection creation MIGHT have worked. In my tests, Kerio Connect was sending back the following response, but the collection was indeed created.
+           * So we must check if the collection was created before throwing a exception.
+           */
+          /*
+          HTTP/1.1 207 Multistatus
+
+          <?xml version="1.0" encoding="UTF-8"?>
+          <a:multistatus xmlns:a="DAV:" xmlns:c="http://apple.com/ns/ical/" xmlns:d="urn:ietf:params:xml:ns:caldav" xmlns:b="xml:">
+          <a:response>
+            <a:href>/full-calendars/kerio.famillerobert.lan/admin/12348</a:href>
+            <a:propstat>
+              <a:status>HTTP/1.1 200 OK</a:status>
+              <a:prop>
+                <a:displayname>Sans titre</a:displayname>
+              </a:prop>
+            </a:propstat>
+            <a:propstat>
+              <a:status>HTTP/1.1 403 Forbidden</a:status>
+              <a:prop><d:calendar-free-busy-set/></a:prop>
+            </a:propstat>
+          </a:response>
+          </a:multistatus>
+           */
+          throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        
+        } else {
+
+          if (statusCode == HttpStatus.SC_FORBIDDEN) {
+            jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+            Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+            StringReader reader = new StringReader(bodyOfResponse);
+            zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+            if (error.getErrorDescription() != null) {
+              throw new DavStoreException(error.getErrorDescription());
+            }
+            if (error.getResourceMustBeNull() != null) {
+              throw new DavStoreException("A resource MUST NOT exist at the Request-URI");
+            }
+            if (error.getCalendarCollectionLocationOk() != null) {
+              throw new DavStoreException("The Request-URI MUST identify a location where a calendar collection can be created");
+            }            
+            if (error.getValidCalendarData() != null) {
+              throw new DavStoreException("The time zone specified in the CALDAV:calendar-timezone property MUST be a valid iCalendar object containing a single valid VTIMEZONE component");
+            }
+            if (error.getNeedsPrivilege() != null) {
+              throw new DavStoreException("The DAV:bind privilege MUST be granted to the current user on the parent collection of the Request-URI.");
+            }
+            if (error.getInitializeCalendarCollection() != null) {
+              throw new DavStoreException("A new calendar collection exists at the Request-URI.");
+            }
+          }
+
+          throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        }
+      } else {
+        EntityUtils.consume(resp.getEntity());
+      }
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + httpScheme() + _serverName +  _port + "/.well-known/caldav");
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+  }
+
+  // TODO should check if DELETE method is allowed for this collection and throw a different exception if that's the case
+  public void deleteCollection(AbstractNotPrincipalCollection collection) throws ClientProtocolException, URISyntaxException, IOException, DavStoreException {
+    try {
+      DeleteRequest del = new DeleteRequest(initUri(collection.getUri()), collection.getGetetag());
+      HttpResponse resp = httpClient().execute(del);
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+      if ((statusCode != HttpStatus.SC_NO_CONTENT) && (statusCode != HttpStatus.SC_OK)) {
+        String bodyOfResponse = EntityUtils.toString(resp.getEntity());
+
+        EntityUtils.consume(resp.getEntity());      
+
+        if (statusCode == HttpStatus.SC_FORBIDDEN) {
+          if ((bodyOfResponse != null) && (bodyOfResponse.length() > 1)) {
+            JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+            Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+            StringReader reader = new StringReader(bodyOfResponse);
+            zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+            if (error.getErrorDescription() != null) {
+              throw new DavStoreException(error.getErrorDescription());
+            } 
+          }
+        }
+
+        throw new DavStoreException("We couldn't delete the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+      } else {
+        EntityUtils.consume(resp.getEntity());
+      }   
+    }       
+    catch (URISyntaxException e) {
+      throw new DavStoreException("Couldn't build a URL for " + collection.getUri());
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+  }
+  
+  protected void copyOrMoveCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination, boolean isMove) throws DavStoreException {
+    HttpEntityEnclosingRequestBase req;
+    
+    String[] pathSegments = calendar.getPath().split("/");
+    
+    try {
+      if (pathSegments.length > 1) {
+        String destinationPath = destination.getUri() + pathSegments[pathSegments.length - 1];
+
+        if (isMove) {
+          req = new MoveRequest(initUri(calendar.getPath()), destinationPath);
+        } else {
+          req = new CopyRequest(initUri(calendar.getPath()), destinationPath);
+        }
+
+        HttpResponse resp = httpClient().execute(req);
+
+        int statusCode = resp.getStatusLine().getStatusCode();
+
+        EntityUtils.consume(resp.getEntity());      
+
+        if ((statusCode != HttpStatus.SC_CREATED) && (statusCode != HttpStatus.SC_OK) && (statusCode != HttpStatus.SC_NO_CONTENT)) {
+
+          if (statusCode == HttpStatus.SC_FORBIDDEN) {
+            throw new DavStoreException("The source and destination URIs are the same.");
+          }
+          if (statusCode == HttpStatus.SC_CONFLICT) {
+            throw new DavStoreException("The server was unable to maintain the liveness of the properties listed in the propertybehavior XML element or the Overwrite header is F and the state of the destination resource is non-null.");
+          }
+          if (statusCode == HttpStatus.SC_LOCKED) {
+            throw new DavStoreException("The source or the destination resource was locked.");
+          }
+          if (statusCode == HttpStatus.SC_CONFLICT) {
+            throw new DavStoreException("This may occur when the destination is on another server and the destination server refuses to accept the resource.");
+          }
+
+          throw new DavStoreException("Return status code is " + statusCode);
+
+        } 
+      }
+    }      
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ClientProtocolException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+  }
+  
+  public void moveCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination) throws DavStoreException {
+    copyOrMoveCalendarToCollection(calendar, destination, true);
+  }
+  
+  public void copyCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination) throws DavStoreException {
+    copyOrMoveCalendarToCollection(calendar, destination, false);
+  }
+
   protected String report(StringEntity body, String path, int depth) throws DavStoreException, NotImplemented {
     ReportRequest req;
     String response = "";
@@ -1079,7 +1329,61 @@ public class DavStore {
     return response;
   }
   
-  public class DavStoreException extends Exception {
+  /**
+   * TODO this method should be called each a collection is called, and the features/allowed methods should be stored inside the collection data structure
+   * 
+   * Get the list of DAV/CalDAV/CardDAV features that this server supports. This is done by looking at 
+   * the "DAV" header of the response (done by a OPTIONS request).
+   * 
+   * @param path URL path to the calendar home set or a calendar collection.
+   */
+  public void fetchFeatures(AbstractDavCollection collection) {
+    ArrayList<DavFeature> supportedFeatures = new ArrayList<DavFeature>();
+    ArrayList<String> allowedMethods = new ArrayList<String>();
+    
+    try {
+      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, collection.getUri()).toURI());
+
+      HttpResponse response = httpClient().execute(headersMethod);
+      Header[] davHeaders = response.getHeaders("DAV");
+      Header[] allowHeaders = response.getHeaders("Allow");
+
+      EntityUtils.consume(response.getEntity());
+      
+      for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
+        Header header = davHeaders[davIndex];
+        String[] featuresAsString = header.getValue().split(",");
+        for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
+          DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
+          supportedFeatures.add(feature);
+        }
+      }
+      
+      collection.setSupportedFeatures(supportedFeatures);
+      
+      for (int index = 0; index < allowHeaders.length; index++) {
+        Header header = allowHeaders[index];
+        String[] methodsAsString = header.getValue().split(",");
+        for (int methodIndex = 0; methodIndex < methodsAsString.length; methodIndex++) {
+          String feature = methodsAsString[methodIndex].trim();
+          allowedMethods.add(feature);
+        }
+      }
+      
+      collection.setAllowedMethods(allowedMethods);
+    }
+    catch (ClientProtocolException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  public static class DavStoreException extends Exception {
     
     public DavStoreException(String reason) {
       super(reason);
@@ -1090,7 +1394,7 @@ public class DavStore {
     }
   }
   
-  public class NotImplemented extends Exception {
+  public static class NotImplemented extends Exception {
     
     public NotImplemented(String reason) {
       super(reason);
@@ -1101,7 +1405,29 @@ public class DavStore {
     }
   }
   
-  public class NoRedirectFoundException extends Exception {
+  public static class UidConflict extends Exception {
+    
+    public UidConflict(String reason) {
+      super(reason);
+    }
+    
+    public UidConflict(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public static class NotSupportedComponent extends Exception {
+    
+    public NotSupportedComponent(String reason) {
+      super(reason);
+    }
+    
+    public NotSupportedComponent(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public static class NoRedirectFoundException extends Exception {
     
     public NoRedirectFoundException(String reason) {
       super(reason);

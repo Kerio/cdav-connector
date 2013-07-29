@@ -19,6 +19,10 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   //{caldav}supported-collation-set
   DefaultHttpClient httpClient;
 
+  public CalendarCollection(String uri) {
+    setUri(uri);
+  }
+  
   public CalendarCollection(DefaultHttpClient _httpClient) {
     httpClient = _httpClient;
   }
@@ -43,7 +47,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     return calendarTimezone;
   }
 
-  protected void setCalendarTimezone(net.fortuna.ical4j.model.Calendar calendarTimezone) {
+  public void setCalendarTimezone(net.fortuna.ical4j.model.Calendar calendarTimezone) {
     this.calendarTimezone = calendarTimezone;
   }
 
@@ -75,7 +79,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     return calendarColor;
   }
 
-  protected void setCalendarColor(String calendarColor) {
+  public void setCalendarColor(String calendarColor) {
     this.calendarColor = calendarColor;
   }
 
@@ -83,7 +87,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     return calendarOrder;
   }
 
-  protected void setCalendarOrder(BigInteger calendarOrder) {
+  public void setCalendarOrder(BigInteger calendarOrder) {
     this.calendarOrder = calendarOrder;
   }
 
@@ -99,5 +103,5 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   public void setSupportedCalendarComponentSet(ArrayList<String> supportedCalendarComponentSet) {
     this.supportedCalendarComponentSet = supportedCalendarComponentSet;
   }
-
+ 
 }

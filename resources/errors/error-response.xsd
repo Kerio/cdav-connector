@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:D="DAV" xmlns:ns1="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns1.xsd"/>
+  <xs:element name="error">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+        <xs:element ref="ns1:calendar-collection-location-ok"/>
+          <xs:element ref="ns1:max-attendees-per-instance"/>
+          <xs:element ref="ns1:max-date-time"/>
+          <xs:element ref="ns1:max-instances"/>
+          <xs:element ref="ns1:max-resource-size"/>
+          <xs:element ref="ns1:min-date-time"/>
+          <xs:element ref="ns1:supported-calendar-component"/>
+          <xs:element ref="ns1:supported-calendar-data"/>
+          <xs:element ref="ns1:valid-calendar-data"/>
+          <xs:element ref="ns1:valid-calendar-object-resource"/>
+        <xs:element ref="ns1:valid-filter"/>
+        <xs:element ref="D:number-of-matches-within-limits"/>
+        <xs:element ref="ns1:supported-collation"/>
+        <xs:element ref="D:resource-must-be-null"/>
+        <xs:element ref="D:needs-privilege"/>
+        <xs:element ref="ns1:initialize-calendar-collection"/>
+        <xs:element ref="ns1:no-uid-conflict"/>
+        </xs:choice>
+        <xs:element ref="dav:error-description"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="number-of-matches-within-limits">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="resource-must-be-null">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="needs-privilege">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="href" type="xs:string"/>
+</xs:schema>

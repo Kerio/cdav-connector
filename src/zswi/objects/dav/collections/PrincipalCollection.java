@@ -23,6 +23,7 @@ import zswi.objects.dav.enums.RecordType;
 import zswi.protocols.communication.core.DavStore;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
+import zswi.schemas.dav.userinfo.AddressbookHomeSet;
 import zswi.schemas.dav.userinfo.Multistatus;
 import zswi.schemas.dav.userinfo.Propstat;
 
@@ -110,8 +111,14 @@ public class PrincipalCollection extends AbstractDavCollection {
       if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
         
         displayName = propstat.getProp().getDisplayname();
-        calendarHomeSetUrl = new java.net.URI(propstat.getProp().getCalendarHomeSet().getHref());
-        addressbookHomeSetUrl = new java.net.URI(propstat.getProp().getAddressbookHomeSet().getHref());
+        
+        zswi.schemas.dav.userinfo.CalendarHomeSet calHomeSet = propstat.getProp().getCalendarHomeSet();
+        if (calHomeSet != null)
+          calendarHomeSetUrl = new java.net.URI(propstat.getProp().getCalendarHomeSet().getHref());
+        
+        AddressbookHomeSet adHomeSet = propstat.getProp().getAddressbookHomeSet();
+        if (adHomeSet != null)
+          addressbookHomeSetUrl = new java.net.URI(adHomeSet.getHref());
         
         if (isFakePrincipals) {
           setUri(uri.getPath());

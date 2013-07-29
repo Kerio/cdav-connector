@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<D:error xmlns:D='DAV:'>
+    <calendar-collection-location-ok xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <valid-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <valid-calendar-object-resource xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <supported-calendar-component xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <max-resource-size xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <min-date-time xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <max-date-time xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <max-instances xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <max-attendees-per-instance xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <supported-calendar-data xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <valid-filter xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <D:number-of-matches-within-limits/>
+    <supported-collation xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <D:resource-must-be-null/>
+    <D:needs-privilege/>
+    <initialize-calendar-collection xmlns='urn:ietf:params:xml:ns:caldav'/>
+    <no-uid-conflict xmlns='urn:ietf:params:xml:ns:caldav'>
+        <D:href>/some/path</D:href>
+    </no-uid-conflict>
+    <error-description xmlns='http://twistedmatrix.com/xml_namespace/dav/'>Cannot create a calendar collection inside another calendar collection</error-description>
+</D:error>
