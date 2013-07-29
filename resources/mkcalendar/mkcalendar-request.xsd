@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:E="http://apple.com/ns/ical/" xmlns:A="DAV" xmlns:B="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="A.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="E.xsd"/>
+  <xs:element name="mkcalendar">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="A:set"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="supported-calendar-component-set">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="B:comp"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="comp">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="calendar-timezone" type="xs:string"/>
+</xs:schema>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:D="DAV" xmlns:ns1="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="DAV" schemaLocation="error-response.xsd"/>
+  <xs:import namespace="http://twistedmatrix.com/xml_namespace/dav/" schemaLocation="dav.xsd"/>
+  <xs:element name="calendar-collection-location-ok">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="max-attendees-per-instance">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="max-date-time">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="max-instances">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="max-resource-size">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="min-date-time">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-calendar-component">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-calendar-data">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="valid-calendar-data">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="valid-calendar-object-resource">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="valid-filter">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="supported-collation">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="initialize-calendar-collection">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="no-uid-conflict">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="D:href"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

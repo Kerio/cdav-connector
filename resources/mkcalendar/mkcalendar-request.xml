@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<B:mkcalendar xmlns:B="urn:ietf:params:xml:ns:caldav">
+    <A:set xmlns:A="DAV:">
+        <A:prop>
+            <A:displayname>New Calendar</A:displayname>
+            <E:calendar-order xmlns:E="http://apple.com/ns/ical/">603</E:calendar-order>
+            <B:supported-calendar-component-set>
+                <B:comp name="VEVENT"/>
+                <B:comp name="VTODO"/>
+            </B:supported-calendar-component-set>
+            <E:calendar-color xmlns:E="http://apple.com/ns/ical/">#0E61B9FF</E:calendar-color>
+            <B:calendar-timezone>BEGIN:VCALENDAR&#13;
+                VERSION:2.0&#13;
+                PRODID:-//Apple Inc.//Mac OS X 10.8.4//EN&#13;
+                CALSCALE:GREGORIAN&#13;
+                BEGIN:VTIMEZONE&#13;
+                TZID:America/Montreal&#13;
+                BEGIN:DAYLIGHT&#13;
+                TZOFFSETFROM:-0500&#13;
+                RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU&#13;
+                DTSTART:20070311T020000&#13;
+                TZNAME:HAE&#13;
+                TZOFFSETTO:-0400&#13;
+                END:DAYLIGHT&#13;
+                BEGIN:STANDARD&#13;
+                TZOFFSETFROM:-0400&#13;
+                RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU&#13;
+                DTSTART:20071104T020000&#13;
+                TZNAME:HNE&#13;
+                TZOFFSETTO:-0500&#13;
+                END:STANDARD&#13;
+                END:VTIMEZONE&#13;
+                END:VCALENDAR&#13;
+            </B:calendar-timezone>
+        </A:prop>
+    </A:set>
+</B:mkcalendar>

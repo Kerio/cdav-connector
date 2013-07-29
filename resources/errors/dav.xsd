@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://twistedmatrix.com/xml_namespace/dav/" xmlns:D="DAV" xmlns:ns1="urn:ietf:params:xml:ns:caldav" xmlns:dav="http://twistedmatrix.com/xml_namespace/dav/">
+  <xs:import namespace="DAV" schemaLocation="error-response.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns1.xsd"/>
+  <xs:element name="error-description" type="xs:string"/>
+</xs:schema>
