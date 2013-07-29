@@ -31,7 +31,6 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
@@ -48,6 +47,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
@@ -73,8 +73,10 @@ import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
+import zswi.protocols.communication.core.requests.CopyRequest;
 import zswi.protocols.communication.core.requests.DeleteRequest;
 import zswi.protocols.communication.core.requests.MkCalendarRequest;
+import zswi.protocols.communication.core.requests.MoveRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
@@ -1192,6 +1194,66 @@ public class DavStore {
     catch (JAXBException e) {
       throw new DavStoreException(e.getMessage());
     }
+  }
+  
+  protected void copyOrMoveCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination, boolean isMove) throws DavStoreException {
+    HttpEntityEnclosingRequestBase req;
+    
+    String[] pathSegments = calendar.getPath().split("/");
+    
+    try {
+      if (pathSegments.length > 1) {
+        String destinationPath = destination.getUri() + pathSegments[pathSegments.length - 1];
+
+        if (isMove) {
+          req = new MoveRequest(initUri(calendar.getPath()), destinationPath);
+        } else {
+          req = new CopyRequest(initUri(calendar.getPath()), destinationPath);
+        }
+
+        HttpResponse resp = httpClient().execute(req);
+
+        int statusCode = resp.getStatusLine().getStatusCode();
+
+        EntityUtils.consume(resp.getEntity());      
+
+        if ((statusCode != HttpStatus.SC_CREATED) && (statusCode != HttpStatus.SC_OK) && (statusCode != HttpStatus.SC_NO_CONTENT)) {
+
+          if (statusCode == HttpStatus.SC_FORBIDDEN) {
+            throw new DavStoreException("The source and destination URIs are the same.");
+          }
+          if (statusCode == HttpStatus.SC_CONFLICT) {
+            throw new DavStoreException("The server was unable to maintain the liveness of the properties listed in the propertybehavior XML element or the Overwrite header is F and the state of the destination resource is non-null.");
+          }
+          if (statusCode == HttpStatus.SC_LOCKED) {
+            throw new DavStoreException("The source or the destination resource was locked.");
+          }
+          if (statusCode == HttpStatus.SC_CONFLICT) {
+            throw new DavStoreException("This may occur when the destination is on another server and the destination server refuses to accept the resource.");
+          }
+
+          throw new DavStoreException("Return status code is " + statusCode);
+
+        } 
+      }
+    }      
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ClientProtocolException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+  }
+  
+  public void moveCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination) throws DavStoreException {
+    copyOrMoveCalendarToCollection(calendar, destination, true);
+  }
+  
+  public void copyCalendarToCollection(ServerVCalendar calendar, CalendarCollection destination) throws DavStoreException {
+    copyOrMoveCalendarToCollection(calendar, destination, false);
   }
 
   protected String report(StringEntity body, String path, int depth) throws DavStoreException, NotImplemented {
