@@ -92,6 +92,15 @@ import zswi.schemas.dav.icalendarobjects.Response;
  * 
  * @author Pascal Robert
  *
+ * TODO PROPPATCH on collections
+ * TODO Checking those requirements http://tools.ietf.org/html/rfc4791#section-5.3.2.1
+ * TODO Sync changes from the server by checking the eTag values
+ * TODO Support calendar-query to find rooms, people, etc. See examples at http://tools.ietf.org/html/rfc4791#section-7.8
+ * TODO Implements free-busy-request http://tools.ietf.org/html/rfc4791#section-7.10 
+ * TODO Implement external attachments http://tools.ietf.org/html/rfc4791#section-8.5
+ * TODO Implement RFC 6638 http://tools.ietf.org/html/rfc6638
+ * TODO Implement sharing http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-sharing.txt
+ *
  */
 public class DavStore {
 
