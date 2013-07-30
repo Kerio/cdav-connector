@@ -40,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
     "calendarColor",
     "calendarTimezone"
 })
-@XmlRootElement(name = "prop", namespace = "DAV")
+@XmlRootElement(name = "prop", namespace = "DAV:")
 public class Prop {
 
-    @XmlElement(namespace = "DAV", required = true)
+    @XmlElement(namespace = "DAV:", required = true)
     protected String displayname;
     @XmlElement(name = "calendar-order", namespace = "http://apple.com/ns/ical/", required = true)
     protected BigInteger calendarOrder;

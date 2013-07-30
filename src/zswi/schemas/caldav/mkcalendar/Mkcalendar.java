@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "mkcalendar")
 public class Mkcalendar {
 
-    @XmlElement(namespace = "DAV", required = true)
+    @XmlElement(namespace = "DAV:", required = true)
     protected Set set;
 
     /**
