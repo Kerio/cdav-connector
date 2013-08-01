@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:ns2="DAV" xmlns:ns1="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="calendar-query-response.xsd"/>
+  <xs:element name="calendar-data" type="xs:string"/>
+</xs:schema>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns2="DAV" xmlns:ns1="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="ns1.xsd"/>
+  <xs:element name="multistatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns2:response"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns2:href"/>
+        <xs:element maxOccurs="unbounded" ref="ns2:propstat"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="href" type="xs:string"/>
+  <xs:element name="propstat">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns2:prop"/>
+        <xs:element ref="ns2:status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns2:getetag"/>
+        <xs:element minOccurs="0" ref="ns1:calendar-data"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getetag" type="xs:string"/>
+  <xs:element name="status" type="xs:string"/>
+</xs:schema>

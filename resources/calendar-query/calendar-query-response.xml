@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+    <response>
+        <href>/calendars/users/probert/calendar/20130724T015319Z-1234%40fdb4%3A5bac%3A8d1e%3A35af%3A9c2e%3A6013%3A76e9%3A8cb3.ics</href>
+        <propstat>
+            <prop>
+                <getetag>"3c3f690bb3dac8009fd8331798d2518c"</getetag>
+                <calendar-data xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+UID:20130724T015319Z-1234@fdb4:5bac:8d1e:35af:9c2e:6013:76e9:8cb3
+SUMMARY:Test 2
+END:VEVENT
+END:VCALENDAR
+]]></calendar-data>
+            </prop>
+            <status>HTTP/1.1 200 OK</status>
+        </propstat>
+    </response>
+    <response>
+        <href>/calendars/users/probert/calendar/20130724T020106Z-1234%40fdb4%3A5bac%3A8d1e%3A35af%3A9c2e%3A6013%3A76e9%3A8cb3.ics</href>
+        <propstat>
+            <prop>
+                <getetag>"5608de889d5205203d2cf838dc1db5f0"</getetag>
+                <calendar-data xmlns='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+UID:20130724T020106Z-1234@fdb4:5bac:8d1e:35af:9c2e:6013:76e9:8cb3
+SUMMARY:Test
+END:VEVENT
+END:VCALENDAR
+]]></calendar-data>
+            </prop>
+            <status>HTTP/1.1 200 OK</status>
+        </propstat>
+        <propstat>
+            <prop>
+                <getetag />
+            </prop>
+            <status>HTTP/1.1 404 Not Found</status>
+        </propstat>
+    </response>
+</multistatus>

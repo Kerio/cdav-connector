@@ -43,6 +43,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -70,6 +71,7 @@ import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
+import zswi.protocols.caldav.ServerCalendar;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
@@ -82,6 +84,7 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.caldav.mkcalendar.Mkcalendar;
+import zswi.schemas.caldav.query.CalendarQuery;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
 import zswi.schemas.carddav.multiget.ObjectFactory;
 import zswi.schemas.dav.discovery.PrincipalURL;
@@ -1381,6 +1384,110 @@ public class DavStore {
     catch (URISyntaxException e) {
       e.printStackTrace();
     }
+  }
+  
+  public List<ServerVCalendar> doCalendarQuery(CalendarCollection collection, CalendarQuery query) throws JAXBException, DavStoreException, NotImplemented {
+    StringWriter sw = new StringWriter();
+    List<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    
+    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.query");
+    Marshaller marshaller = jc.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+    marshaller.marshal(query, sw);
+        
+    StringEntity se;
+    try {
+      se = new StringEntity(sw.toString());
+      String bodyOfResponse = "";
+      ReportRequest req = new ReportRequest(initUri(collection.getUri()), 0);
+      se.setContentType("text/xml");
+      req.setEntity(se);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      bodyOfResponse += EntityUtils.toString(resp.getEntity());
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+
+      if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+        jc = JAXBContext.newInstance("zswi.schemas.caldav.query.response");
+        Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+
+        zswi.schemas.caldav.query.response.Multistatus multistatus = (zswi.schemas.caldav.query.response.Multistatus)userInfounmarshaller.unmarshal(new StringReader(bodyOfResponse));
+        EntityUtils.consume(resp.getEntity());
+
+        for (zswi.schemas.caldav.query.response.Response response: multistatus.getResponse()) {
+          String href = response.getHref();
+          for (zswi.schemas.caldav.query.response.Propstat propstat: response.getPropstat()) {
+            if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+              String eTag = propstat.getProp().getGetetag();
+              
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, eTag, href, collection);
+              result.add(calendarObject);
+            }
+          }
+        } 
+      } else {
+        if (statusCode == HttpStatus.SC_FORBIDDEN) {
+          jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+          Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+          StringReader reader = new StringReader(bodyOfResponse);
+          zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+
+          EntityUtils.consume(resp.getEntity());
+          
+          if (error.getErrorDescription() != null) {
+            throw new DavStoreException(error.getErrorDescription());
+          }
+          if (error.getSupportedCalendarData() != null) {
+            throw new DavStoreException("The attributes \"content-type\" and \"version\" of the CALDAV:calendar-data XML element specify a media type supported by the server for calendar object resources.");
+          }
+          if (error.getValidFilter() != null) {
+            throw new DavStoreException("The CALDAV:filter XML element specified in the REPORT request MUST be valid.");
+          }            
+          if (error.getValidCalendarData() != null) {
+            throw new DavStoreException("The time zone specified in the REPORT request MUST be a valid iCalendar object containing a single valid VTIMEZONE component.");
+          }
+          if (error.getMinDateTime() != null) {
+            throw new DavStoreException("The time-range values are greater than or equal to the value of the CALDAV:min-date-time property of the collection.");
+          }
+          if (error.getMaxDateTime() != null) {
+            throw new DavStoreException("The time-range values are less than or equal to the value of the CALDAV:max-date-time property of the collection.");
+          }
+          if (error.getSupportedCollation() != null) {
+            throw new DavStoreException("Any XML attribute specifying a collation MUST specify a collation supported by the server as described in Section 7.5");
+          }
+          if (error.getNumberOfMatchesWithinLimits() != null) {
+            throw new DavStoreException("The number of matching calendar object resources must fall within server-specific, predefined limits.");
+          }
+          // TODO supported-filter is missing from the list.
+        }
+        
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+      } 
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ParseException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e);
+    }
+    
+    return result;
   }
   
   public static class DavStoreException extends Exception {
