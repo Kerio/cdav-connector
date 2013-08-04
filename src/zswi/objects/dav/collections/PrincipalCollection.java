@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import zswi.objects.dav.enums.AutoScheduleMode;
 import zswi.objects.dav.enums.RecordType;
 import zswi.protocols.communication.core.DavStore;
+import zswi.protocols.communication.core.Utilities;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.dav.userinfo.AddressbookHomeSet;
@@ -106,9 +107,17 @@ public class PrincipalCollection extends AbstractDavCollection {
 
     Multistatus multistatus = (Multistatus)userInfounmarshaller.unmarshal(resp.getEntity().getContent());
     EntityUtils.consume(resp.getEntity());
-
+    
     for (Propstat propstat: multistatus.getResponse().getPropstat()) {
       if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+        
+        if (isFakePrincipals) {
+          setUri(uri.getPath());
+        } else {
+          setUri(propstat.getProp().getPrincipalURL().getHref());
+        }
+        
+        Utilities.fetchFeatures(store.httpClient(), uri, this);
         
         displayName = propstat.getProp().getDisplayname();
         
@@ -120,13 +129,8 @@ public class PrincipalCollection extends AbstractDavCollection {
         if (adHomeSet != null)
           addressbookHomeSetUrl = new java.net.URI(adHomeSet.getHref());
         
-        if (isFakePrincipals) {
-          setUri(uri.getPath());
-        } else {
-          setUri(propstat.getProp().getPrincipalURL().getHref());
-        }
-
         if (isFirstLevel) {
+          // TODO Check if feature is available
           HashMap<String, List<PrincipalCollection>> proxiedCollections = fetchProxiedCollections(store, isFakePrincipals);
 
           if (proxiedCollections.get("write") != null)
@@ -137,10 +141,7 @@ public class PrincipalCollection extends AbstractDavCollection {
             for (PrincipalCollection readForCollection: proxiedCollections.get("read"))
               getCalendarProxyReadFor().add(readForCollection);
         }
-
-        //System.out.println(propstat.getProp().getDropboxHomeURL().getHref());
-        //System.out.println(propstat.getProp().getEmailAddressSet());
-        //System.out.println(propstat.getProp().getResourceId().getHref());
+        // TODO implements rfc6638
       }
     }
   }

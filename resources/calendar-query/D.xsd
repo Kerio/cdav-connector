@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:D="DAV" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="calendar-query-request.xsd"/>
+  <xs:element name="allprop">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="propname">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="D:getetag"/>
+        <xs:element ref="C:calendar-data"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="getetag">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

@@ -43,12 +43,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -69,7 +71,6 @@ import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
-import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
@@ -82,6 +83,7 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.caldav.mkcalendar.Mkcalendar;
+import zswi.schemas.caldav.query.CalendarQuery;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
 import zswi.schemas.carddav.multiget.ObjectFactory;
 import zswi.schemas.dav.discovery.PrincipalURL;
@@ -95,7 +97,6 @@ import zswi.schemas.dav.icalendarobjects.Response;
  * TODO PROPPATCH on collections
  * TODO Checking those requirements http://tools.ietf.org/html/rfc4791#section-5.3.2.1
  * TODO Sync changes from the server by checking the eTag values
- * TODO Support calendar-query to find rooms, people, etc. See examples at http://tools.ietf.org/html/rfc4791#section-7.8
  * TODO Implements free-busy-request http://tools.ietf.org/html/rfc4791#section-7.10 
  * TODO Implement external attachments http://tools.ietf.org/html/rfc4791#section-8.5
  * TODO Implement RFC 6638 http://tools.ietf.org/html/rfc6638
@@ -166,7 +167,7 @@ public class DavStore {
     _httpClient.getConnectionManager().shutdown();
     _httpClient = null;
     
-    fetchPrincipalsCollection("/");
+    fetchPrincipalsCollection("/", false);
   }
 
   /**
@@ -210,7 +211,7 @@ public class DavStore {
       throw new DavStoreException(e);
     }
     
-    fetchPrincipalsCollection(_path);
+    fetchPrincipalsCollection(_path, false);
   }
 
   /**
@@ -333,7 +334,7 @@ public class DavStore {
    * @param path
    * @throws DavStoreException
    */
-  protected void fetchPrincipalsCollection(String path) throws DavStoreException {
+  protected void fetchPrincipalsCollection(String path, boolean secondTry) throws DavStoreException {
     PropfindRequest req;
     try {
       URI urlForRequest = initUri(path);
@@ -347,50 +348,67 @@ public class DavStore {
 
       HttpResponse resp = httpClient().execute(req);
 
-      String currentUserPrincipal = null;
+      int statusCode = resp.getStatusLine().getStatusCode();
+      
+      if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+        String currentUserPrincipal = null;
 
-      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.discovery");
-      Unmarshaller unmarshaller = jc.createUnmarshaller();
-      zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
-      for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
-        if (PROPSTAT_OK.equals(propstat.getStatus())) {
-          zswi.schemas.dav.discovery.CurrentUserPrincipal hrefUserPrincipal = propstat.getProp().getCurrentUserPrincipal();
-          PrincipalURL principalUrl = propstat.getProp().getPrincipalURL();
-          if ((hrefUserPrincipal != null) && (hrefUserPrincipal.getHref() != null)) {
-            currentUserPrincipal = hrefUserPrincipal.getHref();
-          } else if ((principalUrl != null) && (principalUrl.getHref() != null)) {
-            currentUserPrincipal = principalUrl.getHref();
-          } else {
-            logger.warning("No URL found for principals at " + path);
+        JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.discovery");
+        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        zswi.schemas.dav.discovery.Multistatus unmarshal = (zswi.schemas.dav.discovery.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
+        for (zswi.schemas.dav.discovery.Propstat propstat: unmarshal.getResponse().getPropstat()) {
+          if (PROPSTAT_OK.equals(propstat.getStatus())) {
+            zswi.schemas.dav.discovery.CurrentUserPrincipal hrefUserPrincipal = propstat.getProp().getCurrentUserPrincipal();
+            PrincipalURL principalUrl = propstat.getProp().getPrincipalURL();
+            if ((hrefUserPrincipal != null) && (hrefUserPrincipal.getHref() != null)) {
+              currentUserPrincipal = hrefUserPrincipal.getHref();
+            } else if ((principalUrl != null) && (principalUrl.getHref() != null)) {
+              currentUserPrincipal = principalUrl.getHref();
+            } else {
+              logger.warning("No URL found for principals at " + path);
+            }
           }
         }
-      }
 
-      EntityUtils.consume(resp.getEntity());
+        EntityUtils.consume(resp.getEntity());
 
-      /*
-       *  Old and/or bad implementations like CommuniGate Pro 5.3.x don't have principals, so it's probably directly the calendar-home-set directly. 
-       *  We will fake principals in those cases.
-       */
-      if (currentUserPrincipal == null) {
-        PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
-        CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
-        fetchFeatures(calHomeSet);
-        AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
-        fetchFeatures(addressBookSet);
-        _principalCollection = calHomeSet.getOwner();
-      } else {
-        PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
-        if (principals.getCalendarHomeSetUrl() != null) {
-          CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+        /*
+         *  Old and/or bad implementations like CommuniGate Pro 5.3.x don't have principals, so it's probably directly the calendar-home-set directly. 
+         *  We will fake principals in those cases.
+         */
+        if (currentUserPrincipal == null) {
+          PrincipalCollection principals = new PrincipalCollection(this, initUri(path), true, true);
+          CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getUri()));
           fetchFeatures(calHomeSet);
-          _principalCollection = calHomeSet.getOwner();
-        }
-        if (principals.getAddressbookHomeSetUrl() != null) {
-          AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+          AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getUri()));
           fetchFeatures(addressBookSet);
+          _principalCollection = calHomeSet.getOwner();
+        } else {
+          PrincipalCollection principals = new PrincipalCollection(this, initUri(currentUserPrincipal), false, true);
+          if (principals.getCalendarHomeSetUrl() != null) {
+            CalendarHomeSet calHomeSet = new CalendarHomeSet(httpClient(), principals, initUri(principals.getCalendarHomeSetUrl().getPath()));
+            fetchFeatures(calHomeSet);
+            _principalCollection = calHomeSet.getOwner();
+          }
+          if (principals.getAddressbookHomeSetUrl() != null) {
+            AddressBookHomeSet addressBookSet = new AddressBookHomeSet(httpClient(), principals, initUri(principals.getAddressbookHomeSetUrl().getPath()));
+            fetchFeatures(addressBookSet);
+          }
+        }      
+      } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+        // The problem might be that the server is requesting an username in the user@domain.com format (iCloud is an example). 
+        // So let's again with this format.
+        if (!secondTry) {
+          EntityUtils.consume(resp.getEntity());
+          _username = _username + "@" + _domain;
+          fetchPrincipalsCollection(path,true);
+        } else {
+          throw new DavStoreException("Can't fetch principals, bad credentials.");
         }
-      }      
+      } else {
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException("Can't fetch principals, server is responding with " + statusCode);
+      }
     }
     catch (URISyntaxException e) {
       throw new DavStoreException(e);
@@ -474,6 +492,12 @@ public class DavStore {
 
       _httpClient.getCredentialsProvider().setCredentials(new AuthScope(_targetHost.getHostName(), _targetHost.getPort()), new UsernamePasswordCredentials(_username, _password));
       _httpClient.setRedirectStrategy(new LaxRedirectStrategy());
+
+      List<String> authpref = new ArrayList<String>();
+      authpref.add(AuthPolicy.DIGEST);
+      authpref.add(AuthPolicy.BASIC);
+      _httpClient.getParams().setParameter(AuthPNames.PROXY_AUTH_PREF, authpref);
+      
       AuthCache authCache = new BasicAuthCache();
       DigestScheme digestAuth = new DigestScheme();
       digestAuth.overrideParamter("realm", "whatever");
@@ -1338,49 +1362,116 @@ public class DavStore {
    * @param path URL path to the calendar home set or a calendar collection.
    */
   public void fetchFeatures(AbstractDavCollection collection) {
-    ArrayList<DavFeature> supportedFeatures = new ArrayList<DavFeature>();
-    ArrayList<String> allowedMethods = new ArrayList<String>();
-    
     try {
-      HttpOptions headersMethod = new HttpOptions(new URL(httpScheme(), _serverName, _port, collection.getUri()).toURI());
-
-      HttpResponse response = httpClient().execute(headersMethod);
-      Header[] davHeaders = response.getHeaders("DAV");
-      Header[] allowHeaders = response.getHeaders("Allow");
-
-      EntityUtils.consume(response.getEntity());
-      
-      for (int davIndex = 0; davIndex < davHeaders.length; davIndex++) {
-        Header header = davHeaders[davIndex];
-        String[] featuresAsString = header.getValue().split(",");
-        for (int featureIndex = 0; featureIndex < featuresAsString.length; featureIndex++) {
-          DavFeature feature = DavFeature.getByFeatureName(featuresAsString[featureIndex].trim());
-          supportedFeatures.add(feature);
-        }
-      }
-      
-      collection.setSupportedFeatures(supportedFeatures);
-      
-      for (int index = 0; index < allowHeaders.length; index++) {
-        Header header = allowHeaders[index];
-        String[] methodsAsString = header.getValue().split(",");
-        for (int methodIndex = 0; methodIndex < methodsAsString.length; methodIndex++) {
-          String feature = methodsAsString[methodIndex].trim();
-          allowedMethods.add(feature);
-        }
-      }
-      
-      collection.setAllowedMethods(allowedMethods);
-    }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+      Utilities.fetchFeatures(httpClient(), initUri(collection.getUri()), collection);
     }
     catch (URISyntaxException e) {
       e.printStackTrace();
     }
+  }
+  
+  public List<ServerVCalendar> doCalendarQuery(CalendarCollection collection, CalendarQuery query) throws JAXBException, DavStoreException, NotImplemented {
+    StringWriter sw = new StringWriter();
+    List<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    
+    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.query");
+    Marshaller marshaller = jc.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+    marshaller.marshal(query, sw);
+        
+    StringEntity se;
+    try {
+      se = new StringEntity(sw.toString());
+      String bodyOfResponse = "";
+      ReportRequest req = new ReportRequest(initUri(collection.getUri()), 0);
+      se.setContentType("text/xml");
+      req.setEntity(se);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      bodyOfResponse += EntityUtils.toString(resp.getEntity());
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+
+      if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+        jc = JAXBContext.newInstance("zswi.schemas.caldav.query.response");
+        Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+
+        zswi.schemas.caldav.query.response.Multistatus multistatus = (zswi.schemas.caldav.query.response.Multistatus)userInfounmarshaller.unmarshal(new StringReader(bodyOfResponse));
+        EntityUtils.consume(resp.getEntity());
+
+        for (zswi.schemas.caldav.query.response.Response response: multistatus.getResponse()) {
+          String href = response.getHref();
+          for (zswi.schemas.caldav.query.response.Propstat propstat: response.getPropstat()) {
+            if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
+              String eTag = propstat.getProp().getGetetag();
+              
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, eTag, href, collection);
+              result.add(calendarObject);
+            }
+          }
+        } 
+      } else {
+        if (statusCode == HttpStatus.SC_FORBIDDEN) {
+          jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+          Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+          StringReader reader = new StringReader(bodyOfResponse);
+          zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+
+          EntityUtils.consume(resp.getEntity());
+          
+          if (error.getErrorDescription() != null) {
+            throw new DavStoreException(error.getErrorDescription());
+          }
+          if (error.getSupportedCalendarData() != null) {
+            throw new DavStoreException("The attributes \"content-type\" and \"version\" of the CALDAV:calendar-data XML element specify a media type supported by the server for calendar object resources.");
+          }
+          if (error.getValidFilter() != null) {
+            throw new DavStoreException("The CALDAV:filter XML element specified in the REPORT request MUST be valid.");
+          }            
+          if (error.getValidCalendarData() != null) {
+            throw new DavStoreException("The time zone specified in the REPORT request MUST be a valid iCalendar object containing a single valid VTIMEZONE component.");
+          }
+          if (error.getMinDateTime() != null) {
+            throw new DavStoreException("The time-range values are greater than or equal to the value of the CALDAV:min-date-time property of the collection.");
+          }
+          if (error.getMaxDateTime() != null) {
+            throw new DavStoreException("The time-range values are less than or equal to the value of the CALDAV:max-date-time property of the collection.");
+          }
+          if (error.getSupportedCollation() != null) {
+            throw new DavStoreException("Any XML attribute specifying a collation MUST specify a collation supported by the server as described in Section 7.5");
+          }
+          if (error.getNumberOfMatchesWithinLimits() != null) {
+            throw new DavStoreException("The number of matching calendar object resources must fall within server-specific, predefined limits.");
+          }
+          // TODO supported-filter is missing from the list.
+        }
+        
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException("We couldn't create the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+      } 
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ParseException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e);
+    }
+    
+    return result;
   }
   
   public static class DavStoreException extends Exception {

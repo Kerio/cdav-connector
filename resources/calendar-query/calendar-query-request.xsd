@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:D="DAV" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="D.xsd"/>
+  <xs:element name="calendar-query">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="D:allprop"/>
+        <xs:element ref="D:propname"/>
+        <xs:element ref="D:prop"/>
+        <xs:element ref="C:filter"/>
+        <xs:element ref="C:timezone"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="calendar-data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="C:expand"/>
+        <xs:element ref="C:limit-recurrence-set"/>
+        <xs:element ref="C:limit-freebusy-set"/>
+        <xs:element ref="C:comp"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="expand">
+    <xs:complexType>
+      <xs:attribute name="end" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="start" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="limit-recurrence-set">
+    <xs:complexType>
+      <xs:attribute name="end" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="start" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="limit-freebusy-set">
+    <xs:complexType>
+      <xs:attribute name="end" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="start" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="C:comp-filter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="timezone" type="xs:string"/>
+  <xs:element name="comp">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="C:comp"/>
+        <xs:element ref="C:cprop"/>
+      </xs:choice>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="cprop">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="comp-filter">
+    <xs:complexType>
+      <xs:sequence minOccurs="0">
+        <xs:element ref="C:comp-filter"/>
+        <xs:element ref="C:is-not-defined"/>
+        <xs:element ref="C:time-range"/>
+        <xs:element maxOccurs="unbounded" ref="C:prop-filter"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="time-range">
+    <xs:complexType>
+      <xs:attribute name="end" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="start" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop-filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="C:is-not-defined"/>
+        <xs:element minOccurs="0" ref="C:text-match"/>
+        <xs:element minOccurs="0" ref="C:param-filter"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="param-filter">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="C:is-not-defined"/>
+        <xs:element ref="C:text-match"/>
+      </xs:choice>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="is-not-defined">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="text-match">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:anyURI">
+          <xs:attribute name="collation"/>
+          <xs:attribute name="negate-condition" type="xs:NCName"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
