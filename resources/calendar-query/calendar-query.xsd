@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="caldav" xmlns:caldav="urn:ietf:params:xml:ns:caldav" xmlns:DAV="DAV">
+  <xs:import namespace="DAV" schemaLocation="DAV.xsd"/>
+  <xs:element name="calendar-query">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0">
+          <xs:element ref="DAV:allprop"/>
+          <xs:element ref="DAV:propname"/>
+          <xs:element ref="DAV:prop"/>
+        </xs:choice>
+        <xs:element ref="caldav:filter"/>
+        <xs:element minOccurs="0" ref="caldav:timezone"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="caldav:comp-filter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="timezone" type="xs:string"/>
+  <xs:element name="comp-filter">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="caldav:is-not-defined"/>
+        <xs:sequence>
+          <xs:element minOccurs="0" ref="caldav:time-range"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="caldav:prop-filter"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="caldav:comp-filter"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="caldav:attlist.caldav.comp-filter"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="caldav:attlist.caldav.comp-filter">
+    <xs:attribute name="name" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="is-not-defined">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="time-range">
+    <xs:complexType>
+      <xs:attributeGroup ref="caldav:attlist.caldav.time-range"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.time-range">
+    <xs:attribute name="start"/>
+    <xs:attribute name="end"/>
+  </xs:attributeGroup>
+  <xs:element name="prop-filter">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="caldav:is-not-defined"/>
+        <xs:sequence>
+          <xs:choice minOccurs="0">
+            <xs:element ref="caldav:time-range"/>
+            <xs:element ref="caldav:text-match"/>
+          </xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="caldav:param-filter"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="caldav:attlist.caldav.prop-filter"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.prop-filter">
+    <xs:attribute name="name" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="text-match">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="caldav:attlist.caldav.text-match"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.text-match">
+    <xs:attribute name="collation" default="i;ascii-casemap"/>
+    <xs:attribute name="negate-condition" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="param-filter">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="caldav:is-not-defined"/>
+        <xs:element minOccurs="0" ref="caldav:text-match"/>
+      </xs:choice>
+      <xs:attributeGroup ref="caldav:attlist.caldav.param-filter"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.param-filter">
+    <xs:attribute name="name" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="calendar-data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="caldav:comp"/>
+        <xs:choice minOccurs="0">
+          <xs:element ref="caldav:expand"/>
+          <xs:element ref="caldav:limit-recurrence-set"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="caldav:limit-freebusy-set"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="limit-freebusy-set">
+    <xs:complexType>
+      <xs:attributeGroup ref="caldav:attlist.caldav.limit-freebusy-set"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.limit-freebusy-set">
+    <xs:attribute name="start" use="required"/>
+    <xs:attribute name="end" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="limit-recurrence-set">
+    <xs:complexType>
+      <xs:attributeGroup ref="caldav:attlist.caldav.limit-recurrence-set"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.limit-recurrence-set">
+    <xs:attribute name="start" use="required"/>
+    <xs:attribute name="end" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="expand">
+    <xs:complexType>
+      <xs:attributeGroup ref="caldav:attlist.caldav.expand"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.expand">
+    <xs:attribute name="start" use="required"/>
+    <xs:attribute name="end" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="comp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="caldav:allprop"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="caldav:prop"/>
+        </xs:choice>
+        <xs:choice>
+          <xs:element ref="caldav:allcomp"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="caldav:comp"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="allprop">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:attributeGroup ref="caldav:attlist.caldav.prop"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.caldav.prop">
+    <xs:attribute name="name" use="required"/>
+    <xs:attribute name="novalue" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="allcomp">
+    <xs:complexType/>
+  </xs:element>
+  <xs:complexType name="any" mixed="true">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
