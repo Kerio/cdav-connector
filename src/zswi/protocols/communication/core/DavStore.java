@@ -494,7 +494,6 @@ public class DavStore {
       _httpClient.setRedirectStrategy(new LaxRedirectStrategy());
 
       List<String> authpref = new ArrayList<String>();
-      authpref.add("X-MobileMe-AuthToken");
       authpref.add(AuthPolicy.DIGEST);
       authpref.add(AuthPolicy.BASIC);
       _httpClient.getParams().setParameter(AuthPNames.PROXY_AUTH_PREF, authpref);
