@@ -140,7 +140,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "supportedCalendarComponentSets",
     "supportedCalendarData",
     "defaultAlarmVeventDate",
-    "defaultAlarmVeventDatetime"
+    "defaultAlarmVeventDatetime",
+    "calendarDescription"
 })
 @XmlRootElement(name = "prop")
 public class Prop {
@@ -220,6 +221,8 @@ public class Prop {
     protected String defaultAlarmVeventDate;
     @XmlElement(name = "default-alarm-vevent-datetime", namespace = "urn:ietf:params:xml:ns:caldav")
     protected String defaultAlarmVeventDatetime;
+    @XmlElement(name = "calendar-description", namespace = "urn:ietf:params:xml:ns:caldav")
+    protected String calendarDescription;
 
     /**
      * Gets the value of the acl property.
@@ -1203,6 +1206,30 @@ public class Prop {
      */
     public void setDefaultAlarmVeventDatetime(String value) {
         this.defaultAlarmVeventDatetime = value;
+    }
+    
+    /**
+     * Gets the value of the calendarOrder property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCalendarDescription() {
+        return calendarDescription;
+    }
+
+    /**
+     * Sets the value of the calendarOrder property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCalendarDescription(String value) {
+        this.calendarDescription = value;
     }
 
 }

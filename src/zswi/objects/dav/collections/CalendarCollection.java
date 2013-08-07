@@ -18,6 +18,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   ArrayList<String> supportedCalendarComponentSet;
   //{caldav}supported-collation-set
   DefaultHttpClient httpClient;
+  String calendarDescription;
 
   public CalendarCollection(String uri) {
     setUri(uri);
@@ -89,6 +90,14 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
 
   public void setCalendarOrder(BigInteger calendarOrder) {
     this.calendarOrder = calendarOrder;
+  }
+
+  public String getCalendarDescription() {
+    return calendarDescription;
+  }
+
+  public void setCalendarDescription(String calendarDescription) {
+    this.calendarDescription = calendarDescription;
   }
 
   @Override

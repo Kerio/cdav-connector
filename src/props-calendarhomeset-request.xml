@@ -44,5 +44,6 @@
 		<caldav:supported-calendar-data />
 		<caldav:default-alarm-vevent-date />
 		<caldav:default-alarm-vevent-datetime />
+		<caldav:calendar-description />
 	</dav:prop>
 </dav:propfind>

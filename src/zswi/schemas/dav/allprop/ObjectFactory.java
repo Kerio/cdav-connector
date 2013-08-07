@@ -56,6 +56,7 @@ public class ObjectFactory {
     private final static QName _Pushkey_QNAME = new QName("http://calendarserver.org/ns/", "pushkey");
     private final static QName _Creationdate_QNAME = new QName("DAV:", "creationdate");
     private final static QName _DefaultAlarmVeventDate_QNAME = new QName("urn:ietf:params:xml:ns:caldav", "default-alarm-vevent-date");
+    private final static QName _CalendarDescription_QNAME = new QName("urn:ietf:params:xml:ns:caldav", "calendar-description");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: zswi.schemas.dav.allprop
@@ -903,4 +904,12 @@ public class ObjectFactory {
         return new JAXBElement<String>(_DefaultAlarmVeventDate_QNAME, String.class, null, value);
     }
 
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn:ietf:params:xml:ns:caldav", name = "calendar-description")
+    public JAXBElement<String> createCalendarDescription(String value) {
+        return new JAXBElement<String>(_CalendarDescription_QNAME, String.class, null, value);
+    }
 }
