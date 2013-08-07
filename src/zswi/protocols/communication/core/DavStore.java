@@ -31,6 +31,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.util.CompatibilityHints;
@@ -1474,6 +1475,82 @@ public class DavStore {
     return result;
   }
   
+  /**
+   * This method will do a calendar-query for the specified time range. It's a common query that many people do.
+   * 
+   * @param collection
+   * @param startTime
+   * @param endTime
+   * @return
+   * @throws DateNotUtc This exception will be raised if the start or end datetime are not set in UTC (date.setUtc(true))
+   */
+  public List<ServerVCalendar> getEventsForTimePeriod(CalendarCollection collection, DateTime startTime, DateTime endTime) throws DateNotUtc {
+    
+    if ((!startTime.isUtc()) || (!endTime.isUtc())) {
+      throw new DateNotUtc("Dates must be set to UTC");
+    }
+    
+    List<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    
+    zswi.schemas.caldav.query.Cprop compSummary = new zswi.schemas.caldav.query.Cprop();
+    compSummary.setName("SUMMARY");
+    
+    zswi.schemas.caldav.query.Cprop compUid = new zswi.schemas.caldav.query.Cprop();
+    compUid.setName("UID");
+    
+    zswi.schemas.caldav.query.Comp compVevent = new zswi.schemas.caldav.query.Comp();
+    compVevent.setName(Component.VEVENT);
+    compVevent.getCompOrCprop().add(compSummary);
+    compVevent.getCompOrCprop().add(compUid);
+    
+    zswi.schemas.caldav.query.Cprop version = new zswi.schemas.caldav.query.Cprop();
+    version.setName("VERSION");
+    
+    zswi.schemas.caldav.query.Comp comp = new zswi.schemas.caldav.query.Comp();
+    comp.setName("VCALENDAR");
+    comp.getCompOrCprop().add(version);
+    comp.getCompOrCprop().add(compVevent);
+    
+    zswi.schemas.caldav.query.CalendarData calData = new zswi.schemas.caldav.query.CalendarData();
+    calData.setComp(comp);
+    
+    zswi.schemas.caldav.query.Prop prop = new zswi.schemas.caldav.query.Prop();
+    prop.setCalendarData(calData);
+    
+    zswi.schemas.caldav.query.TimeRange timeRangeFilter = new zswi.schemas.caldav.query.TimeRange();
+    timeRangeFilter.setEnd(startTime.toString());
+    timeRangeFilter.setStart(endTime.toString());
+    
+    zswi.schemas.caldav.query.CompFilter eventFilter = new zswi.schemas.caldav.query.CompFilter();
+    eventFilter.setName(Component.VEVENT);
+    eventFilter.setTimeRange(timeRangeFilter);
+    
+    zswi.schemas.caldav.query.CompFilter calFilter = new zswi.schemas.caldav.query.CompFilter();
+    calFilter.setName("VCALENDAR");
+    calFilter.setCompFilter(eventFilter);
+    
+    zswi.schemas.caldav.query.Filter filter = new zswi.schemas.caldav.query.Filter();
+    filter.setCompFilter(calFilter);
+    
+    CalendarQuery query = new CalendarQuery();
+    query.setProp(prop);
+    query.setFilter(filter);
+    
+    try {
+      result = doCalendarQuery(collection, query);
+    }
+    catch (NotImplemented e1) {
+      e1.printStackTrace();
+    }
+    catch (JAXBException e) {
+      e.printStackTrace();
+    }
+    catch (DavStoreException e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+  
   public static class DavStoreException extends Exception {
     
     public DavStoreException(String reason) {
@@ -1528,5 +1605,16 @@ public class DavStore {
       super(throwable);
     }
   }
-
+  
+  public static class DateNotUtc extends Exception {
+    
+    public DateNotUtc(String reason) {
+      super(reason);
+    }
+    
+    public DateNotUtc(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
 }

@@ -112,6 +112,10 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
                  collection.setCalendarOrder(order);
               }
               
+              String calendarDescription = propstat.getProp().getCalendarDescription();
+              if (calendarDescription != null)
+                collection.setCalendarDescription(calendarDescription);
+              
               collection.setDisplayName(propstat.getProp().getDisplayname());
               collection.setGetctag(propstat.getProp().getGetctag());
               collection.setOwner(principals);
