@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:E="http://apple.com/ns/ical/" xmlns:A="DAV" xmlns:B="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="proppatch-calendar-collection-request.xsd"/>
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="E.xsd"/>
+  <xs:element name="calendar-description" type="xs:string"/>
+  <xs:element name="schedule-calendar-transp">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="B:transparent"/>
+        <xs:element ref="B:opaque"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="transparent">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="opaque">
+    <xs:complexType/>
+  </xs:element>  
+  <xs:element name="calendar-timezone" type="xs:string"/>
+</xs:schema>
