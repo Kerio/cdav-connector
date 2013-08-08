@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<d:multistatus xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns" xmlns:fx="http://fruux.com/ns" xmlns:cal="urn:ietf:params:xml:ns:caldav" xmlns:cs="http://calendarserver.org/ns/" xmlns:card="urn:ietf:params:xml:ns:carddav">
+    <d:response>
+        <d:href>/calendars/a3298279261/ce91a02d-a4b7-4937-9eca-afad217b230d</d:href>
+        <d:propstat>
+            <d:prop>
+                <calendar-description xmlns='urn:ietf:params:xml:ns:caldav'/>
+                <x6:calendar-color xmlns:x6="http://apple.com/ns/ical/"/>
+            </d:prop>
+            <d:status>HTTP/1.1 200 OK</d:status>
+            <d:responsedescription>OK</d:responsedescription>
+        </d:propstat>
+        <d:propstat>
+            <d:prop>
+                <cal:schedule-calendar-transp/>
+                <cal:calendar-timezone/>
+            </d:prop>
+            <d:status>HTTP/1.1 424 Failed Dependency</d:status>
+        </d:propstat>
+    </d:response>
+</d:multistatus>

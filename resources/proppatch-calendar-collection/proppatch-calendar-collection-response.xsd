@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:x6="http://apple.com/ns/ical/" xmlns:d="DAV" xmlns:cal="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="http://apple.com/ns/ical/" schemaLocation="x6.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="cal.xsd"/>
+  <xs:element name="multistatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="d:response"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="d:href"/>
+        <xs:element maxOccurs="unbounded" ref="d:propstat"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="href" type="xs:string"/>
+  <xs:element name="propstat">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="d:prop"/>
+        <xs:element ref="d:status"/>
+        <xs:element minOccurs="0" ref="d:responsedescription"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element ref="cal:calendar-description"/>
+          <xs:element ref="x6:calendar-color"/>
+        </xs:sequence>
+        <xs:sequence>
+          <xs:element ref="cal:schedule-calendar-transp"/>
+          <xs:element ref="cal:calendar-timezone"/>
+        </xs:sequence>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="status" type="xs:string"/>
+  <xs:element name="responsedescription" type="xs:NCName"/>
+</xs:schema>
