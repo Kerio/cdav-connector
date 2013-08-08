@@ -1,15 +1,6 @@
 package zswi.objects.dav.collections;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
-
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.util.EntityUtils;
 
 import zswi.objects.dav.enums.DavFeature;
 import zswi.objects.dav.enums.ResourceType;

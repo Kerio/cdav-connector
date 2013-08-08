@@ -72,7 +72,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     return scheduleCalendarTransp;
   }
 
-  protected void setScheduleCalendarTransp(String scheduleCalendarTransp) {
+  public void setScheduleCalendarTransp(String scheduleCalendarTransp) {
     this.scheduleCalendarTransp = scheduleCalendarTransp;
   }
 

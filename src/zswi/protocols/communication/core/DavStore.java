@@ -80,10 +80,12 @@ import zswi.protocols.communication.core.requests.DeleteRequest;
 import zswi.protocols.communication.core.requests.MkCalendarRequest;
 import zswi.protocols.communication.core.requests.MoveRequest;
 import zswi.protocols.communication.core.requests.PropfindRequest;
+import zswi.protocols.communication.core.requests.ProppatchRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.caldav.mkcalendar.Mkcalendar;
+import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
 import zswi.schemas.carddav.multiget.ObjectFactory;
@@ -1549,6 +1551,89 @@ public class DavStore {
       e.printStackTrace();
     }
     return result;
+  }
+  
+  public void updateCalendarCollection(CalendarCollection collection) throws JAXBException, DavStoreException {
+    zswi.schemas.caldav.proppatch.ObjectFactory factory = new zswi.schemas.caldav.proppatch.ObjectFactory();
+   
+    zswi.schemas.caldav.proppatch.ScheduleCalendarTransp transparency = new ScheduleCalendarTransp();
+
+    zswi.schemas.caldav.proppatch.Prop prop = new zswi.schemas.caldav.proppatch.Prop();
+    
+    prop.setCalendarColor(collection.getCalendarColor());
+    prop.setCalendarOrder(collection.getCalendarOrder());
+    prop.setCalendarDescription(collection.getCalendarDescription());
+    prop.setDisplayname(collection.getDisplayName());
+
+    String transparencyAsStr = collection.getScheduleCalendarTransp();
+    if ("OPAQUE".equals(transparencyAsStr)) 
+      transparency.setOpaque(factory.createOpaque());
+    else
+      transparency.setTransparent(factory.createTransparent());
+    prop.setScheduleCalendarTransp(transparency);
+
+    Calendar timezone = collection.getCalendarTimezone();
+    if (timezone != null)
+      prop.setCalendarTimezone(timezone.toString());
+    
+    zswi.schemas.caldav.proppatch.Set set = new zswi.schemas.caldav.proppatch.Set();
+    set.setProp(prop);
+    
+    zswi.schemas.caldav.proppatch.Propertyupdate propUpdate = factory.createPropertyupdate();
+    propUpdate.setSet(set);
+    
+    StringWriter sw = new StringWriter();
+    
+    JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.proppatch");
+    Marshaller marshaller = jc.createMarshaller();
+    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+    marshaller.marshal(propUpdate, sw);
+    
+    StringEntity se;
+    try {
+      se = new StringEntity(sw.toString());
+      String bodyOfResponse = "";
+      ProppatchRequest req = new ProppatchRequest(initUri(collection.getUri()), 0);
+      se.setContentType("text/xml");
+      req.setEntity(se);
+
+      HttpResponse resp = _httpClient.execute(req);
+
+      bodyOfResponse += EntityUtils.toString(resp.getEntity());
+
+      int statusCode = resp.getStatusLine().getStatusCode();
+
+      if (statusCode == HttpStatus.SC_FORBIDDEN) {
+        jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+        Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+        StringReader reader = new StringReader(bodyOfResponse);
+        zswi.schemas.caldav.errors.Error error = (zswi.schemas.caldav.errors.Error)userInfounmarshaller.unmarshal(reader);
+
+        EntityUtils.consume(resp.getEntity());
+
+        if (error.getErrorDescription() != null) {
+          throw new DavStoreException(error.getErrorDescription());
+        }
+      } else {
+        EntityUtils.consume(resp.getEntity());
+        if (!(statusCode == HttpStatus.SC_MULTI_STATUS)) {
+          throw new DavStoreException("We couldn't update the calendar collection, the server have sent : " + resp.getStatusLine().getReasonPhrase());
+        }
+      }
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e);
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e);
+    }
+    catch (ParseException e) {
+      throw new DavStoreException(e);
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e);
+    }
+
   }
   
   public static class DavStoreException extends Exception {

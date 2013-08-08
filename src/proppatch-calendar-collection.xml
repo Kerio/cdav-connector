@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<A:propertyupdate xmlns:A="DAV:">
+    <A:set>
+        <A:prop>
+            <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav">Une description</B:calendar-description>
+            <E:calendar-color xmlns:E="http://apple.com/ns/ical/">#F64F00FF</E:calendar-color>
+            <E:calendar-order xmlns:E="http://apple.com/ns/ical/">1</E:calendar-order>
+            <A:displayname>Calendrier</A:displayname>
+            <B:schedule-calendar-transp xmlns:B='urn:ietf:params:xml:ns:caldav'>
+                <B:transparent xmlns:B='urn:ietf:params:xml:ns:caldav'/>
+            </B:schedule-calendar-transp>
+            <B:calendar-timezone xmlns:B='urn:ietf:params:xml:ns:caldav'><![CDATA[BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Apple Inc.//Mac OS X 10.8.4//EN
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:America/Montreal
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+DTSTART:20070311T020000
+TZNAME:HAE
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+DTSTART:20071104T020000
+TZNAME:HNE
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+END:VCALENDAR
+]]></B:calendar-timezone>
+        </A:prop>
+    </A:set>
+</A:propertyupdate>

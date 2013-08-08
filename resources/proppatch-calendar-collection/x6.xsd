@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://apple.com/ns/ical/" xmlns:x6="http://apple.com/ns/ical/" xmlns:d="DAV" xmlns:cal="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="proppatch-calendar-collection-response.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="cal.xsd"/>
+  <xs:element name="calendar-color">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>
