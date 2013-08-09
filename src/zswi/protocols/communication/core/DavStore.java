@@ -97,10 +97,8 @@ import zswi.schemas.dav.icalendarobjects.Response;
  * 
  * @author Pascal Robert
  *
- * TODO PROPPATCH on collections
  * TODO Checking those requirements http://tools.ietf.org/html/rfc4791#section-5.3.2.1
  * TODO Sync changes from the server by checking the eTag values
- * TODO Implements free-busy-request http://tools.ietf.org/html/rfc4791#section-7.10 
  * TODO Implement external attachments http://tools.ietf.org/html/rfc4791#section-8.5
  * TODO Implement RFC 6638 http://tools.ietf.org/html/rfc6638
  * TODO Implement sharing http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-sharing.txt
@@ -550,7 +548,6 @@ public class DavStore {
       response = this.report("rep_events.txt", path, 1);
     }
     catch (NotImplemented e1) {
-      // ç
       e1.printStackTrace();
     }
 
@@ -1068,6 +1065,7 @@ public class DavStore {
 
     try {
       req = new MkCalendarRequest(initUri(collection.getUri()));
+      // FIXME it should work with Fruux
       if (!(this.principalCollection().getCalendarHomeSet().allowedMethods().contains(req.getMethod()))) {
         throw new DavStoreException("The calendar home-set doesn't allow the MKCALENDAR method");
       }
@@ -1634,6 +1632,85 @@ public class DavStore {
       throw new DavStoreException(e);
     }
 
+  }
+  
+  /**
+   * Implements free-busy-request (see http://tools.ietf.org/html/rfc4791#section-7.10)
+   * 
+   * @param uriToCalendarCollection Path to the calendar collection that you want to do a free-busy-query against. Example: /calendars/users/probert/calendar/
+   * @param startTime
+   * @param endTime
+   * @return 
+   * @throws DavStoreException
+   * @throws DateNotUtc 
+   */
+  public ServerVCalendar getFreeBusyInformation(String uriToCalendarCollection, DateTime startTime, DateTime endTime) throws DavStoreException, DateNotUtc {
+
+    if ((!startTime.isUtc()) || (!endTime.isUtc())) {
+      throw new DateNotUtc("Dates must be set to UTC");
+    }
+    
+    StringWriter sw = new StringWriter();
+
+    zswi.schemas.caldav.freebusy.TimeRange timeRange = new zswi.schemas.caldav.freebusy.TimeRange();
+    timeRange.setEnd(endTime.toString());
+    timeRange.setStart(startTime.toString());
+    zswi.schemas.caldav.freebusy.FreeBusyQuery query = new zswi.schemas.caldav.freebusy.FreeBusyQuery();
+    query.setTimeRange(timeRange);
+    
+    String path = uriToCalendarCollection;
+
+    try {
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.freebusy");
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      marshaller.marshal(query, sw);
+          
+      StringEntity se;
+     
+      se = new StringEntity(sw.toString());
+      ReportRequest req = new ReportRequest(initUri(path), 0);
+      se.setContentType("text/xml");
+      req.setEntity(se);    
+      
+      HttpResponse resp = _httpClient.execute(req);
+
+      String response = EntityUtils.toString(resp.getEntity());
+      
+      int statusCode = resp.getStatusLine().getStatusCode();
+      
+      if (statusCode == 200) {
+        StringReader sin = new StringReader(response);
+        CalendarBuilder builder = new CalendarBuilder();
+        Calendar calendarData = builder.build(sin);
+        
+        String eTag = null;
+        Header[] eTags = resp.getHeaders("ETag");
+        if (eTags.length == 1) {
+          eTag = eTags[0].getValue();
+        }
+        
+        EntityUtils.consume(resp.getEntity());
+        
+        ServerVCalendar calendarObject = new ServerVCalendar(calendarData, eTag, null);
+        return calendarObject;
+      } else {
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException("Couldn't do free-busy-query, server returned a " + statusCode + " code.");
+      }
+    } 
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
   }
   
   public static class DavStoreException extends Exception {
