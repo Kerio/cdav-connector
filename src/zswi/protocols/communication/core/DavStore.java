@@ -1652,8 +1652,9 @@ public class DavStore {
    * @return 
    * @throws DavStoreException
    * @throws DateNotUtc 
+   * @throws NotFound 
    */
-  public ServerVCalendar getFreeBusyInformation(String uriToCalendarCollection, DateTime startTime, DateTime endTime) throws DavStoreException, DateNotUtc {
+  public ServerVCalendar getFreeBusyInformation(String uriToCalendarCollection, DateTime startTime, DateTime endTime) throws DavStoreException, DateNotUtc, NotFound {
 
     if ((!startTime.isUtc()) || (!endTime.isUtc())) {
       throw new DateNotUtc("Dates must be set to UTC");
@@ -1705,6 +1706,9 @@ public class DavStore {
         return calendarObject;
       } else {
         EntityUtils.consume(resp.getEntity());
+        if (statusCode == HttpStatus.SC_NOT_FOUND) {
+          throw new NotFound("Couldn't find requested URI");
+        }
         throw new DavStoreException("Couldn't do free-busy-query, server returned a " + statusCode + " code.");
       }
     } 
@@ -1807,6 +1811,9 @@ public class DavStore {
         return result;
       } else {
         EntityUtils.consume(resp.getEntity());
+        if (statusCode == HttpStatus.SC_NOT_FOUND) {
+          return result;
+        }
         throw new DavStoreException("Couldn't return the list of principals, the server returned " + statusCode);
       }
     } 
@@ -1883,6 +1890,17 @@ public class DavStore {
     }
     
     public DateNotUtc(Throwable throwable) {
+      super(throwable);
+    }
+  }
+  
+  public static class NotFound extends Exception {
+    
+    public NotFound(String reason) {
+      super(reason);
+    }
+    
+    public NotFound(Throwable throwable) {
       super(throwable);
     }
   }

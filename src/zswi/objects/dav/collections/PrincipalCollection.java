@@ -152,7 +152,7 @@ public class PrincipalCollection extends AbstractDavCollection {
         
         ScheduleOutboxURL outboxUrl = propstat.getProp().getScheduleOutboxURL();
         if (outboxUrl != null)
-          scheduleOutboxURL = new java.net.URI(adHomeSet.getHref());
+          scheduleOutboxURL = new java.net.URI(outboxUrl.getHref());
       }
     }
   }
