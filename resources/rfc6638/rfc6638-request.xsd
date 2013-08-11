@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:C="http://calendarserver.org/ns/" xmlns:A="DAV" xmlns:E="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="C.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="E.xsd"/>
+  <xs:element name="propfind">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="A:prop"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="A:displayname"/>
+        <xs:element ref="C:schedule-default-tasks-URL"/>
+        <xs:element ref="E:schedule-default-calendar-URL"/>
+        <xs:element ref="C:getctag"/>
+        <xs:element ref="A:resourcetype"/>
+        <xs:element ref="A:getetag"/>
+        <xs:element ref="E:schedule-tag"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="displayname">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="resourcetype">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="getetag">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

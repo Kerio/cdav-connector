@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:ns1="DAV">
+  <xs:element name="multistatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:response"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:href"/>
+        <xs:element ref="ns1:status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="href" type="xs:string"/>
+  <xs:element name="status" type="xs:string"/>
+</xs:schema>

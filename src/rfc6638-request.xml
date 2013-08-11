@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<A:propfind xmlns:A="DAV:">
+    <A:prop>
+        <A:displayname xmlns:A="DAV:"/>
+        <C:schedule-default-tasks-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <E:schedule-default-calendar-URL xmlns:E="urn:ietf:params:xml:ns:caldav"/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:resourcetype xmlns:A="DAV:"/>
+        <A:getetag xmlns:A="DAV:"/>
+        <E:schedule-tag xmlns:E="urn:ietf:params:xml:ns:caldav"/>
+    </A:prop>
+</A:propfind>

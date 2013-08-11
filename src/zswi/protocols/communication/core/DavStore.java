@@ -34,11 +34,13 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.CuType;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.sourceforge.cardme.engine.VCardEngine;
 import net.sourceforge.cardme.io.VCardWriter;
 import net.sourceforge.cardme.vcard.VCard;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -72,6 +74,7 @@ import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
 import zswi.objects.dav.collections.PrincipalCollection;
+import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
 import zswi.protocols.carddav.ServerVCard;
@@ -85,6 +88,12 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.caldav.mkcalendar.Mkcalendar;
+import zswi.schemas.caldav.principalSearch.bytype.AutoSchedule;
+import zswi.schemas.caldav.principalSearch.bytype.CalendarUserType;
+import zswi.schemas.caldav.principalSearch.bytype.Displayname;
+import zswi.schemas.caldav.principalSearch.bytype.Prop;
+import zswi.schemas.caldav.principalSearch.bytype.PropertySearch;
+import zswi.schemas.caldav.principalSearch.bytype.RecordType;
 import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
@@ -1703,6 +1712,105 @@ public class DavStore {
       throw new DavStoreException(e.getMessage());
     }
     catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+  }
+  
+  // TODO Should this method simply returns a empty list if the feature is not supported?
+  /**
+   * Find other users/resources/groups/rooms by doing a REPORT by type, as defined by CuType (INDIVIDUAL, ROOM, etc.). 
+   * The server must support rfc6638 for this to work. 
+   * 
+   * @param type The type of principals you are looking for. Could be INDIVIDUAL, GROUP, ROOM or RESOURCE.
+   * @param displayname Optional. If you wish to find all principals of a give type, pass null as the value.
+   * @return
+   * @throws DavStoreException
+   * @throws NotImplementedException Throw if the server don't support rfc6638 ("calendar-auto-schedule" feature)
+   */
+  public List<PrincipalCollection> findPrincipalsByType(CuType type, String displayname) throws DavStoreException, NotImplementedException {
+    if (!principalCollection().supportedFeatures().contains(DavFeature.CALENDAR_AUTO_SCHEDULE)) {
+      throw new NotImplementedException("This CalDAV store don't support the calendar-auto-schedule feature, you cannot find principals by type");
+    }
+    
+    List<PrincipalCollection> result = new ArrayList<PrincipalCollection>();
+
+    zswi.schemas.caldav.principalSearch.bytype.PrincipalPropertySearch principalPropSearch = new zswi.schemas.caldav.principalSearch.bytype.PrincipalPropertySearch();
+    principalPropSearch.setType(type.getValue());
+
+    zswi.schemas.caldav.principalSearch.bytype.Prop userTypeProp = new zswi.schemas.caldav.principalSearch.bytype.Prop();
+    userTypeProp.setCalendarUserType(new zswi.schemas.caldav.principalSearch.bytype.CalendarUserType());
+    zswi.schemas.caldav.principalSearch.bytype.PropertySearch propType = new zswi.schemas.caldav.principalSearch.bytype.PropertySearch();
+    propType.setMatch(type.getValue());
+    propType.setProp(userTypeProp);
+
+    principalPropSearch.getPropertySearch().add(propType);
+    
+    if ((displayname != null) && (displayname.length() > 0)) {
+      zswi.schemas.caldav.principalSearch.bytype.Prop displaynameProp = new zswi.schemas.caldav.principalSearch.bytype.Prop();
+      displaynameProp.setDisplayname(new zswi.schemas.caldav.principalSearch.bytype.Displayname());
+      zswi.schemas.caldav.principalSearch.bytype.PropertySearch propSearchDisplayname = new zswi.schemas.caldav.principalSearch.bytype.PropertySearch();
+      propSearchDisplayname.setMatch(displayname);
+      propSearchDisplayname.setProp(displaynameProp);
+      principalPropSearch.getPropertySearch().add(propSearchDisplayname);
+      principalPropSearch.setTest("allof");
+    } else {
+      principalPropSearch.setTest("anyof");
+    }
+    
+    StringWriter sw = new StringWriter();
+    
+    String path = principalCollection().getUri();
+
+    try {
+      JAXBContext jc = JAXBContext.newInstance("zswi.schemas.caldav.principalSearch.bytype");
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, new Boolean(true));
+      marshaller.marshal(principalPropSearch, sw);
+          
+      StringEntity se;
+     
+      se = new StringEntity(sw.toString());
+      ReportRequest req = new ReportRequest(initUri(path), 0);
+      se.setContentType("text/xml");
+      req.setEntity(se);    
+      
+      HttpResponse resp = _httpClient.execute(req);
+      
+      int statusCode = resp.getStatusLine().getStatusCode();
+      
+      if (statusCode == HttpStatus.SC_MULTI_STATUS) {
+        jc = JAXBContext.newInstance("zswi.schemas.caldav.principalSearch.bytype.response");
+        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        zswi.schemas.caldav.principalSearch.bytype.response.Multistatus unmarshal = (zswi.schemas.caldav.principalSearch.bytype.response.Multistatus)unmarshaller.unmarshal(resp.getEntity().getContent());
+        
+        EntityUtils.consume(resp.getEntity());
+        
+        for (zswi.schemas.caldav.principalSearch.bytype.response.Response responseElement: unmarshal.getResponse()) {
+          String status = responseElement.getStatus();
+          if ("HTTP/1.1 200 OK".equals(status)) {
+            String uriForPrincipals = responseElement.getHref();
+            if (uriForPrincipals != null) {
+              PrincipalCollection principals = new PrincipalCollection(this, initUri(uriForPrincipals), false, true);
+              if (principals != null) {
+                result.add(principals);
+              }
+            }
+          }
+        }
+        
+        return result;
+      } else {
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException("Couldn't return the list of principals, the server returned " + statusCode);
+      }
+    } 
+    catch (IOException e) {
       throw new DavStoreException(e.getMessage());
     }
     catch (JAXBException e) {

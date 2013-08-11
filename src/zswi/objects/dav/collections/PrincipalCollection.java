@@ -27,6 +27,8 @@ import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.dav.userinfo.AddressbookHomeSet;
 import zswi.schemas.dav.userinfo.Multistatus;
 import zswi.schemas.dav.userinfo.Propstat;
+import zswi.schemas.dav.userinfo.ScheduleInboxURL;
+import zswi.schemas.dav.userinfo.ScheduleOutboxURL;
 
 public class PrincipalCollection extends AbstractDavCollection {
 
@@ -42,10 +44,11 @@ public class PrincipalCollection extends AbstractDavCollection {
   
   /** http://tools.ietf.org/html/rfc6638#section-2.2.1 */
   InboxCollection scheduleInbox;
-  
+
   /** http://tools.ietf.org/html/rfc6638#section-2.1.1 */
   OutboxCollection scheduleOutbox;
-  
+  java.net.URI scheduleOutboxURL;
+
   /** http://tools.ietf.org/html/rfc6352#section-7.1.1 */
   AddressBookHomeSet addressbookHomeSet;
   java.net.URI addressbookHomeSetUrl;
@@ -79,7 +82,7 @@ public class PrincipalCollection extends AbstractDavCollection {
   
   /** http://tools.ietf.org/html/rfc3744#section-4.2 */
   java.net.URI principalURL;
-  
+    
   /*
   email-address-set
   expanded-group-member-set
@@ -141,7 +144,15 @@ public class PrincipalCollection extends AbstractDavCollection {
             for (PrincipalCollection readForCollection: proxiedCollections.get("read"))
               getCalendarProxyReadFor().add(readForCollection);
         }
-        // TODO implements rfc6638
+        
+        ScheduleInboxURL inboxUrl = propstat.getProp().getScheduleInboxURL();
+        if (inboxUrl != null) {
+          new InboxCollection(store.httpClient(), this, store.initUri(inboxUrl.getHref()));
+        }
+        
+        ScheduleOutboxURL outboxUrl = propstat.getProp().getScheduleOutboxURL();
+        if (outboxUrl != null)
+          scheduleOutboxURL = new java.net.URI(adHomeSet.getHref());
       }
     }
   }
@@ -238,8 +249,16 @@ public class PrincipalCollection extends AbstractDavCollection {
     return scheduleInbox;
   }
   
+  protected void setInboxCollection(InboxCollection _scheduleInbox) {
+    this.scheduleInbox = _scheduleInbox;
+  }
+  
   public OutboxCollection getScheduleOutbox() {
     return scheduleOutbox;
+  }
+  
+  protected void setOutboxCollection(OutboxCollection _scheduleOutbox) {
+    this.scheduleOutbox = _scheduleOutbox;
   }
   
   public AddressBookHomeSet getAddressbookHomeSet() {

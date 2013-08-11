@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+    <response>
+        <href>/calendars/users/probert/inbox/</href>
+        <propstat>
+            <prop>
+                <displayname>inbox</displayname>
+                <schedule-default-tasks-URL xmlns='http://calendarserver.org/ns/'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/tasks</href>
+                </schedule-default-tasks-URL>
+                <schedule-default-calendar-URL xmlns='urn:ietf:params:xml:ns:caldav'>
+                    <href xmlns='DAV:'>/calendars/__uids__/AD04C60B-3704-447B-8997-24F5ACF589C7/calendar</href>
+                </schedule-default-calendar-URL>
+                <getctag xmlns='http://calendarserver.org/ns/'>8917_19435</getctag>
+                <resourcetype>
+                    <collection/>
+                    <schedule-inbox xmlns='urn:ietf:params:xml:ns:caldav'/>
+                </resourcetype>
+                <getetag>"171c5c834d4e4521432591b6202b2ba9"</getetag>
+            </prop>
+            <status>HTTP/1.1 200 OK</status>
+        </propstat>
+        <propstat>
+            <prop>
+                <schedule-tag xmlns='urn:ietf:params:xml:ns:caldav'/>
+            </prop>
+            <status>HTTP/1.1 404 Not Found</status>
+        </propstat>
+    </response>
+</multistatus>
