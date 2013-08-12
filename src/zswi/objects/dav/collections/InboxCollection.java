@@ -24,7 +24,7 @@ public class InboxCollection extends AbstractNotPrincipalCollection {
   CalendarCollection scheduleDefaultTasks;
   
   public InboxCollection(DefaultHttpClient _httpClient, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException {
-    PropfindRequest req = new PropfindRequest(uriForRequest, 1);
+    PropfindRequest req = new PropfindRequest(uriForRequest, 0);
     InputStream is = ClassLoader.getSystemResourceAsStream("rfc6638-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
