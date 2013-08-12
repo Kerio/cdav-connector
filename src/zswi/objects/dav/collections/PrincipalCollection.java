@@ -147,12 +147,15 @@ public class PrincipalCollection extends AbstractDavCollection {
         
         ScheduleInboxURL inboxUrl = propstat.getProp().getScheduleInboxURL();
         if (inboxUrl != null) {
-          new InboxCollection(store.httpClient(), this, store.initUri(inboxUrl.getHref()));
+          InboxCollection inbox = new InboxCollection(store.httpClient(), this, store.initUri(inboxUrl.getHref()));
+          this.setInboxCollection(inbox);
         }
         
         ScheduleOutboxURL outboxUrl = propstat.getProp().getScheduleOutboxURL();
-        if (outboxUrl != null)
-          scheduleOutboxURL = new java.net.URI(outboxUrl.getHref());
+        if (outboxUrl != null) {
+          OutboxCollection outbox = new OutboxCollection(store.httpClient(), this, store.initUri(outboxUrl.getHref()));
+          this.setOutboxCollection(outbox);
+        }
       }
     }
   }
