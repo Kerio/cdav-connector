@@ -1811,6 +1811,9 @@ public class DavStore {
         return result;
       } else {
         EntityUtils.consume(resp.getEntity());
+        if (statusCode == HttpStatus.SC_OK) {
+          return result;
+        }
         if (statusCode == HttpStatus.SC_NOT_FOUND) {
           return result;
         }
