@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="DAV" xmlns:E="http://calendarserver.org/ns/" xmlns:D="DAV" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="E.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="C.xsd"/>
+  <xs:element name="principal-property-search">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="D:property-search"/>
+        <xs:element ref="D:prop"/>
+      </xs:sequence>
+      <xs:attribute name="test" use="required" type="xs:NCName"/>
+      <xs:attribute name="type" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="property-search">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="D:prop"/>
+        <xs:element ref="D:match"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="match" type="xs:NCName"/>
+  <xs:element name="prop">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="C:calendar-user-address-set"/>
+        <xs:element minOccurs="0" ref="C:calendar-user-type"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="E:record-type"/>
+          <xs:element ref="E:first-name"/>
+          <xs:element ref="E:last-name"/>
+          <xs:element ref="E:auto-schedule"/>
+          <xs:element ref="E:auto-schedule-mode"/>
+          <xs:element ref="D:resourcetype"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="D:displayname"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="resourcetype">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="displayname">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

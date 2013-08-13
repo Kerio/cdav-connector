@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:E="http://calendarserver.org/ns/" xmlns:D="DAV" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="principal-search-bytype-request.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="E.xsd"/>
+  <xs:element name="calendar-user-address-set">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="calendar-user-type">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>
