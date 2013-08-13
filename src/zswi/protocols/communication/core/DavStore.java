@@ -73,6 +73,7 @@ import zswi.objects.dav.collections.AddressBookCollection;
 import zswi.objects.dav.collections.AddressBookHomeSet;
 import zswi.objects.dav.collections.CalendarCollection;
 import zswi.objects.dav.collections.CalendarHomeSet;
+import zswi.objects.dav.collections.InboxCollection;
 import zswi.objects.dav.collections.PrincipalCollection;
 import zswi.objects.dav.enums.DavFeature;
 import zswi.protocols.caldav.ServerVCalendar;
@@ -111,6 +112,7 @@ import zswi.schemas.dav.icalendarobjects.Response;
  * TODO Implement external attachments http://tools.ietf.org/html/rfc4791#section-8.5
  * TODO Implement RFC 6638 http://tools.ietf.org/html/rfc6638
  * TODO Implement sharing http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-sharing.txt
+ * TODO Implement RFC 6578 http://tools.ietf.org/html/rfc6578
  *
  */
 public class DavStore {
@@ -177,7 +179,7 @@ public class DavStore {
     _httpClient.getConnectionManager().shutdown();
     _httpClient = null;
     
-    fetchPrincipalsCollection("/", false);
+    fetchPrincipalsCollection(_path, false);
   }
 
   /**
@@ -1829,6 +1831,57 @@ public class DavStore {
     catch (URISyntaxException e) {
       throw new DavStoreException(e.getMessage());
     }
+  }
+  
+  // FIXME Almost the same code as getVCalendars, should merge them.
+  public List<ServerVCalendar> getInvitations() throws DavStoreException {
+    ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    
+    InboxCollection inbox = principalCollection().getScheduleInbox();
+    
+    if (inbox != null) {
+      String path = inbox.getUri();
+
+      String response = "";
+      try {
+        response = this.report("rep_events.txt", path, 1);
+      }
+      catch (NotImplemented e1) {
+        e1.printStackTrace();
+      }
+
+      JAXBContext jc;
+      try {
+        jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
+        Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+        StringReader reader = new StringReader(response);
+        zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
+
+        for (Response xmlResponse: multistatus.getResponse()) {
+          String hrefForObject = xmlResponse.getHref();
+          for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
+            if (PROPSTAT_OK.equals(propstat.getStatus())) {
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            }
+          }
+        }
+      }
+      catch (JAXBException e) {
+        throw new DavStoreException(e.getMessage());
+      }
+      catch (IOException e) {
+        throw new DavStoreException(e.getMessage());
+      }
+      catch (ParserException e) {
+        throw new DavStoreException(e.getMessage());
+      }
+    }
+
+    return result;
   }
   
   public static class DavStoreException extends Exception {
