@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<multistatus xmlns='DAV:'>
+    <response>
+        <href>/principals/__uids__/632ED82A-31F1-4B83-A332-B9C45376154B/</href>
+        <status>HTTP/1.1 200 OK</status>
+    </response>
+    <response>
+        <href>/principals/__uids__/3EF74711-26DB-4F03-BCEA-FEB976982E4D/</href>
+        <status>HTTP/1.1 200 OK</status>
+    </response>
+</multistatus>

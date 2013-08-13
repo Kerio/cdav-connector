@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<C:free-busy-query xmlns:C="urn:ietf:params:xml:ns:caldav">
+    <C:time-range start="20060104T140000Z"
+        end="20060105T220000Z"/>
+</C:free-busy-query>

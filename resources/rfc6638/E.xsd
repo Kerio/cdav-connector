@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:C="http://calendarserver.org/ns/" xmlns:A="DAV" xmlns:E="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="rfc6638-request.xsd"/>
+  <xs:import namespace="http://calendarserver.org/ns/" schemaLocation="C.xsd"/>
+  <xs:element name="schedule-default-calendar-URL">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="schedule-tag">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>

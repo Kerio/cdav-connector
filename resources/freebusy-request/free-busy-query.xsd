@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:ietf:params:xml:ns:caldav" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:element name="free-busy-query">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="C:time-range"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="time-range">
+    <xs:complexType>
+      <xs:attribute name="end" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="start" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

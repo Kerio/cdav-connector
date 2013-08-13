@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://calendarserver.org/ns/" xmlns:E="http://calendarserver.org/ns/" xmlns:D="DAV" xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <xs:import namespace="DAV" schemaLocation="principal-search-bytype-request.xsd"/>
+  <xs:import namespace="urn:ietf:params:xml:ns:caldav" schemaLocation="C.xsd"/>
+  <xs:element name="record-type">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="first-name">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="last-name">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="auto-schedule">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="auto-schedule-mode">
+    <xs:complexType/>
+  </xs:element>
+</xs:schema>
