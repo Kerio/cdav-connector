@@ -89,12 +89,6 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.protocols.communication.core.requests.UpdateRequest;
 import zswi.schemas.caldav.mkcalendar.Mkcalendar;
-import zswi.schemas.caldav.principalSearch.bytype.AutoSchedule;
-import zswi.schemas.caldav.principalSearch.bytype.CalendarUserType;
-import zswi.schemas.caldav.principalSearch.bytype.Displayname;
-import zswi.schemas.caldav.principalSearch.bytype.Prop;
-import zswi.schemas.caldav.principalSearch.bytype.PropertySearch;
-import zswi.schemas.caldav.principalSearch.bytype.RecordType;
 import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
 import zswi.schemas.carddav.multiget.AddressbookMultiget;
@@ -502,7 +496,7 @@ public class DavStore {
 
       _targetHost = new HttpHost(_serverName, _port, (_isSecure) ? "https" : "http");
 
-      _httpClient.getCredentialsProvider().setCredentials(new AuthScope(_targetHost.getHostName(), _targetHost.getPort()), new UsernamePasswordCredentials(_username, _password));
+      _httpClient.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(_username, _password));
       _httpClient.setRedirectStrategy(new LaxRedirectStrategy());
 
       List<String> authpref = new ArrayList<String>();
