@@ -18,6 +18,7 @@ public class ReportRequest extends HttpEntityEnclosingRequestBase {
 	*/
 	public ReportRequest(URI uri, int depth) {
 		this.setURI(uri);
+    this.addHeader("Depth", (depth+"") );
 	}
 	
 	@Override
