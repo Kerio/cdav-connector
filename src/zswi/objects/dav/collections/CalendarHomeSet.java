@@ -30,6 +30,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import zswi.protocols.communication.core.HTTPConnectionManager;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.dav.allprop.Comp;
 import zswi.schemas.dav.allprop.ResourceId;
@@ -48,7 +49,7 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
   ArrayList<String> supportedCalendarComponentSets;
   java.util.ArrayList<CalendarCollection> calendarCollections;
   
-  public CalendarHomeSet(DefaultHttpClient _httpClient, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException, ParserException {
+  public CalendarHomeSet(HTTPConnectionManager connectionManager, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException, ParserException {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
     InputStream is = ClassLoader.getSystemResourceAsStream("props-calendarhomeset-request.xml");
 
@@ -57,7 +58,7 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
     se.setContentType("text/xml");
     req.setEntity(se);
 
-    HttpResponse resp = _httpClient.execute(req);
+    HttpResponse resp = connectionManager.getHttpClient().execute(req);
     
     JAXBContext jc = JAXBContext.newInstance("zswi.schemas.dav.allprop");
     Unmarshaller appPropUnmarshaller = jc.createUnmarshaller();
@@ -103,7 +104,7 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
           } else {
             
             if (isCalendarCollection(propstat.getProp())) {
-              CalendarCollection collection = new CalendarCollection(_httpClient);
+              CalendarCollection collection = new CalendarCollection(connectionManager);
               collection.setCalendarColor(propstat.getProp().getCalendarColor());
               
               String calendarOrder = propstat.getProp().getCalendarOrder();
