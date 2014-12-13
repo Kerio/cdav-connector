@@ -98,7 +98,7 @@ public class PrincipalCollection extends AbstractDavCollection {
     PropfindRequest req = new PropfindRequest(uri, 0);
     InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
 
-    StringEntity se = new StringEntity(store.convertStreamToString(is));
+    StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
     se.setContentType("text/xml");
     req.setEntity(se);
@@ -168,7 +168,7 @@ public class PrincipalCollection extends AbstractDavCollection {
       req = new ReportRequest(store.initUri(uri), 0);
       InputStream is = ClassLoader.getSystemResourceAsStream("calendar-proxies-request.xml");
 
-      StringEntity se = new StringEntity(store.convertStreamToString(is));
+      StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
       se.setContentType("text/xml");
       req.setEntity(se);

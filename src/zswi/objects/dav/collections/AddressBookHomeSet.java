@@ -14,9 +14,9 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import zswi.protocols.communication.core.HTTPConnectionManager;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.carddav.allprop.Resourcetype;
 import zswi.schemas.carddav.allprop.SupportedAddressData;
@@ -26,7 +26,7 @@ public class AddressBookHomeSet extends AbstractHomeSetCollection {
   AddressBookCollection defaultAddressbook;
   java.util.List<AddressBookCollection> addressBookCollections;
 
-  public AddressBookHomeSet(DefaultHttpClient _httpClient, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException {
+  public AddressBookHomeSet(HTTPConnectionManager connectionManager, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
     InputStream is = ClassLoader.getSystemResourceAsStream("props-adressbookhomeset-request.xml");
 
@@ -35,7 +35,7 @@ public class AddressBookHomeSet extends AbstractHomeSetCollection {
     se.setContentType("text/xml");
     req.setEntity(se);
 
-    HttpResponse resp = _httpClient.execute(req);
+    HttpResponse resp = connectionManager.getHttpClient().execute(req);
     
     JAXBContext jc = JAXBContext.newInstance("zswi.schemas.carddav.allprop");
     Unmarshaller appPropUnmarshaller = jc.createUnmarshaller();
@@ -64,7 +64,7 @@ public class AddressBookHomeSet extends AbstractHomeSetCollection {
           } else {
             
             if (isAddressbookCollection(propstat.getProp())) {
-              AddressBookCollection collection = new AddressBookCollection(_httpClient);
+              AddressBookCollection collection = new AddressBookCollection(connectionManager);
                             
               collection.setDisplayName(propstat.getProp().getDisplayname());
               collection.setGetctag(propstat.getProp().getGetctag());

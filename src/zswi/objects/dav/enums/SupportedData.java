@@ -7,6 +7,7 @@ import java.util.Map;
 public enum SupportedData {
 
   VCARD_3_0("address-data-type","text/vcard","3.0"),
+  VCARD_4_0("address-data-type","text/vcard","4.0"),
   ICALENDAR_2_0("calendar-data","text/calendar","2.0");
   
   private String type;
