@@ -1,6 +1,7 @@
 package zswi.objects.dav.collections;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -35,14 +36,16 @@ import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
-import zswi.protocols.communication.core.HTTPConnectionManager;
+import zswi.protocols.carddav.ServerVCard;
 import zswi.protocols.communication.core.DavStore;
 import zswi.protocols.communication.core.DavStore.DateNotUtc;
 import zswi.protocols.communication.core.DavStore.DavStoreException;
 import zswi.protocols.communication.core.DavStore.NotImplemented;
 import zswi.protocols.communication.core.DavStore.NotSupportedComponent;
 import zswi.protocols.communication.core.DavStore.UidConflict;
+import zswi.protocols.communication.core.HTTPConnectionManager;
 import zswi.protocols.communication.core.Utilities;
+import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.protocols.communication.core.requests.ProppatchRequest;
 import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
@@ -297,8 +300,55 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
           }
         }
 
+        if (etag == null || "".equals(etag)) {
+          try {
+            URL propfindUrl = new URL(connectionManager.httpScheme(), connectionManager.getServerName(), connectionManager.getPort(), path);
+            PropfindRequest propFindRequest = new PropfindRequest(propfindUrl.toURI(), 0);
+            InputStream is = ClassLoader.getSystemResourceAsStream("propfind-etag-request.xml");
+
+            StringEntity propFindBoby = new StringEntity(Utilities.convertStreamToString(is));
+
+            propFindBoby.setContentType("text/xml");
+            propFindRequest.setEntity(propFindBoby);
+
+            HttpResponse response = connectionManager.getHttpClient().execute(propFindRequest);
+            int status = response.getStatusLine().getStatusCode();
+            if (status < 300) {
+              JAXBContext jc;
+              try {
+                jc = JAXBContext.newInstance("zswi.schemas.dav.propfind.etag");
+                Unmarshaller unmarshaller = jc.createUnmarshaller();
+                zswi.schemas.dav.propfind.etag.Multistatus unmarshal = (zswi.schemas.dav.propfind.etag.Multistatus)unmarshaller.unmarshal(response.getEntity().getContent());
+
+                EntityUtils.consume(response.getEntity());
+
+                List<zswi.schemas.dav.propfind.etag.Response> responses = unmarshal.getResponse();
+                for (zswi.schemas.dav.propfind.etag.Response xmlResponse: responses) {
+                  if (DavStore.PROPSTAT_OK.equals(xmlResponse.getPropstat().getStatus())) {
+                    etag = xmlResponse.getPropstat().getProp().getGetetag();
+                  }
+                }            
+              } catch (JAXBException e) {
+                e.printStackTrace();
+              }
+            } else {
+              EntityUtils.consume(response.getEntity());
+            }
+
+          }
+          catch (MalformedURLException e1) {
+            e1.printStackTrace();
+          }
+          catch (URISyntaxException e1) {
+            e1.printStackTrace();
+          }
+          catch (IOException e) {
+            e.printStackTrace();
+          }
+        }        
+
         ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path, this);
-        // TODO if Location and ETag are not present, we should do a PROPFIND at the same URL to get the value of the getetag property
+        
         return vcalendar;
       } else {
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
