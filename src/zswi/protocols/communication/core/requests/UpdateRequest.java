@@ -20,6 +20,8 @@ public class UpdateRequest extends HttpPut{
 	 */
 	public UpdateRequest(URI uri, String etag) {
 		super(uri);
-		this.addHeader("If-Match", etag);
+		if (etag != null && !"".equals(etag)) {
+		  this.addHeader("If-Match", etag);
+		}
 	}
 }
