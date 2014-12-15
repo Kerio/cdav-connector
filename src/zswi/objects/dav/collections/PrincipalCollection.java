@@ -186,12 +186,16 @@ public class PrincipalCollection extends AbstractDavCollection {
           if ("HTTP/1.1 200 OK".equals(propstat.getStatus())) {
             for (zswi.schemas.dav.proxies.Prop prop: propstat.getProp()) {
               zswi.schemas.dav.proxies.CalendarProxyReadFor proxyRead = prop.getCalendarProxyReadFor();
-              ArrayList<PrincipalCollection> readCollections = parseProxyResponses(proxyRead.getResponse(), store, isFakePrincipals);
-              collections.put("read", readCollections);
+              if (proxyRead != null) {
+                ArrayList<PrincipalCollection> readCollections = parseProxyResponses(proxyRead.getResponse(), store, isFakePrincipals);
+                collections.put("read", readCollections);
+              }
 
               zswi.schemas.dav.proxies.CalendarProxyWriteFor proxyWrite = prop.getCalendarProxyWriteFor();
-              ArrayList<PrincipalCollection> writeCollections = parseProxyResponses(proxyWrite.getResponse(), store, isFakePrincipals);
-              collections.put("write", writeCollections);
+              if (proxyWrite != null) {
+                ArrayList<PrincipalCollection> writeCollections = parseProxyResponses(proxyWrite.getResponse(), store, isFakePrincipals);
+                collections.put("write", writeCollections);
+              }
             }
           }
         }
