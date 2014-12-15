@@ -27,12 +27,12 @@ import net.fortuna.ical4j.model.property.XProperty;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.communication.core.HTTPConnectionManager;
 import zswi.protocols.communication.core.requests.PropfindRequest;
 import zswi.schemas.dav.allprop.Comp;
+import zswi.schemas.dav.allprop.Privilege;
 import zswi.schemas.dav.allprop.ResourceId;
 import zswi.schemas.dav.allprop.Resourcetype;
 import zswi.schemas.dav.allprop.ScheduleCalendarTransp;
@@ -106,6 +106,8 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
             if (isCalendarCollection(propstat.getProp())) {
               CalendarCollection collection = new CalendarCollection(connectionManager);
               collection.setCalendarColor(propstat.getProp().getCalendarColor());
+              
+              collection.setPrivileges(propstat.getProp().getCurrentUserPrivilegeSet().getPrivilege());
               
               String calendarOrder = propstat.getProp().getCalendarOrder();
               if (calendarOrder != null) {

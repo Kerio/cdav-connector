@@ -36,7 +36,6 @@ import org.apache.http.util.EntityUtils;
 
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
-import zswi.protocols.carddav.ServerVCard;
 import zswi.protocols.communication.core.DavStore;
 import zswi.protocols.communication.core.DavStore.DateNotUtc;
 import zswi.protocols.communication.core.DavStore.DavStoreException;
@@ -51,6 +50,8 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
+import zswi.schemas.carddav.allprop.Write;
+import zswi.schemas.dav.allprop.Privilege;
 import zswi.schemas.dav.icalendarobjects.Response;
 
 public class CalendarCollection extends AbstractNotPrincipalCollection implements ICalDavSupported {
@@ -67,6 +68,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   //{caldav}supported-collation-set
   HTTPConnectionManager connectionManager;
   String calendarDescription;
+  List<Privilege> privileges;
 
   public CalendarCollection(String uri) {
     setUri(uri);
@@ -161,6 +163,26 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     this.supportedCalendarComponentSet = supportedCalendarComponentSet;
   }
   
+  public List<Privilege> getPrivileges() {
+    return privileges;
+  }
+
+  public void setPrivileges(List<Privilege> list) {
+    this.privileges = list;
+  }
+  
+  /**
+   * Return true if the logged user have the Write property in the privileges for this collection.
+   */
+  public boolean isWritableByCurrentUser() {
+    for (Privilege privilege: privileges) {
+      if (privilege.getWrite() != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * @deprecated Use getVCalendars instead
    * 
