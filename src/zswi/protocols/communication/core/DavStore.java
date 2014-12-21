@@ -119,6 +119,14 @@ public class DavStore {
         checkWellKnownUrl();
       } catch (NoRedirectFoundException e) {
         logger.info(e.getMessage());
+        logger.info("Let's retry with username@domain");
+        connectionManager.closeConnection();
+        connectionManager.setUsername(connectionManager.getUsername() + "@" + connectionManager.getDomain());
+        try {
+          checkWellKnownUrl();
+        } catch (NoRedirectFoundException e2) {
+          logger.info(e2.getMessage());
+        }
       }
     } 
 
