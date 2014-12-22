@@ -42,7 +42,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "bogusElement",
     "getetag",
-    "calendarData"
+    "calendarData",
+    "getcontenttype"
 })
 @XmlRootElement(name = "prop")
 public class Prop {
@@ -51,6 +52,7 @@ public class Prop {
     protected String getetag;
     @XmlElement(name = "calendar-data", namespace = "urn:ietf:params:xml:ns:caldav")
     protected String calendarData;
+    protected String getcontenttype;
 
     /**
      * Gets the value of the bogusElement property.
@@ -122,6 +124,30 @@ public class Prop {
      */
     public void setCalendarData(String value) {
         this.calendarData = value;
+    }
+    
+    /**
+     * Gets the value of the getetag property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGetcontenttype() {
+        return getcontenttype;
+    }
+
+    /**
+     * Sets the value of the getetag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGetcontenttype(String value) {
+        this.getcontenttype = value;
     }
 
 }

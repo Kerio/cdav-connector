@@ -17,6 +17,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -33,6 +43,8 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
@@ -50,7 +62,6 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
-import zswi.schemas.carddav.allprop.Write;
 import zswi.schemas.dav.allprop.Privilege;
 import zswi.schemas.dav.icalendarobjects.Response;
 
@@ -212,7 +223,8 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
    */
   public List<ServerVCalendar> getVCalendars() throws DavStoreException {
     ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
-
+    ArrayList<String> calendarsHref = new ArrayList<String>();
+    
     String path = getUri();
 
     String response = "";
@@ -234,11 +246,116 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
         String hrefForObject = xmlResponse.getHref();
         for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
           if (DavStore.PROPSTAT_OK.equals(propstat.getStatus())) {
-            StringReader sin = new StringReader(propstat.getProp().getCalendarData());
-            CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendarData = builder.build(sin);
-            ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
-            result.add(calendarObject);
+            if (propstat.getProp().getCalendarData() != null) {
+              // For when the server is sending the actual data
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            } else if (propstat.getProp().getGetcontenttype() != null && propstat.getProp().getGetcontenttype().contains("text/calendar")) {
+              /* Services like iCloud will instead send links to the data, and those events needs to be fetched 
+               * with a calendar-multiget query. We will add those links to an array and fetch them later. */
+              calendarsHref.add(hrefForObject);
+            }
+          }
+        }
+      }
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    
+    if (calendarsHref.size() > 0) {
+      ArrayList<ServerVCalendar> vCalendarsFromMultiget = getVCalendarsByLinks(calendarsHref);
+      result.addAll(vCalendarsFromMultiget);
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Get the iCalendar objects with a calendar-multiget request. This method is also called from getVCalendars
+   * if the response from a calendar-query is returning hrefs to calendar objects instead of the actual data.
+   * 
+   * @param links
+   * @return
+   * @throws DavStoreException
+   */
+  public ArrayList<ServerVCalendar> getVCalendarsByLinks(ArrayList<String> links) throws DavStoreException {
+    ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder;
+    String response = null;
+    
+    try {
+      docBuilder = docFactory.newDocumentBuilder();
+      Document doc = docBuilder.newDocument();
+      Element rootElement = doc.createElementNS("urn:ietf:params:xml:ns:caldav", "calendar-multiget");
+      doc.appendChild(rootElement);
+      Element propElement = doc.createElementNS("DAV:","prop");
+      rootElement.appendChild(propElement);
+      Element getEtagElement = doc.createElementNS("DAV:","getetag");
+      propElement.appendChild(getEtagElement);
+      Element calDatElement = doc.createElementNS("urn:ietf:params:xml:ns:caldav","calendar-data");
+      propElement.appendChild(calDatElement);
+      for (String link: links) {
+        Element hrefElement = doc.createElementNS("DAV:","href");
+        hrefElement.setTextContent(link);
+        rootElement.appendChild(hrefElement);
+      }
+      TransformerFactory tf = TransformerFactory.newInstance();
+      Transformer transformer;
+      try {
+        transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        String xmlString = writer.getBuffer().toString().replaceAll("\n|\r", "");
+        response = DavStore.calendarMultiGetReport(connectionManager, this.getUri(), xmlString, 0);
+      }
+      catch (TransformerConfigurationException e) {
+        e.printStackTrace();
+      }
+      catch (TransformerException e) {
+        e.printStackTrace();
+      }
+    }
+    catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    }
+    catch (DavStoreException e) {
+      e.printStackTrace();
+    }
+    catch (NotImplemented e) {
+      e.printStackTrace();
+    }
+    
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
+      Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+      StringReader reader = new StringReader(response);
+      zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
+
+      for (Response xmlResponse: multistatus.getResponse()) {
+        String hrefForObject = xmlResponse.getHref();
+        for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
+          if (DavStore.PROPSTAT_OK.equals(propstat.getStatus())) {
+            if (propstat.getProp().getCalendarData() != null) {
+              // For when the server is sending the actual data
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            } 
           }
         }
       }
@@ -254,9 +371,9 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     }
 
     return result;
+
   }
-
-
+  
   /**
    * @deprecated You should use addVCalendar instead
    * @param collection

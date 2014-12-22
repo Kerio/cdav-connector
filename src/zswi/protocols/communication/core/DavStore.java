@@ -718,7 +718,49 @@ public class DavStore {
     }
     return response;
   }
+  
+  public static String calendarMultiGetReport(HTTPConnectionManager connectionManager, String path, String xmlContent, int depth) throws DavStoreException, NotImplemented {
+    ReportRequest req;
+    String response = "";
+    StringEntity body = null;
+    try {
+      body = new StringEntity(xmlContent);
+    }
+    catch (UnsupportedEncodingException e1) {
+      e1.printStackTrace();
+    }
+    
+    try {
+      req = new ReportRequest(connectionManager.initUri(path), depth);
+      body.setContentType("text/xml");
+      req.setEntity(body);
 
+      HttpResponse resp = connectionManager.getHttpClient().execute(req);
+
+      if (resp.getStatusLine().getStatusCode() == 501) {
+        EntityUtils.consume(resp.getEntity());
+        throw new NotImplemented(resp.getStatusLine().getReasonPhrase());
+      } else if (resp.getStatusLine().getStatusCode() >= 400) {
+        EntityUtils.consume(resp.getEntity());
+        throw new DavStoreException(resp.getStatusLine().getReasonPhrase());
+      }
+
+      response += EntityUtils.toString(resp.getEntity());
+
+      EntityUtils.consume(resp.getEntity());
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (URISyntaxException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+
+    return response;
+  }
   /**
    * TODO this method should be called each a collection is called, and the features/allowed methods should be stored inside the collection data structure
    * 
