@@ -17,6 +17,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -33,6 +43,8 @@ import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import zswi.protocols.caldav.ServerVCalendar;
 import zswi.protocols.caldav.ServerVEvent;
@@ -50,7 +62,6 @@ import zswi.protocols.communication.core.requests.PutRequest;
 import zswi.protocols.communication.core.requests.ReportRequest;
 import zswi.schemas.caldav.proppatch.ScheduleCalendarTransp;
 import zswi.schemas.caldav.query.CalendarQuery;
-import zswi.schemas.carddav.allprop.Write;
 import zswi.schemas.dav.allprop.Privilege;
 import zswi.schemas.dav.icalendarobjects.Response;
 
@@ -73,7 +84,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   public CalendarCollection(String uri) {
     setUri(uri);
   }
-  
+
   public CalendarCollection(HTTPConnectionManager _connectionManager) {
     connectionManager = _connectionManager;
   }
@@ -162,7 +173,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   public void setSupportedCalendarComponentSet(ArrayList<String> supportedCalendarComponentSet) {
     this.supportedCalendarComponentSet = supportedCalendarComponentSet;
   }
-  
+
   public List<Privilege> getPrivileges() {
     return privileges;
   }
@@ -170,7 +181,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
   public void setPrivileges(List<Privilege> list) {
     this.privileges = list;
   }
-  
+
   /**
    * Return true if the logged user have the Write property in the privileges for this collection.
    */
@@ -212,7 +223,8 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
    */
   public List<ServerVCalendar> getVCalendars() throws DavStoreException {
     ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
-
+    ArrayList<String> calendarsHref = new ArrayList<String>();
+    
     String path = getUri();
 
     String response = "";
@@ -234,11 +246,116 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
         String hrefForObject = xmlResponse.getHref();
         for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
           if (DavStore.PROPSTAT_OK.equals(propstat.getStatus())) {
-            StringReader sin = new StringReader(propstat.getProp().getCalendarData());
-            CalendarBuilder builder = new CalendarBuilder();
-            Calendar calendarData = builder.build(sin);
-            ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
-            result.add(calendarObject);
+            if (propstat.getProp().getCalendarData() != null) {
+              // For when the server is sending the actual data
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            } else if (propstat.getProp().getGetcontenttype() != null && propstat.getProp().getGetcontenttype().contains("text/calendar")) {
+              /* Services like iCloud will instead send links to the data, and those events needs to be fetched 
+               * with a calendar-multiget query. We will add those links to an array and fetch them later. */
+              calendarsHref.add(hrefForObject);
+            }
+          }
+        }
+      }
+    }
+    catch (JAXBException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    catch (ParserException e) {
+      throw new DavStoreException(e.getMessage());
+    }
+    
+    if (calendarsHref.size() > 0) {
+      ArrayList<ServerVCalendar> vCalendarsFromMultiget = getVCalendarsByLinks(calendarsHref);
+      result.addAll(vCalendarsFromMultiget);
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Get the iCalendar objects with a calendar-multiget request. This method is also called from getVCalendars
+   * if the response from a calendar-query is returning hrefs to calendar objects instead of the actual data.
+   * 
+   * @param links
+   * @return
+   * @throws DavStoreException
+   */
+  public ArrayList<ServerVCalendar> getVCalendarsByLinks(ArrayList<String> links) throws DavStoreException {
+    ArrayList<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
+    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder;
+    String response = null;
+    
+    try {
+      docBuilder = docFactory.newDocumentBuilder();
+      Document doc = docBuilder.newDocument();
+      Element rootElement = doc.createElementNS("urn:ietf:params:xml:ns:caldav", "calendar-multiget");
+      doc.appendChild(rootElement);
+      Element propElement = doc.createElementNS("DAV:","prop");
+      rootElement.appendChild(propElement);
+      Element getEtagElement = doc.createElementNS("DAV:","getetag");
+      propElement.appendChild(getEtagElement);
+      Element calDatElement = doc.createElementNS("urn:ietf:params:xml:ns:caldav","calendar-data");
+      propElement.appendChild(calDatElement);
+      for (String link: links) {
+        Element hrefElement = doc.createElementNS("DAV:","href");
+        hrefElement.setTextContent(link);
+        rootElement.appendChild(hrefElement);
+      }
+      TransformerFactory tf = TransformerFactory.newInstance();
+      Transformer transformer;
+      try {
+        transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter writer = new StringWriter();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        String xmlString = writer.getBuffer().toString().replaceAll("\n|\r", "");
+        response = DavStore.calendarMultiGetReport(connectionManager, this.getUri(), xmlString, 0);
+      }
+      catch (TransformerConfigurationException e) {
+        e.printStackTrace();
+      }
+      catch (TransformerException e) {
+        e.printStackTrace();
+      }
+    }
+    catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    }
+    catch (DavStoreException e) {
+      e.printStackTrace();
+    }
+    catch (NotImplemented e) {
+      e.printStackTrace();
+    }
+    
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance("zswi.schemas.dav.icalendarobjects");
+      Unmarshaller userInfounmarshaller = jc.createUnmarshaller();
+      StringReader reader = new StringReader(response);
+      zswi.schemas.dav.icalendarobjects.Multistatus multistatus = (zswi.schemas.dav.icalendarobjects.Multistatus)userInfounmarshaller.unmarshal(reader);
+
+      for (Response xmlResponse: multistatus.getResponse()) {
+        String hrefForObject = xmlResponse.getHref();
+        for (zswi.schemas.dav.icalendarobjects.Propstat propstat: xmlResponse.getPropstat()) {
+          if (DavStore.PROPSTAT_OK.equals(propstat.getStatus())) {
+            if (propstat.getProp().getCalendarData() != null) {
+              // For when the server is sending the actual data
+              StringReader sin = new StringReader(propstat.getProp().getCalendarData());
+              CalendarBuilder builder = new CalendarBuilder();
+              Calendar calendarData = builder.build(sin);
+              ServerVCalendar calendarObject = new ServerVCalendar(calendarData, propstat.getProp().getGetetag(), hrefForObject);
+              result.add(calendarObject);
+            } 
           }
         }
       }
@@ -254,9 +371,9 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     }
 
     return result;
+
   }
-
-
+  
   /**
    * @deprecated You should use addVCalendar instead
    * @param collection
@@ -266,8 +383,16 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
    * @throws NotSupportedComponent 
    * @throws UidConflict 
    * @throws ValidationException 
+   * @throws InvalidCalendarObject 
+   * @throws NotSupportedCalendarData 
+   * @throws InvalidCalendarData 
+   * @throws CalendarCollectionLocationNotOk 
+   * @throws MaxAttendeesPerInstanceReached 
+   * @throws DateInFuture 
+   * @throws MaxResourceSizeReached 
+   * @throws DateInPast 
    */
-  public ServerVEvent addVEvent(VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
+  public ServerVEvent addVEvent(VEvent event) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException, InvalidCalendarObject, NotSupportedCalendarData, InvalidCalendarData, DateInPast, MaxResourceSizeReached, DateInFuture, MaxAttendeesPerInstanceReached, CalendarCollectionLocationNotOk {
     Calendar calendarForEvent = new Calendar();
     calendarForEvent.getComponents().add(event);
 
@@ -284,8 +409,16 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
    * @throws UidConflict 
    * @throws NotSupportedComponent 
    * @throws ValidationException 
+   * @throws InvalidCalendarObject 
+   * @throws NotSupportedCalendarData 
+   * @throws InvalidCalendarData 
+   * @throws DateInPast 
+   * @throws MaxResourceSizeReached 
+   * @throws DateInFuture 
+   * @throws MaxAttendeesPerInstanceReached 
+   * @throws CalendarCollectionLocationNotOk 
    */
-  public ServerVCalendar addVCalendar(Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException {
+  public ServerVCalendar addVCalendar(Calendar calendar) throws DavStoreException, UidConflict, NotSupportedComponent, ValidationException, InvalidCalendarObject, NotSupportedCalendarData, InvalidCalendarData, DateInPast, MaxResourceSizeReached, DateInFuture, MaxAttendeesPerInstanceReached, CalendarCollectionLocationNotOk {
     StringEntity se;
     try {
       se = new StringEntity(calendar.toString());
@@ -298,11 +431,11 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
       putReq.setEntity(se);
 
       HttpResponse resp = connectionManager.getHttpClient().execute(putReq);
-      EntityUtils.consume(resp.getEntity());
 
       String path = urlForRequest.getPath();
 
       if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+        EntityUtils.consume(resp.getEntity());
 
         Header[] headers = resp.getHeaders("Etag");
         String etag = "";
@@ -370,9 +503,14 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
         }        
 
         ServerVCalendar vcalendar = new ServerVCalendar(calendar, etag, path, this);
-        
+
         return vcalendar;
       } else {
+        // If the request failed because of an error, check the type of error
+        if (resp.getStatusLine().getStatusCode() == 403) {
+          handleDavError(resp.getEntity().getContent());
+        }
+        EntityUtils.consume(resp.getEntity());
         throw new DavStoreException("Can't create the calendar object, returned status code is " + resp.getStatusLine().getStatusCode());
       }
     }
@@ -386,7 +524,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
       throw new DavStoreException(e);
     }
   }
-
+  
   /**
    * @deprecated Use updateVCalendar instead
    * @param event
@@ -620,7 +758,7 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     }
 
   }
-  
+
   protected List<ServerVCalendar> doCalendarQuery(CalendarQuery query) throws JAXBException, DavStoreException, NotImplemented {
     StringWriter sw = new StringWriter();
     List<ServerVCalendar> result = new ArrayList<ServerVCalendar>();
@@ -725,6 +863,241 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
     return result;
   }
 
+  /**
+   * This method will handle any DAV/CalDAV errors coming from the response.
+   * 
+   * @param content
+   * @throws DateInPast
+   * @throws MaxResourceSizeReached
+   * @throws DateInFuture
+   * @throws MaxAttendeesPerInstanceReached
+   * @throws CalendarCollectionLocationNotOk
+   * @throws InvalidCalendarData
+   * @throws NotSupportedCalendarData
+   * @throws InvalidCalendarObject
+   */
+  protected void handleDavError(InputStream content) throws DateInPast, MaxResourceSizeReached, DateInFuture, MaxAttendeesPerInstanceReached, CalendarCollectionLocationNotOk, InvalidCalendarData, NotSupportedCalendarData, InvalidCalendarObject {
+    JAXBContext jc;
+    try {
+      jc = JAXBContext.newInstance("zswi.schemas.caldav.errors");
+      Unmarshaller unmarshaller = jc.createUnmarshaller();       
+      zswi.schemas.caldav.errors.Error errorType = (zswi.schemas.caldav.errors.Error)unmarshaller.unmarshal(content);
+      if (errorType.getValidCalendarObjectResource() != null) {
+        throw new InvalidCalendarObject();
+      }
+      if (errorType.getSupportedCalendarData() != null) {
+        throw new NotSupportedCalendarData();
+      }
+      if (errorType.getValidCalendarData() != null) {
+        throw new InvalidCalendarData();
+      }
+      if (errorType.getCalendarCollectionLocationOk() != null) {
+        throw new CalendarCollectionLocationNotOk();
+      }
+      if (errorType.getMaxAttendeesPerInstance() != null) {
+        throw new MaxAttendeesPerInstanceReached();
+      }
+      if (errorType.getMaxDateTime() != null) {
+        throw new DateInFuture();
+      }
+      if (errorType.getMaxResourceSize() != null) {
+        throw new MaxResourceSizeReached();
+      }
+      if (errorType.getMinDateTime() != null) {
+        throw new DateInPast();
+      }
+    }
+    catch (JAXBException e) {
+      e.printStackTrace();
+    }    
+  }
 
-   
+  /**
+   * This exception is throw if the calendar object is not respecting some conditions. 
+   * See https://tools.ietf.org/html/rfc4791#section-4.1 and https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class InvalidCalendarObject extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public InvalidCalendarObject() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the calendar object is invalid. 
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class InvalidCalendarData extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public InvalidCalendarData() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the content, or the Content-Type header, is not correct for this collection.
+   * For example, this error could be throw if you try to submit vCard data to a calendar collection.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class NotSupportedCalendarData extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public NotSupportedCalendarData() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the iCalendar component is not supported by this collection.
+   * For example, this error could be throw if you try to add a VTODO component to a collection that only supports VEVENT.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class NotSupportedCalendarComponent extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public NotSupportedCalendarComponent() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the iCalendar UID is in conflict with another iCalendar object in the collection that
+   * have a different URL but have the same UID.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class CalendarUidConflict extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public CalendarUidConflict() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the iCalendar UID is in conflict with another iCalendar object in the collection that
+   * have a different URL but have the same UID.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class CalendarCollectionLocationNotOk extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public CalendarCollectionLocationNotOk() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the iCalendar object's bytes count is higher than the 
+   * limit set by the collection.
+   * have a different URL but have the same UID.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class MaxResourceSizeReached extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public MaxResourceSizeReached() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if start or end date of the calendar object is sooner than the 
+   * minimum date set for this collection.
+   * For example, with CalendarServer from Apple, the default min date time is one year from the current date.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class DateInPast extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public DateInPast() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if start or end date of the calendar object is later than the 
+   * maximum date set for this collection.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class DateInFuture extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public DateInFuture() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the number of recurring instances of the iCalendar object is
+   * higher than the limit set by the collection.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class MaxInstancesReached extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public MaxInstancesReached() {
+      super();
+    }
+
+  }
+
+  /**
+   * This exception is throw if the number of attendees is higher than the limit set by the collection.
+   * have a different URL but have the same UID.
+   * See https://tools.ietf.org/html/rfc4791#section-5.3.2.1
+   * @author probert
+   *
+   */
+  public class MaxAttendeesPerInstanceReached extends Exception {
+
+    private static final long serialVersionUID = -6753517096601532491L;
+
+    public MaxAttendeesPerInstanceReached() {
+      super();
+    }
+
+  }
+
+  
 }

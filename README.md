@@ -98,34 +98,24 @@ Copyright 2013 Jan Ambrož, Tomáš Balíček, Tomáš Krásný, Jindřich Pouba
 For connection to the server, user must provide the application with name or address of the server, user name and password. Connection itself realizes an instance of the `HTTPSConnection` class. Example of basic constructor usage, with server `mail.company.tld`, user name `admin` and password `123456`:
 	
 ```java
-HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
+DavStore store = new DavStore("user@something.com", "password");
 ```
 
-This will create a server connection. For secure communication is used HTTPS. If the server SSL certificate is not already installed in the client TrustStore or is not signed by an certification authority, it is created and saved. To disable this function (i.e. to not create an connection, if the certificate is not trusted), user can call the more advanced constructor:
+This will attempt to use auto-discovery for the user. Auto-discovery needs a TXT or SRV DNS entry to locate the server. An example of a service that offers auto-discovery it is iCloud.
+If auto-discovery is not working, you will get an DavStoreException and you should ask the user for an URL to their CalDAV server (see the next constructor).
 	
 ```java
-HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456",  433, false);
+DavStore store = new DavStore("user", "password", "https://server/something");
 ```
 
-where the last attribute means **do not create the connection, if the certificate is not trusted already**. The attribute `433` specifies port for the connection. Default for HTTPS and for our library is 443, but with this advanced constructors, user can specify his own.
-Default value for downloading certificates is `true`, so calling 
-
-```java	
-HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456", 433, true);
-```
-
-has the same meaning as:
-
-```java
-HTTPSConnection connection = new HTTPSConnection("mail.company.tld", "admin", "123456");
-```
+This constructor needs an URL to the CalDAV server. For example, for a Kerio Connect server, it would be https://MyServer/caldav
 
 ### Terminating server connection
 
-For termination of connection user must call the function `shutdown()` on top of instance of that connection, that will get terminated. For example, to terminate the connection used in previous example:
+For termination of connection user must call the function `disconnect()` on top of instance of that connection, that will get terminated. For example, to terminate the connection used in previous example:
 
 ```java	
-connection.shutdown();
+store.shutdown();
 ```
 
 It's highly recommended to terminate every created connection.
