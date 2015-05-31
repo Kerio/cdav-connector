@@ -128,7 +128,9 @@ public class AddressBookCollection extends AbstractNotPrincipalCollection {
     PropfindRequest req;
     try {
       req = new PropfindRequest(connectionManager.initUri(collection.getUri()), 1);
-      InputStream is = ClassLoader.getSystemResourceAsStream("propfind-etag-request.xml");
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			InputStream is = classLoader.getResourceAsStream("propfind-etag-request.xml");
+//      InputStream is = ClassLoader.getSystemResourceAsStream("propfind-etag-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 

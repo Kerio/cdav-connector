@@ -96,7 +96,9 @@ public class PrincipalCollection extends AbstractDavCollection {
   public PrincipalCollection(DavStore store, URI uri, boolean isFakePrincipals, boolean isFirstLevel) throws JAXBException, URISyntaxException, ClientProtocolException, IOException {
     
     PropfindRequest req = new PropfindRequest(uri, 0);
-    InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream("userinfo-request.xml");            
+//    InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
 
     StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -166,7 +168,9 @@ public class PrincipalCollection extends AbstractDavCollection {
     ReportRequest req;
     try {
       req = new ReportRequest(store.initUri(uri), 0);
-      InputStream is = ClassLoader.getSystemResourceAsStream("calendar-proxies-request.xml");
+  		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+  		InputStream is = classLoader.getResourceAsStream("calendar-proxies-request.xml");            
+//      InputStream is = ClassLoader.getSystemResourceAsStream("calendar-proxies-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 

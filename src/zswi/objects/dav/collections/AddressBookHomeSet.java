@@ -28,7 +28,9 @@ public class AddressBookHomeSet extends AbstractHomeSetCollection {
 
   public AddressBookHomeSet(HTTPConnectionManager connectionManager, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
-    InputStream is = ClassLoader.getSystemResourceAsStream("props-adressbookhomeset-request.xml");
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream("props-adressbookhomeset-request.xml");
+//    InputStream is = ClassLoader.getSystemResourceAsStream("props-adressbookhomeset-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 
