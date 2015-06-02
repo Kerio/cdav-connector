@@ -51,7 +51,9 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
   
   public CalendarHomeSet(HTTPConnectionManager connectionManager, PrincipalCollection principals, URI uriForRequest) throws JAXBException, ClientProtocolException, IOException, URISyntaxException, ParserException {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
-    InputStream is = ClassLoader.getSystemResourceAsStream("props-calendarhomeset-request.xml");
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream("props-calendarhomeset-request.xml");            
+//    InputStream is = ClassLoader.getSystemResourceAsStream("props-calendarhomeset-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 

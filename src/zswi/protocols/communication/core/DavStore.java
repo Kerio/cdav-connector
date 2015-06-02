@@ -260,7 +260,9 @@ public class DavStore {
     try {
       URL urlForRequest = new URL(httpScheme(), connectionManager.getServerName(), connectionManager.getPort(), "/.well-known/caldav");
       req = new PropfindRequest(urlForRequest.toURI(), 0);
-      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
+  		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+  		InputStream is = classLoader.getResourceAsStream("well-known-request.xml");            
+//      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -313,7 +315,9 @@ public class DavStore {
     try {
       URI urlForRequest = initUri(path);
       req = new PropfindRequest(urlForRequest, 0);
-      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
+  		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+  		InputStream is = classLoader.getResourceAsStream("well-known-request.xml");            
+//      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -707,7 +711,9 @@ public class DavStore {
 
   public static String report(HTTPConnectionManager connectionManager, String filename, String path, int depth) throws DavStoreException, NotImplemented {
     String response = "";
-    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream(filename);            
+//    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
     StringEntity se;
     try {
       se = new StringEntity(Utilities.convertStreamToString(is));

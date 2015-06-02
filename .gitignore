@@ -8,3 +8,6 @@
 # Build files
 target
 bin
+/.settings/
+/.classpath
+/.project

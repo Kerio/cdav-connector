@@ -25,6 +25,7 @@ import java.security.KeyStore;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -474,7 +475,9 @@ public class HTTPSConnection {
 	private String report(String filename, String path, int depth) throws ClientProtocolException, IOException, URISyntaxException {
 		ReportRequest req = new ReportRequest(initUri(path), depth);
 
-		InputStream is = ClassLoader.getSystemResourceAsStream(filename);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream(filename);            
+//		InputStream is = ClassLoader.getSystemResourceAsStream(filename);
 
 		StringEntity se = new StringEntity(convertStreamToString(is));
 		
@@ -500,7 +503,9 @@ public class HTTPSConnection {
 	private String propfind(String fileName, String uriName) throws URISyntaxException, ClientProtocolException, IOException {
 
 		PropfindRequest req = new PropfindRequest(initUri(uriName));
-		InputStream is = ClassLoader.getSystemResourceAsStream(fileName);
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classLoader.getResourceAsStream(fileName);            
+//		InputStream is = ClassLoader.getSystemResourceAsStream(fileName);
 		
 		StringEntity se = new StringEntity(convertStreamToString(is));
 		
