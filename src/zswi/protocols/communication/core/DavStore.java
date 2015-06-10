@@ -262,7 +262,6 @@ public class DavStore {
       req = new PropfindRequest(urlForRequest.toURI(), 0);
   		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
   		InputStream is = classLoader.getResourceAsStream("well-known-request.xml");            
-//      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -317,7 +316,6 @@ public class DavStore {
       req = new PropfindRequest(urlForRequest, 0);
   		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
   		InputStream is = classLoader.getResourceAsStream("well-known-request.xml");            
-//      InputStream is = ClassLoader.getSystemResourceAsStream("well-known-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -713,7 +711,6 @@ public class DavStore {
     String response = "";
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream(filename);            
-//    InputStream is = ClassLoader.getSystemResourceAsStream(filename);
     StringEntity se;
     try {
       se = new StringEntity(Utilities.convertStreamToString(is));

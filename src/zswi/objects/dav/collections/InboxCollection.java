@@ -27,7 +27,6 @@ public class InboxCollection extends AbstractNotPrincipalCollection {
     PropfindRequest req = new PropfindRequest(uriForRequest, 0);
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream("rfc6638-request.xml");            
-//    InputStream is = ClassLoader.getSystemResourceAsStream("rfc6638-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 

@@ -53,7 +53,6 @@ public class CalendarHomeSet extends AbstractHomeSetCollection {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream("props-calendarhomeset-request.xml");            
-//    InputStream is = ClassLoader.getSystemResourceAsStream("props-calendarhomeset-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 

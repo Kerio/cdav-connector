@@ -98,7 +98,6 @@ public class PrincipalCollection extends AbstractDavCollection {
     PropfindRequest req = new PropfindRequest(uri, 0);
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream("userinfo-request.xml");            
-//    InputStream is = ClassLoader.getSystemResourceAsStream("userinfo-request.xml");
 
     StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 
@@ -170,7 +169,6 @@ public class PrincipalCollection extends AbstractDavCollection {
       req = new ReportRequest(store.initUri(uri), 0);
   		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
   		InputStream is = classLoader.getResourceAsStream("calendar-proxies-request.xml");            
-//      InputStream is = ClassLoader.getSystemResourceAsStream("calendar-proxies-request.xml");
 
       StringEntity se = new StringEntity(Utilities.convertStreamToString(is));
 

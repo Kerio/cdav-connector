@@ -461,7 +461,6 @@ public class CalendarCollection extends AbstractNotPrincipalCollection implement
             PropfindRequest propFindRequest = new PropfindRequest(propfindUrl.toURI(), 0);
         		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         		InputStream is = classLoader.getResourceAsStream("propfind-etag-request.xml");            
-//            InputStream is = ClassLoader.getSystemResourceAsStream("propfind-etag-request.xml");
 
             StringEntity propFindBoby = new StringEntity(Utilities.convertStreamToString(is));
 

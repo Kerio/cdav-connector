@@ -30,7 +30,6 @@ public class AddressBookHomeSet extends AbstractHomeSetCollection {
     PropfindRequest req = new PropfindRequest(uriForRequest, 1);
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream("props-adressbookhomeset-request.xml");
-//    InputStream is = ClassLoader.getSystemResourceAsStream("props-adressbookhomeset-request.xml");
 
     StringEntity se = new StringEntity(convertStreamToString(is));
 

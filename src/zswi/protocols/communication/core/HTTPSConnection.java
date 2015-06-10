@@ -229,7 +229,6 @@ public class HTTPSConnection {
 		calendarForEvent.getComponents().add(event);
 
 		StringEntity se = new StringEntity(calendarForEvent.toString(), "UTF-8");
-//		StringEntity se = new StringEntity(calendarForEvent.toString());
 		se.setContentType(TYPE_VEVENT);
 		String path;
 		if (calendar == null) {
@@ -281,7 +280,6 @@ public class HTTPSConnection {
 		wr.setVCard(card);
 
 		StringEntity se = new StringEntity(wr.buildVCardString(), "UTF-8");
-//		StringEntity se = new StringEntity(wr.buildVCardString());
 		se.setContentType(TYPE_VCARD);
 		return this.addVCard(se, defaultContactsPath);
 	}
@@ -414,7 +412,6 @@ public class HTTPSConnection {
 		wr.setVCard(card.getVcard());
 
 		StringEntity se = new StringEntity(wr.buildVCardString(), "UTF-8");
-//		StringEntity se = new StringEntity(wr.buildVCardString());
 		se.setContentType(TYPE_VCARD);
 		return this.updateVCard(se, card.geteTag(), card.getPath());
 	}
@@ -432,7 +429,6 @@ public class HTTPSConnection {
 		calendarForEvent.getComponents().add(event.getVevent());
 
 		StringEntity se = new StringEntity(calendarForEvent.toString(), "UTF-8");		
-//		StringEntity se = new StringEntity(calendarForEvent.toString());
 		se.setContentType(TYPE_VEVENT);
 
 		return this.updateVCard(se, event.geteTag(), event.getPath());
@@ -481,10 +477,8 @@ public class HTTPSConnection {
 
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream(filename);            
-//		InputStream is = ClassLoader.getSystemResourceAsStream(filename);
 
 		StringEntity se = new StringEntity(convertStreamToString(is), "UTF-8");
-//		StringEntity se = new StringEntity(convertStreamToString(is));
 		
 		se.setContentType(TYPE_XML);
 		req.setEntity(se);
@@ -510,10 +504,8 @@ public class HTTPSConnection {
 		PropfindRequest req = new PropfindRequest(initUri(uriName));
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = classLoader.getResourceAsStream(fileName);            
-//		InputStream is = ClassLoader.getSystemResourceAsStream(fileName);
 		
 		StringEntity se = new StringEntity(convertStreamToString(is), "UTF-8");
-//		StringEntity se = new StringEntity(convertStreamToString(is));
 		
 		se.setContentType(TYPE_XML);
 		req.setEntity(se);
