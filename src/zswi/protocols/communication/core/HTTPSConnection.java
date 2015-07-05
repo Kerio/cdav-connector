@@ -309,7 +309,21 @@ public class HTTPSConnection {
 		@return list with ServerCalendar objects		
 	 */
 	public List<ServerCalendar> getCalendars() throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
-		String response = this.propfind("propfind_calendars.txt", "/full-calendars/"+domain+"/"+username+"/");
+		
+		// If multiple domains are hosted on the same server (e.g. foo.com, bar.com)
+		// users of the bar.com have to authenticate with their username AND domain: 
+		// user@bar.com. Therefore we can't use the username for the path, since the
+		// Kerio server expects for in the propfind request only the username, but not the 
+		// username with domain appended. 
+		String name = username; 
+		if (name != null) {
+			if (name.indexOf("@") > 0) {
+				name = name.substring(0, name.indexOf("@")); 
+			}
+		}
+		
+		String response = this.propfind("propfind_calendars.txt", "/full-calendars/"+domain+"/"+name+"/");
+//		String response = this.propfind("propfind_calendars.txt", "/full-calendars/"+domain+"/"+username+"/");
 		List<ServerCalendar> calendars = CalendarsGetter.getCalendars(response);
 		return calendars;
 	}
