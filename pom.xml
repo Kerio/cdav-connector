@@ -12,18 +12,33 @@
 	</properties>
 
 	<build>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+
 		<directory>target</directory>
 		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-		<testOutputDirectory>target/test-classes</testOutputDirectory>
+
 		<sourceDirectory>src</sourceDirectory>
 		<scriptSourceDirectory>src</scriptSourceDirectory>
+		
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.txt</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<testSourceDirectory>src</testSourceDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<testResources>
 			<testResource>
 				<directory>test</directory>
 			</testResource>
 		</testResources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
