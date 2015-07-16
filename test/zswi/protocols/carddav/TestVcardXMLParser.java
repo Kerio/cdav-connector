@@ -98,11 +98,11 @@ public class TestVcardXMLParser {
 				assertEquals("3.Full Name ", "b3a0b06aec23456aa0e0877dba95a1b90000000800000000", vcards.get(i).geteTag());
 
 			} else if (i == 3) {
-				assertEquals("4.Full Name ", "Hektor ��v�z", fn.getFormattedName());
+				assertEquals("4.Full Name ", "Hektor Čávéz", fn.getFormattedName());
 				assertEquals("4.Full Name ", "b3a0b06aec23456aa0e0877dba95a1b90000000900000000", vcards.get(i).geteTag());
 
 			} else if (i == 4) {
-				assertEquals("5.Full Name ", "�eho� Skywalker", fn.getFormattedName());
+				assertEquals("5.Full Name ", "Řehoř Skywalker", fn.getFormattedName());
 				assertEquals("5.Full Name ", "b3a0b06aec23456aa0e0877dba95a1b90000000a00000000", vcards.get(i).geteTag());
 
 			}

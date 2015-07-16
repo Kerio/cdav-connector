@@ -35,16 +35,16 @@ END:VCARD
 ]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-00000009.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000900000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
 VERSION:3.0
 PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
-FN:Hektor Èávéz
-N:Èávéz;Hektor;;;
+FN:Hektor ÄŒÃ¡vÃ©z
+N:ÄŒÃ¡vÃ©z;Hektor;;;
 URL;TYPE=WORK:www.seznam.cz
 UID:87b794bd-6972-425d-8ffe-79d7b6ebe306
 END:VCARD
 ]]></address-data></prop></propstat></response><response><href>/contacts/localhost/admin/addressbook/b3a0b06a-ec23-456a-a0e0-877dba95a1b9-0000000a.eml</href><propstat><status>HTTP/1.1 200 OK</status><prop><getetag xmlns="DAV:">b3a0b06aec23456aa0e0877dba95a1b90000000a00000000</getetag><address-data xmlns="urn:ietf:params:xml:ns:carddav"><![CDATA[BEGIN:VCARD
 VERSION:3.0
 PRODID:-//kerio.com/Contacts//NONSGML v1.0//EN
-FN:Øehoø Skywalker
-N:Skywalker;Øehoø;;;
+FN:Å˜ehoÅ™ Skywalker
+N:Skywalker;Å˜ehoÅ™;;;
 NOTE:Veni vidi vici
 UID:0ab8f96a-f386-43a7-9e1b-4c07ecaade59
 END:VCARD
