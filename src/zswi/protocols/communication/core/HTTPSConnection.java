@@ -500,7 +500,7 @@ public class HTTPSConnection {
 		HttpResponse resp = client.execute(req);
 
 		String response = "";
-		response += EntityUtils.toString(resp.getEntity());
+		response += EntityUtils.toString(resp.getEntity(), "UTF-8");
 
 		EntityUtils.consume(resp.getEntity());
 
@@ -527,7 +527,7 @@ public class HTTPSConnection {
 		HttpResponse resp = client.execute(req);
 
 		String response = "";
-		response += EntityUtils.toString(resp.getEntity());
+		response += EntityUtils.toString(resp.getEntity(), "UTF-8");
 		
 		EntityUtils.consume(resp.getEntity());
 
